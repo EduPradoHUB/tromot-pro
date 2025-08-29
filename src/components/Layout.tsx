@@ -41,8 +41,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="container flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
-              T
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg">
+              <img src="/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png" alt="Tromot Logo" className="h-6 w-6 object-contain" />
             </div>
             <span className="font-bold text-xl">TROMOT PRO</span>
           </Link>
