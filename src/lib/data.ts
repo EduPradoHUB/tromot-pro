@@ -1,4 +1,4 @@
-import { User, Vehicle, Product, Post, Rating, Banner, Question } from './types';
+import { User, Vehicle, Product, Post, Rating, Banner, Question, Advertisement, AdStats } from './types';
 
 export const mockUsers: User[] = [
   {
@@ -262,3 +262,63 @@ export const mockQuestions: Question[] = [
 ];
 
 export const brands = ['Todos', ...Array.from(new Set(mockVehicles.map(v => v.brand)))];
+
+export const mockAdvertisements: Advertisement[] = [
+  {
+    id: 'ad1',
+    advertiser: 'AutoPeças Brasil',
+    slot: 'home_hero',
+    creative_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=320&h=400&fit=crop',
+    creative_aspect_ratio: '4:5',
+    target_url: 'https://autopecas.com.br',
+    start_date: '2024-08-01T00:00:00Z',
+    end_date: '2024-09-30T23:59:59Z',
+    daily_cap: 1000,
+    status: 'active',
+    impressions_count: 15420,
+    clicks_count: 312,
+    created_at: '2024-07-25T00:00:00Z'
+  },
+  {
+    id: 'ad2',
+    advertiser: 'Som & Acessórios',
+    slot: 'product_banner',
+    creative_url: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=640&h=360&fit=crop',
+    creative_aspect_ratio: '16:9',
+    target_url: 'https://somacessorios.com.br',
+    start_date: '2024-08-15T00:00:00Z',
+    end_date: '2024-09-15T23:59:59Z',
+    daily_cap: 500,
+    status: 'active',
+    impressions_count: 8750,
+    clicks_count: 175,
+    created_at: '2024-08-10T00:00:00Z'
+  },
+  {
+    id: 'ad3',
+    advertiser: 'ElectroMobile',
+    slot: 'feed_sponsored',
+    creative_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
+    creative_aspect_ratio: '4:5',
+    target_url: 'https://electromobile.com.br',
+    start_date: '2024-08-20T00:00:00Z',
+    end_date: '2024-10-20T23:59:59Z',
+    daily_cap: 800,
+    status: 'active',
+    impressions_count: 5230,
+    clicks_count: 94,
+    created_at: '2024-08-18T00:00:00Z'
+  }
+];
+
+export const mockAdStats: AdStats[] = [
+  { ad_id: 'ad1', impressions: 1200, clicks: 25, ctr: 2.08, date: '2024-08-29' },
+  { ad_id: 'ad1', impressions: 1150, clicks: 23, ctr: 2.00, date: '2024-08-28' },
+  { ad_id: 'ad1', impressions: 1300, clicks: 28, ctr: 2.15, date: '2024-08-27' },
+  { ad_id: 'ad2', impressions: 650, clicks: 12, ctr: 1.85, date: '2024-08-29' },
+  { ad_id: 'ad2', impressions: 700, clicks: 15, ctr: 2.14, date: '2024-08-28' },
+  { ad_id: 'ad2', impressions: 580, clicks: 9, ctr: 1.55, date: '2024-08-27' },
+  { ad_id: 'ad3', impressions: 420, clicks: 6, ctr: 1.43, date: '2024-08-29' },
+  { ad_id: 'ad3', impressions: 380, clicks: 4, ctr: 1.05, date: '2024-08-28' },
+  { ad_id: 'ad3', impressions: 450, clicks: 8, ctr: 1.78, date: '2024-08-27' },
+];

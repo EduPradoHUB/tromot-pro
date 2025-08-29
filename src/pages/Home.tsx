@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/carousel';
 import { useApp } from '@/contexts/AppContext';
 import { brands } from '@/lib/data';
+import AdSlot from '@/components/AdSlot';
 
 export default function Home() {
   const { banners, products, vehicles, trackEvent } = useApp();
@@ -80,23 +81,10 @@ export default function Home() {
             {/* Featured Banner */}
             {banners.length > 0 && (
               <div className="lg:flex justify-center hidden">
-                <Card className="w-80 shadow-lg overflow-hidden">
-                  <CardContent className="p-0">
-                    <img
-                      src={banners[0].image_url}
-                      alt={banners[0].title}
-                      className="w-full h-96 object-cover"
-                    />
-                    <div className="p-4">
-                      <h3 className="font-semibold text-foreground">{banners[0].title}</h3>
-                      {banners[0].link && (
-                        <Button size="sm" className="mt-2" asChild>
-                          <Link to={banners[0].link}>Ver Produto</Link>
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                <AdSlot 
+                  slot="home_hero" 
+                  className="w-80"
+                />
               </div>
             )}
           </div>

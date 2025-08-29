@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, Product, Vehicle, Post, Rating, Banner, AnalyticsEvent, Question, DashboardStats } from '@/lib/types';
-import { mockUsers, mockProducts, mockVehicles, mockPosts, mockRatings, mockBanners, mockQuestions } from '@/lib/data';
+import { User, Product, Vehicle, Post, Rating, Banner, AnalyticsEvent, Question, DashboardStats, Advertisement, AdStats } from '@/lib/types';
+import { mockUsers, mockProducts, mockVehicles, mockPosts, mockRatings, mockBanners, mockQuestions, mockAdvertisements, mockAdStats } from '@/lib/data';
 
 interface AppContextType {
   // Auth
@@ -15,6 +15,7 @@ interface AppContextType {
   ratings: Rating[];
   banners: Banner[];
   questions: Question[];
+  advertisements: Advertisement[];
   
   // Actions
   likePost: (postId: string) => void;
@@ -22,6 +23,10 @@ interface AppContextType {
   submitRating: (productId: string, rating: number, comment: string) => void;
   submitQuestion: (productId: string, question: string) => void;
   answerQuestion: (questionId: string, answer: string) => void;
+  
+  // Ads
+  getActiveAd: (slot: 'home_hero' | 'product_banner' | 'feed_sponsored') => Advertisement | null;
+  getAdStats: (adId?: string) => AdStats[];
   
   // Analytics
   trackEvent: (event: Omit<AnalyticsEvent, 'id' | 'timestamp'>) => void;
@@ -58,6 +63,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [ratings, setRatings] = useState<Rating[]>(mockRatings);
   const [banners] = useState<Banner[]>(mockBanners);
   const [questions, setQuestions] = useState<Question[]>(mockQuestions);
+  const [advertisements] = useState<Advertisement[]>(mockAdvertisements);
   
   // Filters
   const [selectedCategory, setSelectedCategory] = useState('Todos');
@@ -183,6 +189,28 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     console.log('Analytics Event:', fullEvent);
   };
 
+  const getActiveAd = (slot: 'home_hero' | 'product_banner' | 'feed_sponsored'): Advertisement | null => {
+    const now = new Date();
+    const activeAds = advertisements.filter(ad => {
+      const startDate = new Date(ad.start_date);
+      const endDate = new Date(ad.end_date);
+      return ad.status === 'active' && 
+             ad.slot === slot &&
+             now >= startDate && 
+             now <= endDate;
+    });
+    
+    // Return the first active ad for the slot (in real app, would consider capping)
+    return activeAds[0] || null;
+  };
+
+  const getAdStats = (adId?: string): AdStats[] => {
+    if (adId) {
+      return mockAdStats.filter(stat => stat.ad_id === adId);
+    }
+    return mockAdStats;
+  };
+
   const value: AppContextType = {
     currentUser,
     login,
@@ -193,11 +221,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     ratings,
     banners,
     questions,
+    advertisements,
     likePost,
     reportPost,
     submitRating,
     submitQuestion,
     answerQuestion,
+    getActiveAd,
+    getAdStats,
     trackEvent,
     getDashboardStats,
     selectedCategory,

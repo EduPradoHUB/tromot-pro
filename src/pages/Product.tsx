@@ -22,6 +22,7 @@ import { PostCard } from '@/components/PostCard';
 import { RatingForm } from '@/components/RatingForm';
 import { QuestionForm } from '@/components/QuestionForm';
 import { Product, Post, Rating, Question } from '@/lib/types';
+import AdSlot from '@/components/AdSlot';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -187,6 +188,13 @@ export default function ProductPage() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Banner Publicitário */}
+            <AdSlot 
+              slot="product_banner" 
+              className="mb-6"
+              productId={id}
+            />
           </div>
 
           {/* Tabs for Posts, Reviews, Questions */}
@@ -218,8 +226,19 @@ export default function ProductPage() {
               </div>
               {productPosts.length > 0 ? (
                 <div className="space-y-4">
-                  {productPosts.map((post) => (
-                    <PostCard key={post.id} post={post} />
+                  {productPosts.map((post, index) => (
+                    <div key={post.id}>
+                      <PostCard post={post} />
+                      {/* Anúncio patrocinado a cada 3 posts */}
+                      {(index + 1) % 3 === 0 && (
+                        <div className="mt-4">
+                          <AdSlot 
+                            slot="feed_sponsored" 
+                            productId={id}
+                          />
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               ) : (

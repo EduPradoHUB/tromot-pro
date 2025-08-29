@@ -90,12 +90,20 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </div>
                   </div>
                   {currentUser?.role === 'ADM' && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard" className="cursor-pointer">
-                        <BarChart3 className="mr-2 h-4 w-4" />
-                        <span>Dashboard</span>
-                      </Link>
-                    </DropdownMenuItem>
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to="/dashboard" className="cursor-pointer">
+                          <BarChart3 className="mr-2 h-4 w-4" />
+                          <span>Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/midia" className="cursor-pointer">
+                          <Package className="mr-2 h-4 w-4" />
+                          <span>Dashboard de Mídia</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
                   )}
                   <DropdownMenuItem asChild>
                     <Link to="/perfil" className="cursor-pointer">

@@ -10,6 +10,7 @@ import Catalog from "./pages/Catalog";
 import Product from "./pages/Product";
 import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
+import MediaDashboard from "./pages/MediaDashboard";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/produto/:id" element={<Layout><Product /></Layout>} />
             <Route path="/perfil" element={<Layout><Profile /></Layout>} />
             <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
+            <Route path="/midia" element={<Layout><MediaDashboard /></Layout>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
