@@ -24,7 +24,7 @@ import { useApp } from '@/contexts/AppContext';
 import { categories, brands } from '@/lib/data';
 
 export default function Catalog() {
-  const { products, vehicles, trackEvent } = useApp();
+  const { legacyProducts: products, vehicles, trackEvent } = useApp();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [localSearch, setLocalSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos');

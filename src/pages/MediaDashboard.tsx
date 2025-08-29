@@ -233,7 +233,7 @@ export default function MediaDashboard() {
                     <TableCell>
                       <Badge variant={ad.status === 'active' ? 'default' : 'secondary'}>
                         {ad.status === 'active' ? 'Ativa' : 
-                         ad.status === 'paused' ? 'Pausada' : 'Finalizada'}
+                         ad.status === 'inactive' ? 'Pausada' : 'Finalizada'}
                       </Badge>
                     </TableCell>
                   </TableRow>

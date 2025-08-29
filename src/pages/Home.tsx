@@ -14,7 +14,7 @@ import { usePWA } from '@/hooks/usePWA';
 export default function Home() {
   const {
     banners,
-    products,
+    legacyProducts: products,
     vehicles,
     trackEvent
   } = useApp();
@@ -185,8 +185,8 @@ export default function Home() {
                           </span>
                         </div>
                         <div className="flex items-center text-sm text-muted-foreground">
-                          <Eye className="h-4 w-4 mr-1" />
-                          {product.compatibility.length} veículos
+                        <Eye className="h-4 w-4 mr-1" />
+                        {product.compatibility.length} veículos
                         </div>
                       </div>
 

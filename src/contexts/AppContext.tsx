@@ -30,6 +30,29 @@ interface LegacyUser {
   avatar?: string;
 }
 
+interface LegacyVehicle {
+  id: string;
+  brand: string;
+  model: string;
+  years: string[];
+}
+
+interface LegacyProduct {
+  id: string;
+  name: string;
+  code: string;
+  category: string;
+  compatibility: LegacyVehicle[];
+  manual_url?: string;
+  manual_type?: 'pdf' | 'image';
+  video_url?: string;
+  rating_average: number;
+  rating_count: number;
+  image_url: string;
+  description: string;
+  status: 'active' | 'inactive';
+}
+
 interface LegacyPost {
   id: string;
   product_id: string;
@@ -116,6 +139,9 @@ interface AppContextType {
   ratings: LegacyRating[];
   questions: LegacyQuestion[];
   
+  // Legacy products with proper compatibility type
+  legacyProducts: LegacyProduct[];
+  
   // CRUD Functions
   createProduct: (data: ProductInsert) => Promise<Product>;
   updateProduct: (id: string, data: Partial<ProductInsert>) => Promise<Product>;
@@ -185,6 +211,37 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [selectedBrand, setSelectedBrand] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Helper function to convert Json to array
+  const parseCompatibility = (compatibility: any): LegacyVehicle[] => {
+    if (!compatibility) return [];
+    if (typeof compatibility === 'string') {
+      try {
+        return JSON.parse(compatibility) || [];
+      } catch {
+        return [];
+      }
+    }
+    if (Array.isArray(compatibility)) return compatibility;
+    return [];
+  };
+  
+  // Convert Supabase products to legacy format
+  const legacyProducts: LegacyProduct[] = products.map(product => ({
+    id: product.id,
+    name: product.name,
+    code: product.code,
+    category: product.category,
+    compatibility: parseCompatibility(product.compatibility),
+    manual_url: product.manual_url || undefined,
+    manual_type: (product.manual_type as 'pdf' | 'image') || undefined,
+    video_url: product.video_url || undefined,
+    rating_average: product.rating_average || 0,
+    rating_count: product.rating_count || 0,
+    image_url: product.image_url || '',
+    description: product.description || '',
+    status: product.status === 'active' ? 'active' : 'inactive'
+  }));
 
   // Auth functions
   const login = async (email: string, password: string) => {
@@ -540,6 +597,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     posts,
     ratings,
     questions,
+    legacyProducts,
     likePost,
     reportPost,
     submitRating,

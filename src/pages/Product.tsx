@@ -28,7 +28,7 @@ export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { products, posts, ratings, questions, currentUser, trackEvent, answerQuestion } = useApp();
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState<any>(null);
   const [productPosts, setProductPosts] = useState<Post[]>([]);
   const [productRatings, setProductRatings] = useState<Rating[]>([]);
   const [productQuestions, setProductQuestions] = useState<Question[]>([]);

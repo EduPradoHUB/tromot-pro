@@ -27,17 +27,17 @@ export default function Login() {
       });
       return;
     }
-    const success = await login(email);
-    if (success) {
+    try {
+      await login(email, 'demo123');
       toast({
         title: "Login realizado!",
         description: "Bem-vindo ao Tromot Pro."
       });
       navigate('/');
-    } else {
+    } catch (error) {
       toast({
         title: "Erro no login",
-        description: "Email não encontrado. Tente: joao@tromot.com, maria@tromot.com ou carlos@email.com",
+        description: "Email ou senha incorretos. Use: admin@tromot.com",
         variant: "destructive"
       });
     }

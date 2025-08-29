@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
-import { Advertisement } from '@/lib/types';
+import type { Database } from '@/integrations/supabase/types';
+
+type Advertisement = Database['public']['Tables']['advertisements']['Row'];
 
 interface AdSlotProps {
   slot: 'home_hero' | 'product_banner' | 'feed_sponsored';
