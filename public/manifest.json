@@ -1,0 +1,27 @@
+{
+  "name": "TROMOT PRO",
+  "short_name": "TROMOT PRO",
+  "description": "App para instaladores e técnicos de produtos eletrônicos automotivos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a365d",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "pt-BR",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

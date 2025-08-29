@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ChevronRight, Star, Eye, Download } from 'lucide-react';
+import { Search, ChevronRight, Star, Eye, Download, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { useApp } from '@/contexts/AppContext';
 import { brands } from '@/lib/data';
 import AdSlot from '@/components/AdSlot';
+import { usePWA } from '@/hooks/usePWA';
 export default function Home() {
   const {
     banners,
@@ -17,6 +18,8 @@ export default function Home() {
     vehicles,
     trackEvent
   } = useApp();
+  
+  const { isInstallable, isInstalled, installApp } = usePWA();
   const [searchBrand, setSearchBrand] = useState('');
   const [searchModel, setSearchModel] = useState('');
   const [searchYear, setSearchYear] = useState('');
@@ -56,9 +59,22 @@ export default function Home() {
                     <ChevronRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="border-white hover:bg-white text-base text-red-600">
-                  Ver Manuais
-                </Button>
+                {isInstallable && !isInstalled && (
+                  <Button 
+                    size="lg" 
+                    variant="outline" 
+                    className="border-white hover:bg-white hover:text-primary text-white"
+                    onClick={installApp}
+                  >
+                    <Smartphone className="mr-2 h-5 w-5" />
+                    Instalar App
+                  </Button>
+                )}
+                {!isInstallable && !isInstalled && (
+                  <Button size="lg" variant="outline" className="border-white hover:bg-white hover:text-primary text-white">
+                    Ver Manuais
+                  </Button>
+                )}
               </div>
             </div>
 
