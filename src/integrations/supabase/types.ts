@@ -115,6 +115,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
+          {
+            foreignKeyName: "analytics_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_public_profiles"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       banners: {
@@ -181,6 +188,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
+          {
+            foreignKeyName: "post_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_public_profiles"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       posts: {
@@ -226,6 +240,13 @@ export type Database = {
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "user_public_profiles"
             referencedColumns: ["user_id"]
           },
           {
@@ -367,10 +388,24 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
           {
+            foreignKeyName: "questions_answer_by_fkey"
+            columns: ["answer_by"]
+            isOneToOne: false
+            referencedRelation: "user_public_profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "questions_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "questions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "user_public_profiles"
             referencedColumns: ["user_id"]
           },
           {
@@ -416,6 +451,13 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
           {
+            foreignKeyName: "ratings_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "user_public_profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "ratings_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
@@ -450,7 +492,30 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_public_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          name: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          name?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          name?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
