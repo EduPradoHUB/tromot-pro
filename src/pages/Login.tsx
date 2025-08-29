@@ -8,6 +8,7 @@ import { useApp } from '@/contexts/AppContext';
 import { useToast } from '@/hooks/use-toast';
 export default function Login() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptAnalytics, setAcceptAnalytics] = useState(false);
   const {
@@ -28,7 +29,7 @@ export default function Login() {
       return;
     }
     try {
-      await login(email, 'demo123');
+      await login(email, password);
       toast({
         title: "Login realizado!",
         description: "Bem-vindo ao Tromot Pro."
@@ -37,7 +38,7 @@ export default function Login() {
     } catch (error) {
       toast({
         title: "Erro no login",
-        description: "Email ou senha incorretos. Use: admin@tromot.com",
+        description: "Email ou senha incorretos.",
         variant: "destructive"
       });
     }
@@ -55,7 +56,21 @@ export default function Login() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input type="email" placeholder="seu@email.com ou telefone" value={email} onChange={e => setEmail(e.target.value)} required className="bg-red-200" />
+            <Input 
+              type="email" 
+              placeholder="seu@email.com ou telefone" 
+              value={email} 
+              onChange={e => setEmail(e.target.value)} 
+              required 
+            />
+            
+            <Input 
+              type="password" 
+              placeholder="Sua senha" 
+              value={password} 
+              onChange={e => setPassword(e.target.value)} 
+              required 
+            />
             
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
@@ -82,7 +97,7 @@ export default function Login() {
           </form>
           
           <p className="text-center text-sm text-muted-foreground mt-4">
-            Emails de teste: joao@tromot.com, maria@tromot.com, carlos@email.com
+            Admin: eduardo@tromot.com.br | Senha: 123456
           </p>
         </CardContent>
       </Card>
