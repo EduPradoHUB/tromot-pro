@@ -18,8 +18,11 @@ export default function Home() {
     vehicles,
     trackEvent
   } = useApp();
-  
-  const { isInstallable, isInstalled, installApp } = usePWA();
+  const {
+    isInstallable,
+    isInstalled,
+    installApp
+  } = usePWA();
   const [searchBrand, setSearchBrand] = useState('');
   const [searchModel, setSearchModel] = useState('');
   const [searchYear, setSearchYear] = useState('');
@@ -55,26 +58,15 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="lg" asChild className="bg-primary hover:bg-primary/90">
                   <Link to="/catalogo">
-                    Explorar Manuais
+                    Explorar Catálogo
                     <ChevronRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                {isInstallable && !isInstalled && (
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-white hover:bg-white hover:text-primary text-white"
-                    onClick={installApp}
-                  >
+                {isInstallable && !isInstalled && <Button size="lg" variant="outline" className="border-white hover:bg-white hover:text-primary text-white" onClick={installApp}>
                     <Smartphone className="mr-2 h-5 w-5" />
                     Instalar App
-                  </Button>
-                )}
-                {!isInstallable && !isInstalled && (
-                  <Button size="lg" variant="outline" className="border-white hover:bg-white hover:text-primary text-white">
-                    Ver Manuais
-                  </Button>
-                )}
+                  </Button>}
+                {!isInstallable && !isInstalled}
               </div>
             </div>
 
@@ -149,6 +141,12 @@ export default function Home() {
               Últimos produtos adicionados ao catálogo
             </p>
           </div>
+          <Button variant="outline" asChild>
+            <Link to="/catalogo">
+              Ver Todos
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
 
         <Carousel className="w-full">
