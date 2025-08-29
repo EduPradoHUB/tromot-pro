@@ -55,7 +55,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="lg" asChild className="bg-primary hover:bg-primary/90">
                   <Link to="/catalogo">
-                    Explorar Catálogo
+                    Explorar Manuais
                     <ChevronRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>

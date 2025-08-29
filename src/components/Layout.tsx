@@ -29,7 +29,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const navigationItems = [
     { name: 'Home', path: '/', icon: Home },
-    { name: 'Catálogo', path: '/catalogo', icon: Search },
+    { name: 'Manuais', path: '/catalogo', icon: Search },
     ...(currentUser?.role === 'ADM' ? [{ name: 'Dashboard', path: '/dashboard', icon: BarChart3 }] : []),
   ];
 
