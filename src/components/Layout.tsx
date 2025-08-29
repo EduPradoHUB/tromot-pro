@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Search, Package, User, LogOut, Menu } from 'lucide-react';
+import { Home, Search, Package, User, LogOut, Menu, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -31,6 +31,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'Home', path: '/', icon: Home },
     { name: 'Catálogo', path: '/catalogo', icon: Search },
     { name: 'Produtos', path: '/catalogo', icon: Package },
+    ...(currentUser?.role === 'ADM' ? [{ name: 'Dashboard', path: '/dashboard', icon: BarChart3 }] : []),
   ];
 
   return (
@@ -88,6 +89,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       </p>
                     </div>
                   </div>
+                  {currentUser?.role === 'ADM' && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard" className="cursor-pointer">
+                        <BarChart3 className="mr-2 h-4 w-4" />
+                        <span>Dashboard</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link to="/perfil" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />

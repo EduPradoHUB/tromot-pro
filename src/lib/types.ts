@@ -41,6 +41,20 @@ export interface Post {
   likes_count: number;
   created_at: string;
   status: 'approved' | 'pending' | 'rejected';
+  liked_by_user?: boolean;
+  reports_count?: number;
+}
+
+export interface Question {
+  id: string;
+  product_id: string;
+  author_id: string;
+  author_name: string;
+  question: string;
+  answer?: string;
+  answer_by?: string;
+  created_at: string;
+  answered_at?: string;
 }
 
 export interface Rating {
@@ -55,11 +69,20 @@ export interface Rating {
 
 export interface AnalyticsEvent {
   id: string;
-  type: 'view_product' | 'view_manual' | 'login' | 'new_post' | 'like' | 'rating';
+  type: 'view_product' | 'view_manual' | 'login' | 'new_post' | 'like' | 'rating' | 'question_reply' | 'report_post';
   product_id?: string;
   user_id?: string;
   timestamp: string;
   metadata?: Record<string, any>;
+}
+
+export interface DashboardStats {
+  dau: number;
+  mau: number;
+  manual_views_today: number;
+  posts_today: number;
+  likes_today: number;
+  avg_rating: number;
 }
 
 export interface Banner {

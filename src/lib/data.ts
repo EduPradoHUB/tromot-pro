@@ -1,4 +1,4 @@
-import { User, Vehicle, Product, Post, Rating, Banner } from './types';
+import { User, Vehicle, Product, Post, Rating, Banner, Question } from './types';
 
 export const mockUsers: User[] = [
   {
@@ -226,6 +226,39 @@ export const categories = [
   'Sensores',
   'Interfaces',
   'Chicotes'
+];
+
+export const mockQuestions: Question[] = [
+  {
+    id: 'q1',
+    product_id: '1',
+    author_id: '3',
+    author_name: 'João Silva',
+    question: 'Qual a melhor posição para instalar esta proteção de cárter?',
+    answer: 'A proteção deve ser instalada na parte inferior do motor, seguindo os pontos de fixação originais do veículo.',
+    answer_by: 'Maria Santos',
+    created_at: '2024-08-25T14:30:00Z',
+    answered_at: '2024-08-25T15:45:00Z',
+  },
+  {
+    id: 'q2',
+    product_id: '2',
+    author_id: '3',
+    author_name: 'Carlos Mendes',
+    question: 'É necessário alguma ferramenta especial para a instalação?',
+    created_at: '2024-08-28T10:15:00Z',
+  },
+  {
+    id: 'q3',
+    product_id: '3',
+    author_id: '3',
+    author_name: 'Ana Costa',
+    question: 'O kit funciona em carros com trava original?',
+    answer: 'Sim, o kit é compatível com travas originais e pode ser integrado ao sistema existente.',
+    answer_by: 'Maria Santos',
+    created_at: '2024-08-24T16:20:00Z',
+    answered_at: '2024-08-24T17:30:00Z',
+  },
 ];
 
 export const brands = ['Todos', ...Array.from(new Set(mockVehicles.map(v => v.brand)))];
