@@ -40,11 +40,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg">
-              <img src="/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png" alt="Tromot Logo" className="h-6 w-6 object-contain" />
-            </div>
-            <span className="font-bold text-xl">TROMOT PRO</span>
+          <Link to="/" className="flex items-center space-x-3">
+            <img src="/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png" alt="Tromot Logo" className="h-10 w-auto object-contain" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -155,7 +152,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="font-semibold mb-4">TROMOT PRO</h3>
+              <div className="mb-4">
+                <img src="/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png" alt="Tromot Logo" className="h-12 w-auto object-contain mb-2" />
+              </div>
               <p className="text-sm text-muted-foreground">
                 App para instaladores e técnicos de produtos eletrônicos automotivos.
               </p>
