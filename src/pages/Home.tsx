@@ -149,12 +149,6 @@ export default function Home() {
               Últimos produtos adicionados ao catálogo
             </p>
           </div>
-          <Button variant="outline" asChild>
-            <Link to="/catalogo">
-              Ver Todos
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
         </div>
 
         <Carousel className="w-full">
