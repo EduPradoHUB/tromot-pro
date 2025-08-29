@@ -45,8 +45,8 @@ export default function Login() {
   return <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold mx-auto mb-4">
-            T
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg mx-auto mb-4">
+            <img src="/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png" alt="Tromot Logo" className="h-10 w-10 object-contain" />
           </div>
           <CardTitle className="text-2xl">TROMOT PRO</CardTitle>
           <p className="text-muted-foreground">
