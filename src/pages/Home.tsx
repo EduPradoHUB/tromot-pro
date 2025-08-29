@@ -5,53 +5,37 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useApp } from '@/contexts/AppContext';
 import { brands } from '@/lib/data';
 import AdSlot from '@/components/AdSlot';
-
 export default function Home() {
-  const { banners, products, vehicles, trackEvent } = useApp();
+  const {
+    banners,
+    products,
+    vehicles,
+    trackEvent
+  } = useApp();
   const [searchBrand, setSearchBrand] = useState('');
   const [searchModel, setSearchModel] = useState('');
   const [searchYear, setSearchYear] = useState('');
-
-  const availableModels = searchBrand 
-    ? vehicles.filter(v => v.brand === searchBrand).map(v => v.model)
-    : [];
-
-  const availableYears = searchBrand && searchModel
-    ? vehicles.find(v => v.brand === searchBrand && v.model === searchModel)?.years || []
-    : [];
-
+  const availableModels = searchBrand ? vehicles.filter(v => v.brand === searchBrand).map(v => v.model) : [];
+  const availableYears = searchBrand && searchModel ? vehicles.find(v => v.brand === searchBrand && v.model === searchModel)?.years || [] : [];
   const handleQuickSearch = () => {
     if (searchBrand || searchModel || searchYear) {
       // Navigate to catalog with filters
       window.location.href = `/catalogo?brand=${searchBrand}&model=${searchModel}&year=${searchYear}`;
     }
   };
-
   const handleProductView = (productId: string) => {
-    trackEvent({ type: 'view_product', product_id: productId });
+    trackEvent({
+      type: 'view_product',
+      product_id: productId
+    });
   };
-
   const latestProducts = products.slice(0, 6);
-
-  return (
-    <div className="space-y-12">
+  return <div className="space-y-12">
       {/* Hero Section with Banner */}
       <section className="relative bg-gradient-hero text-white overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
@@ -72,21 +56,16 @@ export default function Home() {
                     <ChevronRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-tromot-dark">
+                <Button size="lg" variant="outline" className="border-white hover:bg-white text-base text-red-600">
                   Ver Manuais
                 </Button>
               </div>
             </div>
 
             {/* Featured Banner */}
-            {banners.length > 0 && (
-              <div className="lg:flex justify-center hidden">
-                <AdSlot 
-                  slot="home_hero" 
-                  className="w-80"
-                />
-              </div>
-            )}
+            {banners.length > 0 && <div className="lg:flex justify-center hidden">
+                <AdSlot slot="home_hero" className="w-80" />
+              </div>}
           </div>
         </div>
       </section>
@@ -108,45 +87,31 @@ export default function Home() {
                   <SelectValue placeholder="Marca" />
                 </SelectTrigger>
                 <SelectContent className="bg-background border shadow-lg">
-                  {brands.filter(b => b !== 'Todos').map((brand) => (
-                    <SelectItem key={brand} value={brand}>
+                  {brands.filter(b => b !== 'Todos').map(brand => <SelectItem key={brand} value={brand}>
                       {brand}
-                    </SelectItem>
-                  ))}
+                    </SelectItem>)}
                 </SelectContent>
               </Select>
 
-              <Select 
-                value={searchModel} 
-                onValueChange={setSearchModel}
-                disabled={!searchBrand}
-              >
+              <Select value={searchModel} onValueChange={setSearchModel} disabled={!searchBrand}>
                 <SelectTrigger>
                   <SelectValue placeholder="Modelo" />
                 </SelectTrigger>
                 <SelectContent className="bg-background border shadow-lg">
-                  {availableModels.map((model) => (
-                    <SelectItem key={model} value={model}>
+                  {availableModels.map(model => <SelectItem key={model} value={model}>
                       {model}
-                    </SelectItem>
-                  ))}
+                    </SelectItem>)}
                 </SelectContent>
               </Select>
 
-              <Select 
-                value={searchYear} 
-                onValueChange={setSearchYear}
-                disabled={!searchModel}
-              >
+              <Select value={searchYear} onValueChange={setSearchYear} disabled={!searchModel}>
                 <SelectTrigger>
                   <SelectValue placeholder="Ano" />
                 </SelectTrigger>
                 <SelectContent className="bg-background border shadow-lg">
-                  {availableYears.map((year) => (
-                    <SelectItem key={year} value={year}>
+                  {availableYears.map(year => <SelectItem key={year} value={year}>
                       {year}
-                    </SelectItem>
-                  ))}
+                    </SelectItem>)}
                 </SelectContent>
               </Select>
 
@@ -178,16 +143,11 @@ export default function Home() {
 
         <Carousel className="w-full">
           <CarouselContent className="-ml-2 md:-ml-4">
-            {latestProducts.map((product) => (
-              <CarouselItem key={product.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+            {latestProducts.map(product => <CarouselItem key={product.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
                 <Card className="shadow-card hover:shadow-lg transition-shadow">
                   <CardContent className="p-0">
                     <div className="aspect-[4/3] relative overflow-hidden rounded-t-2xl">
-                      <img
-                        src={product.image_url}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                       <div className="absolute top-3 right-3">
                         <Badge variant="secondary" className="bg-background/90">
                           {product.category}
@@ -222,11 +182,7 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <Button 
-                        className="w-full" 
-                        asChild
-                        onClick={() => handleProductView(product.id)}
-                      >
+                      <Button className="w-full" asChild onClick={() => handleProductView(product.id)}>
                         <Link to={`/produto/${product.id}`}>
                           Ver Produto
                         </Link>
@@ -234,8 +190,7 @@ export default function Home() {
                     </div>
                   </CardContent>
                 </Card>
-              </CarouselItem>
-            ))}
+              </CarouselItem>)}
           </CarouselContent>
           <CarouselPrevious className="hidden sm:flex" />
           <CarouselNext className="hidden sm:flex" />
@@ -289,6 +244,5 @@ export default function Home() {
           </Card>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 }
