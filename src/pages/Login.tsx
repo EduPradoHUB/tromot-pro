@@ -70,7 +70,7 @@ export default function Login() {
                 <Checkbox
                   id="terms"
                   checked={acceptTerms}
-                  onCheckedChange={setAcceptTerms}
+                  onCheckedChange={(checked) => setAcceptTerms(checked === true)}
                 />
                 <label htmlFor="terms" className="text-sm">
                   Aceito os{' '}
@@ -84,7 +84,7 @@ export default function Login() {
                 <Checkbox
                   id="analytics"
                   checked={acceptAnalytics}
-                  onCheckedChange={setAcceptAnalytics}
+                  onCheckedChange={(checked) => setAcceptAnalytics(checked === true)}
                 />
                 <label htmlFor="analytics" className="text-sm">
                   Aceito o uso de dados para analytics (LGPD)
