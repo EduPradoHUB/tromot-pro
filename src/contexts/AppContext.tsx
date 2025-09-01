@@ -637,22 +637,29 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Auth state management
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        // Only synchronous state updates here to avoid deadlock
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-          
-          setProfile(profileData);
-          
-          // Fetch app data
-          await fetchData();
+          // Defer Supabase calls with setTimeout to avoid deadlock
+          setTimeout(async () => {
+            try {
+              // Fetch user profile
+              const { data: profileData } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .single();
+              
+              setProfile(profileData);
+              // Fetch app data after profile is loaded
+              await fetchData();
+            } catch (error) {
+              console.error('Error fetching profile:', error);
+            }
+          }, 0);
         } else {
           setProfile(null);
           setProducts([]);
