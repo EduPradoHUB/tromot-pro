@@ -83,10 +83,10 @@ export default function Home() {
 
       {/* Admin Banners Section */}
       {banners.length > 0 && (
-        <section className="container">
+        <section className="px-4 sm:container">
           {banners.length === 1 ? (
             <div className="flex justify-center">
-              <div className="aspect-[4/5] w-full max-w-sm rounded-2xl overflow-hidden shadow-card">
+              <div className="aspect-[4/5] w-full max-w-sm sm:max-w-md overflow-hidden shadow-card">
                 <img 
                   src={banners[0].image_url} 
                   alt={banners[0].title}
@@ -100,10 +100,10 @@ export default function Home() {
                className="w-full max-w-4xl mx-auto"
                plugins={[autoplayPlugin()]}
              >
-               <CarouselContent className="-ml-2 md:-ml-4">
+               <CarouselContent className="-ml-1 sm:-ml-2 md:-ml-4">
                  {banners.map((banner) => (
-                   <CarouselItem key={banner.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                     <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-card">
+                   <CarouselItem key={banner.id} className="pl-1 sm:pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+                     <div className="aspect-[4/5] overflow-hidden shadow-card">
                        <img 
                          src={banner.image_url} 
                          alt={banner.title}
