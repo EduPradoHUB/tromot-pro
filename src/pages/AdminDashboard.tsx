@@ -86,10 +86,8 @@ export default function AdminDashboard() {
   const handleFileUpload = async (file: File, bucket: string) => {
     setUploadingFile(true);
     try {
-      console.log('handleFileUpload chamado com:', { fileName: file.name, bucket, fileSize: file.size });
       const fileName = `${Date.now()}-${file.name}`;
       const url = await uploadFile(bucket, fileName, file);
-      console.log('URL recebida do uploadFile:', url);
       toast({
         title: "Upload realizado",
         description: "Arquivo enviado com sucesso!"
@@ -143,7 +141,6 @@ export default function AdminDashboard() {
 
   const handleCreateBanner = async () => {
     try {
-      console.log('Criando banner com dados:', bannerForm);
       await createBanner(bannerForm);
       
       setBannerForm({
