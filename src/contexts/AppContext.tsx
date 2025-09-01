@@ -358,15 +358,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // File upload function
   const uploadFile = async (bucket: string, path: string, file: File): Promise<string> => {
+    console.log('Iniciando upload:', { bucket, path, fileName: file.name });
+    
     const { data, error } = await supabase.storage
       .from(bucket)
       .upload(path, file);
     
-    if (error) throw error;
+    if (error) {
+      console.error('Erro no upload:', error);
+      throw error;
+    }
+    
+    console.log('Upload realizado com sucesso:', data);
     
     const { data: { publicUrl } } = supabase.storage
       .from(bucket)
       .getPublicUrl(data.path);
+    
+    console.log('URL pública gerada:', publicUrl);
     
     return publicUrl;
   };
