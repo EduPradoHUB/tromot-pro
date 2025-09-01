@@ -306,7 +306,30 @@ export default function AdminDashboard() {
                       id="image_url"
                       value={productForm.image_url}
                       onChange={(e) => setProductForm({...productForm, image_url: e.target.value})}
+                      placeholder="Cole a URL da imagem ou faça upload abaixo"
                     />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="product_image_upload">Ou faça upload da imagem do produto</Label>
+                    <Input
+                      id="product_image_upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          try {
+                            const url = await handleFileUpload(file, 'product-images');
+                            setProductForm({...productForm, image_url: url});
+                          } catch (error) {
+                            console.error('Erro no upload:', error);
+                          }
+                        }
+                      }}
+                      disabled={uploadingFile}
+                    />
+                    {uploadingFile && <p className="text-sm text-muted-foreground mt-1">Enviando arquivo...</p>}
                   </div>
                   
                   <div>
@@ -315,7 +338,35 @@ export default function AdminDashboard() {
                       id="manual_url"
                       value={productForm.manual_url}
                       onChange={(e) => setProductForm({...productForm, manual_url: e.target.value})}
+                      placeholder="Cole a URL do manual ou faça upload abaixo"
                     />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="manual_upload">Ou faça upload do manual</Label>
+                    <Input
+                      id="manual_upload"
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          try {
+                            const url = await handleFileUpload(file, 'manuals');
+                            const type = file.type.includes('pdf') ? 'pdf' : 'image';
+                            setProductForm({
+                              ...productForm, 
+                              manual_url: url,
+                              manual_type: type
+                            });
+                          } catch (error) {
+                            console.error('Erro no upload:', error);
+                          }
+                        }
+                      }}
+                      disabled={uploadingFile}
+                    />
+                    {uploadingFile && <p className="text-sm text-muted-foreground mt-1">Enviando arquivo...</p>}
                   </div>
                   
                   <div>
@@ -406,7 +457,30 @@ export default function AdminDashboard() {
                       id="image_url"
                       value={bannerForm.image_url}
                       onChange={(e) => setBannerForm({...bannerForm, image_url: e.target.value})}
+                      placeholder="Cole a URL da imagem ou faça upload abaixo"
                     />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="banner_upload">Ou faça upload da imagem</Label>
+                    <Input
+                      id="banner_upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          try {
+                            const url = await handleFileUpload(file, 'banners');
+                            setBannerForm({...bannerForm, image_url: url});
+                          } catch (error) {
+                            console.error('Erro no upload:', error);
+                          }
+                        }
+                      }}
+                      disabled={uploadingFile}
+                    />
+                    {uploadingFile && <p className="text-sm text-muted-foreground mt-1">Enviando arquivo...</p>}
                   </div>
                   
                   <div>
@@ -518,7 +592,30 @@ export default function AdminDashboard() {
                       id="creative_url"
                       value={adForm.creative_url}
                       onChange={(e) => setAdForm({...adForm, creative_url: e.target.value})}
+                      placeholder="Cole a URL da imagem ou faça upload abaixo"
                     />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="creative_upload">Ou faça upload da imagem</Label>
+                    <Input
+                      id="creative_upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          try {
+                            const url = await handleFileUpload(file, 'advertisements');
+                            setAdForm({...adForm, creative_url: url});
+                          } catch (error) {
+                            console.error('Erro no upload:', error);
+                          }
+                        }
+                      }}
+                      disabled={uploadingFile}
+                    />
+                    {uploadingFile && <p className="text-sm text-muted-foreground mt-1">Enviando arquivo...</p>}
                   </div>
                   
                   <div>
