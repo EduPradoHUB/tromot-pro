@@ -33,17 +33,24 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Check if admin already exists
-    const { data: existingUser } = await supabaseAdmin.auth.admin.getUserByEmail('eduardo@tromot.com.br');
+    // Check if admin already exists by listing users
+    const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers();
     
-    if (existingUser.user) {
+    if (listError) {
+      console.error('Error listing users:', listError);
+      throw listError;
+    }
+
+    const existingUser = users.users.find(user => user.email === 'eduardo@tromot.com.br');
+    
+    if (existingUser) {
       console.log('Admin user already exists, updating profile...');
       
       // Update profile to ensure correct role
       const { error: profileError } = await supabaseAdmin
         .from('profiles')
         .upsert({
-          user_id: existingUser.user.id,
+          user_id: existingUser.id,
           name: 'Eduardo Admin',
           email: 'eduardo@tromot.com.br',
           role: 'ADM'
@@ -58,7 +65,7 @@ serve(async (req) => {
         JSON.stringify({ 
           success: true, 
           message: 'Usuário admin já existe e foi atualizado',
-          user_id: existingUser.user.id 
+          user_id: existingUser.id 
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
