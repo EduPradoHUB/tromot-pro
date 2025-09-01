@@ -11,15 +11,60 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptAnalytics, setAcceptAnalytics] = useState(false);
-  const {
-    login
-  } = useApp();
-  const {
-    toast
-  } = useToast();
+  const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
+  const { login } = useApp();
+  const { toast } = useToast();
   const navigate = useNavigate();
+
+  const createAdminUser = async () => {
+    if (email !== 'eduardo@tromot.com.br') {
+      toast({
+        title: "Acesso negado",
+        description: "Esta função é apenas para o admin.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsCreatingAdmin(true);
+    try {
+      const adminToken = prompt('Digite o token de configuração do admin:');
+      if (!adminToken) {
+        throw new Error('Token necessário');
+      }
+
+      const response = await fetch(`https://bclktrcbwpwsxksbhqsv.supabase.co/functions/v1/create-admin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: adminToken })
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao criar admin');
+      }
+
+      toast({
+        title: "Sucesso!",
+        description: result.message
+      });
+    } catch (error) {
+      console.error('Erro ao criar admin:', error);
+      toast({
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Erro ao criar usuário admin.",
+        variant: "destructive"
+      });
+    }
+    setIsCreatingAdmin(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!acceptTerms) {
       toast({
         title: "Termos necessários",
@@ -28,6 +73,7 @@ export default function Login() {
       });
       return;
     }
+
     try {
       await login(email, password);
       toast({
@@ -35,10 +81,19 @@ export default function Login() {
         description: "Bem-vindo ao Tromot Pro."
       });
       navigate('/');
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Erro de login:', error);
+      
+      let errorMessage = "Email ou senha incorretos.";
+      if (error?.message?.includes('Invalid login credentials')) {
+        errorMessage = "Credenciais inválidas. Verifique seu email e senha.";
+      } else if (error?.message?.includes('Email not confirmed')) {
+        errorMessage = "Email não confirmado. Verifique sua caixa de entrada.";
+      }
+
       toast({
         title: "Erro no login",
-        description: "Email ou senha incorretos.",
+        description: errorMessage,
         variant: "destructive"
       });
     }
@@ -58,7 +113,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input 
               type="email" 
-              placeholder="seu@email.com ou telefone" 
+              placeholder="seu@email.com" 
               value={email} 
               onChange={e => setEmail(e.target.value)} 
               required 
@@ -96,9 +151,23 @@ export default function Login() {
             </Button>
           </form>
           
-          <p className="text-center text-sm text-muted-foreground mt-4">
-            Admin: eduardo@tromot.com.br | Senha: 123456
-          </p>
+          <div className="space-y-2 mt-4">
+            <p className="text-center text-sm text-muted-foreground">
+              Admin: eduardo@tromot.com.br | Senha: 123456
+            </p>
+            
+            {email === 'eduardo@tromot.com.br' && (
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full" 
+                onClick={createAdminUser}
+                disabled={isCreatingAdmin}
+              >
+                {isCreatingAdmin ? 'Criando admin...' : 'Criar usuário admin'}
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>;
