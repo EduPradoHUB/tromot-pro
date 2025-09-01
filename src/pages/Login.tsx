@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useApp } from '@/contexts/AppContext';
 import { useToast } from '@/hooks/use-toast';
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,7 +18,7 @@ export default function Login() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const createAdminUser = async () => {
+  const updateAdminRole = async () => {
     if (email !== 'eduardo@tromot.com.br') {
       toast({
         title: "Acesso negado",
@@ -44,7 +46,7 @@ export default function Login() {
       const result = await response.json();
       
       if (!response.ok) {
-        throw new Error(result.error || 'Erro ao criar admin');
+        throw new Error(result.error || 'Erro ao atualizar admin');
       }
 
       toast({
@@ -52,10 +54,10 @@ export default function Login() {
         description: result.message
       });
     } catch (error) {
-      console.error('Erro ao criar admin:', error);
+      console.error('Erro ao atualizar admin:', error);
       toast({
         title: "Erro",
-        description: error instanceof Error ? error.message : "Erro ao criar usuário admin.",
+        description: error instanceof Error ? error.message : "Erro ao atualizar usuário admin.",
         variant: "destructive"
       });
     }
@@ -98,7 +100,9 @@ export default function Login() {
       });
     }
   };
-  return <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
+
+  return (
+    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg mx-auto mb-4">
@@ -156,19 +160,24 @@ export default function Login() {
               Admin: eduardo@tromot.com.br | Senha: 123456
             </p>
             
+            <p className="text-center text-xs text-muted-foreground">
+              Primeiro faça login, depois clique em "Atualizar para Admin"
+            </p>
+            
             {email === 'eduardo@tromot.com.br' && (
               <Button 
                 type="button" 
                 variant="outline" 
                 className="w-full" 
-                onClick={createAdminUser}
+                onClick={updateAdminRole}
                 disabled={isCreatingAdmin}
               >
-                {isCreatingAdmin ? 'Criando admin...' : 'Criar usuário admin'}
+                {isCreatingAdmin ? 'Atualizando para admin...' : 'Atualizar para Admin'}
               </Button>
             )}
           </div>
         </CardContent>
       </Card>
-    </div>;
+    </div>
+  );
 }

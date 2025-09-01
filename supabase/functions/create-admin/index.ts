@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -25,7 +26,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Creating admin user with service role client...');
+    console.log('Updating admin profile with service role client...');
 
     // Create Supabase admin client with service role key
     const supabaseAdmin = createClient(
@@ -33,58 +34,59 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Skip checking existing user - just create admin directly
-    console.log('Creating admin user directly...');
-
-    // Create new admin user
-    console.log('Creating new admin user...');
-    const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email: 'eduardo@tromot.com.br',
-      password: '123456',
-      email_confirm: true,
-      user_metadata: {
-        name: 'Eduardo Admin'
-      }
-    });
-
-    if (createError) {
-      console.error('Error creating user:', createError);
-      throw createError;
-    }
-
-    console.log('Admin user created successfully:', newUser.user?.id);
-
-    // Create/update profile
-    const { error: profileError } = await supabaseAdmin
+    // First, try to find the user by email in profiles table
+    const { data: existingProfile, error: findError } = await supabaseAdmin
       .from('profiles')
-      .upsert({
-        user_id: newUser.user!.id,
-        name: 'Eduardo Admin',
-        email: 'eduardo@tromot.com.br',
-        role: 'ADM'
-      });
+      .select('*')
+      .eq('email', 'eduardo@tromot.com.br')
+      .single();
 
-    if (profileError) {
-      console.error('Error creating profile:', profileError);
-      throw profileError;
+    if (findError && findError.code !== 'PGRST116') {
+      console.error('Error finding profile:', findError);
+      throw findError;
     }
 
-    console.log('Admin setup completed successfully');
+    if (existingProfile) {
+      console.log('Found existing profile, updating role...');
+      
+      // Update existing profile to ADM role
+      const { error: updateError } = await supabaseAdmin
+        .from('profiles')
+        .update({ role: 'ADM' })
+        .eq('id', existingProfile.id);
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: 'Usuário admin criado com sucesso',
-        user_id: newUser.user!.id 
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+      if (updateError) {
+        console.error('Error updating profile role:', updateError);
+        throw updateError;
+      }
+
+      console.log('Profile updated successfully');
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Perfil atualizado para ADM com sucesso',
+          user_id: existingProfile.user_id 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    } else {
+      console.log('Profile not found, user may not exist yet');
+      
+      return new Response(
+        JSON.stringify({ 
+          error: 'Usuário não encontrado',
+          message: 'Faça login primeiro para criar o perfil, depois tente novamente' 
+        }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
   } catch (error) {
     console.error('Error in create-admin function:', error);
     return new Response(
       JSON.stringify({ 
-        error: 'Erro ao criar usuário admin',
+        error: 'Erro ao atualizar usuário admin',
         details: error.message 
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
