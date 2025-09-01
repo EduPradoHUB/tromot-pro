@@ -78,6 +78,43 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Admin Banners Section */}
+      {banners.length > 0 && (
+        <section className="container">
+          {banners.length === 1 ? (
+            <div className="flex justify-center">
+              <div className="aspect-[4/5] w-full max-w-sm rounded-2xl overflow-hidden shadow-card">
+                <img 
+                  src={banners[0].image_url} 
+                  alt={banners[0].title}
+                  className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                  onClick={() => banners[0].link_url && window.open(banners[0].link_url, '_blank')}
+                />
+              </div>
+            </div>
+          ) : (
+            <Carousel className="w-full max-w-4xl mx-auto">
+              <CarouselContent className="-ml-2 md:-ml-4">
+                {banners.map((banner) => (
+                  <CarouselItem key={banner.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                    <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-card">
+                      <img 
+                        src={banner.image_url} 
+                        alt={banner.title}
+                        className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                        onClick={() => banner.link_url && window.open(banner.link_url, '_blank')}
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden sm:flex" />
+              <CarouselNext className="hidden sm:flex" />
+            </Carousel>
+          )}
+        </section>
+      )}
+
       {/* Quick Search */}
       <section className="container">
         <Card className="shadow-card">
