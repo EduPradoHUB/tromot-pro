@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,11 +13,18 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [resetEmail, setResetEmail] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptAnalytics, setAcceptAnalytics] = useState(false);
-  const { login, signUp, resetPassword } = useApp();
+  const { login, signUp, resetPassword, user, profile, loading } = useApp();
   const navigate = useNavigate();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!loading && user && profile) {
+      navigate('/', { replace: true });
+    }
+  }, [user, profile, loading, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +38,7 @@ export default function Login() {
       return;
     }
 
-    setLoading(true);
+    setFormLoading(true);
 
     try {
       const { error } = await login(email, password);
@@ -61,7 +68,7 @@ export default function Login() {
           title: "Sucesso",
           description: "Login realizado com sucesso!",
         });
-        navigate('/');
+        // Navigation will be handled by useEffect when user state updates
       }
     } catch (error) {
       toast({
@@ -70,7 +77,7 @@ export default function Login() {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   };
 
@@ -95,7 +102,7 @@ export default function Login() {
       return;
     }
 
-    setLoading(true);
+    setFormLoading(true);
 
     try {
       const { error } = await signUp(email, password, name);
@@ -127,13 +134,13 @@ export default function Login() {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setFormLoading(true);
 
     try {
       const { error } = await resetPassword(resetEmail);
@@ -158,7 +165,7 @@ export default function Login() {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   };
 
@@ -226,13 +233,13 @@ export default function Login() {
                   </div>
                 </div>
                 
-                <Button
-                  type="submit"
-                  className="w-full bg-tromot-red hover:bg-tromot-red/90"
-                  disabled={loading}
-                >
-                  {loading ? 'Entrando...' : 'Entrar'}
-                </Button>
+                 <Button
+                   type="submit"
+                   className="w-full bg-tromot-red hover:bg-tromot-red/90"
+                   disabled={formLoading}
+                 >
+                   {formLoading ? 'Entrando...' : 'Entrar'}
+                 </Button>
               </form>
             </TabsContent>
             
@@ -291,13 +298,13 @@ export default function Login() {
                   </div>
                 </div>
                 
-                <Button
-                  type="submit"
-                  className="w-full bg-tromot-red hover:bg-tromot-red/90"
-                  disabled={loading}
-                >
-                  {loading ? 'Criando conta...' : 'Criar conta'}
-                </Button>
+                 <Button
+                   type="submit"
+                   className="w-full bg-tromot-red hover:bg-tromot-red/90"
+                   disabled={formLoading}
+                 >
+                   {formLoading ? 'Criando conta...' : 'Criar conta'}
+                 </Button>
               </form>
             </TabsContent>
             
@@ -312,13 +319,13 @@ export default function Login() {
                     required
                   />
                 </div>
-                <Button
-                  type="submit"
-                  className="w-full bg-tromot-red hover:bg-tromot-red/90"
-                  disabled={loading}
-                >
-                  {loading ? 'Enviando...' : 'Enviar link de redefinição'}
-                </Button>
+                 <Button
+                   type="submit"
+                   className="w-full bg-tromot-red hover:bg-tromot-red/90"
+                   disabled={formLoading}
+                 >
+                   {formLoading ? 'Enviando...' : 'Enviar link de redefinição'}
+                 </Button>
               </form>
             </TabsContent>
           </Tabs>
