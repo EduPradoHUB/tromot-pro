@@ -26,7 +26,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Updating admin profile with service role client...');
+    console.log('Creating/updating admin user with service role client...');
 
     // Create Supabase admin client with service role key
     const supabaseAdmin = createClient(
@@ -34,51 +34,71 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // First, try to find the user by email in profiles table
-    const { data: existingProfile, error: findError } = await supabaseAdmin
-      .from('profiles')
-      .select('*')
-      .eq('email', 'eduardo@tromot.com.br')
-      .single();
+    // First, try to create the user
+    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
+      email: 'eduardo@tromot.com.br',
+      password: '123456',
+      email_confirm: true,
+      user_metadata: {
+        name: 'Eduardo Tromot'
+      }
+    });
 
-    if (findError && findError.code !== 'PGRST116') {
-      console.error('Error finding profile:', findError);
-      throw findError;
-    }
+    if (userError) {
+      if (userError.message.includes('User already registered')) {
+        console.log('User already exists, finding and updating profile...');
+        
+        // Find existing user by email
+        const { data: users } = await supabaseAdmin.auth.admin.listUsers();
+        const existingUser = users.users.find(u => u.email === 'eduardo@tromot.com.br');
+        
+        if (existingUser) {
+          // Update profile to ADM role
+          const { error: updateError } = await supabaseAdmin
+            .from('profiles')
+            .update({ role: 'ADM' })
+            .eq('user_id', existingUser.id);
 
-    if (existingProfile) {
-      console.log('Found existing profile, updating role...');
+          if (updateError) {
+            console.error('Error updating profile role:', updateError);
+            throw updateError;
+          }
+
+          console.log('Profile updated to ADM successfully');
+
+          return new Response(
+            JSON.stringify({ 
+              success: true, 
+              message: 'Usuário existente atualizado para ADM com sucesso' 
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      } else {
+        console.error('Error creating user:', userError);
+        throw userError;
+      }
+    } else {
+      console.log('Admin user created successfully');
       
-      // Update existing profile to ADM role
+      // The profile should be created automatically by the trigger
+      // But let's update the role to ADM
       const { error: updateError } = await supabaseAdmin
         .from('profiles')
         .update({ role: 'ADM' })
-        .eq('id', existingProfile.id);
+        .eq('user_id', userData.user.id);
 
       if (updateError) {
-        console.error('Error updating profile role:', updateError);
-        throw updateError;
+        console.error('Error updating new user role:', updateError);
+        // Don't throw here, user was created successfully
       }
-
-      console.log('Profile updated successfully');
 
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: 'Perfil atualizado para ADM com sucesso',
-          user_id: existingProfile.user_id 
+          message: 'Usuário admin criado com sucesso! Use email: eduardo@tromot.com.br e senha: 123456' 
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    } else {
-      console.log('Profile not found, user may not exist yet');
-      
-      return new Response(
-        JSON.stringify({ 
-          error: 'Usuário não encontrado',
-          message: 'Faça login primeiro para criar o perfil, depois tente novamente' 
-        }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -86,7 +106,7 @@ serve(async (req) => {
     console.error('Error in create-admin function:', error);
     return new Response(
       JSON.stringify({ 
-        error: 'Erro ao atualizar usuário admin',
+        error: 'Erro ao criar/atualizar usuário admin',
         details: error.message 
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

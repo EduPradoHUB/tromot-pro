@@ -19,15 +19,6 @@ export default function Login() {
   const navigate = useNavigate();
 
   const updateAdminRole = async () => {
-    if (email !== 'eduardo@tromot.com.br') {
-      toast({
-        title: "Acesso negado",
-        description: "Esta função é apenas para o admin.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsCreatingAdmin(true);
     try {
       const adminToken = prompt('Digite o token de configuração do admin:');
@@ -46,7 +37,7 @@ export default function Login() {
       const result = await response.json();
       
       if (!response.ok) {
-        throw new Error(result.error || 'Erro ao atualizar admin');
+        throw new Error(result.error || 'Erro ao criar admin');
       }
 
       toast({
@@ -54,10 +45,10 @@ export default function Login() {
         description: result.message
       });
     } catch (error) {
-      console.error('Erro ao atualizar admin:', error);
+      console.error('Erro ao criar admin:', error);
       toast({
         title: "Erro",
-        description: error instanceof Error ? error.message : "Erro ao atualizar usuário admin.",
+        description: error instanceof Error ? error.message : "Erro ao criar usuário admin.",
         variant: "destructive"
       });
     }
@@ -157,24 +148,22 @@ export default function Login() {
           
           <div className="space-y-2 mt-4">
             <p className="text-center text-sm text-muted-foreground">
-              Admin: eduardo@tromot.com.br | Senha: 123456
+              Clique abaixo para criar o usuário admin
             </p>
+            
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full" 
+              onClick={updateAdminRole}
+              disabled={isCreatingAdmin}
+            >
+              {isCreatingAdmin ? 'Criando usuário admin...' : 'Criar Usuário Admin'}
+            </Button>
             
             <p className="text-center text-xs text-muted-foreground">
-              Primeiro faça login, depois clique em "Atualizar para Admin"
+              Após criar, use: eduardo@tromot.com.br | Senha: 123456
             </p>
-            
-            {email === 'eduardo@tromot.com.br' && (
-              <Button 
-                type="button" 
-                variant="outline" 
-                className="w-full" 
-                onClick={updateAdminRole}
-                disabled={isCreatingAdmin}
-              >
-                {isCreatingAdmin ? 'Atualizando para admin...' : 'Atualizar para Admin'}
-              </Button>
-            )}
           </div>
         </CardContent>
       </Card>
