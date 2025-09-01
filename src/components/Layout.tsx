@@ -16,21 +16,30 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { currentUser, logout } = useApp();
+  const { profile, logout } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isActive = (path: string) => location.pathname === path;
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
+
+  const isActive = (path: string) => location.pathname === path;
 
   const navigationItems = [
     { name: 'Home', path: '/', icon: Home },
-    { name: 'Manuais', path: '/catalogo', icon: Search },
-    ...(currentUser?.role === 'ADM' ? [{ name: 'Dashboard', path: '/dashboard', icon: BarChart3 }] : []),
+    { name: 'Manuais', path: '/manuais', icon: Search },
+    ...(profile?.role === 'ADM' ? [
+      { name: 'Dashboard', path: '/dashboard', icon: BarChart3 },
+      { name: 'Admin', path: '/admin', icon: Package },
+      { name: 'Mídia', path: '/midia', icon: Package },
+      { name: 'Usuários', path: '/usuarios', icon: User },
+    ] : []),
   ];
 
   return (
@@ -63,29 +72,29 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
           {/* User Menu */}
           <div className="flex items-center space-x-4">
-            {currentUser ? (
+            {profile ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
-                      <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={profile.avatar_url} alt={profile.name} />
+                      <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56 bg-background border shadow-lg" align="end" forceMount>
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{currentUser.name}</p>
+                      <p className="font-medium">{profile.name}</p>
                       <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        {currentUser.email}
+                        {profile.email}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {currentUser.role}
+                        {profile.role}
                       </p>
                     </div>
                   </div>
-                  {currentUser?.role === 'ADM' && (
+                  {profile?.role === 'ADM' && (
                     <>
                       <DropdownMenuItem asChild>
                         <Link to="/dashboard" className="cursor-pointer">

@@ -5,9 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
 
 export default function Profile() {
-  const { currentUser } = useApp();
+  const { profile } = useApp();
 
-  if (!currentUser) {
+  if (!profile) {
     return (
       <div className="container py-8">
         <p>Você precisa estar logado para ver o perfil.</p>
@@ -25,18 +25,18 @@ export default function Profile() {
           <CardContent className="space-y-6">
             <div className="flex items-center space-x-4">
               <Avatar className="h-20 w-20">
-                <AvatarImage src={currentUser.avatar} />
+                <AvatarImage src={profile.avatar_url} />
                 <AvatarFallback className="text-2xl">
-                  {currentUser.name.charAt(0)}
+                  {profile.name.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="text-2xl font-bold">{currentUser.name}</h2>
-                <p className="text-muted-foreground">{currentUser.email}</p>
-                {currentUser.phone && (
-                  <p className="text-muted-foreground">{currentUser.phone}</p>
+                <h2 className="text-2xl font-bold">{profile.name}</h2>
+                <p className="text-muted-foreground">{profile.email}</p>
+                {profile.phone && (
+                  <p className="text-muted-foreground">{profile.phone}</p>
                 )}
-                <Badge className="mt-2">{currentUser.role}</Badge>
+                <Badge className="mt-2">{profile.role}</Badge>
               </div>
             </div>
           </CardContent>

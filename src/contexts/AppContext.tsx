@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { User } from '@supabase/supabase-js';
+import type { User, Session } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 
 // Database types
@@ -120,10 +120,17 @@ interface AdStats {
 interface AppContextType {
   // New Supabase Auth
   user: User | null;
+  session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
+  resetPassword: (email: string) => Promise<{ error: Error | null }>;
   logout: () => Promise<void>;
+  
+  // User management (admin only)
+  fetchAllProfiles: () => Promise<Profile[]>;
+  updateUserRole: (userId: string, role: 'ADM' | 'Técnico Tromot' | 'Cliente') => Promise<void>;
   
   // Legacy Auth (for backward compatibility)
   currentUser: LegacyUser | null;
@@ -195,6 +202,7 @@ export const useApp = () => {
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
@@ -243,17 +251,108 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     status: product.status === 'active' ? 'active' : 'inactive'
   }));
 
+  // Fetch user profile
+  const fetchProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching profile:', error);
+      return null;
+    }
+    
+    return data;
+  };
+
   // Auth functions
-  const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
+  const login = async (email: string, password: string): Promise<{ error: Error | null }> => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return { error };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  };
+
+  const signUp = async (email: string, password: string, name: string): Promise<{ error: Error | null }> => {
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            name: name
+          }
+        }
+      });
+
+      // Create profile manually if user is created
+      if (data.user && !error) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: data.user.id,
+            name: name,
+            email: email,
+            role: 'Cliente'
+          });
+        
+        if (profileError) {
+          console.error('Error creating profile:', profileError);
+        }
+      }
+
+      return { error };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  };
+
+  const resetPassword = async (email: string): Promise<{ error: Error | null }> => {
+    try {
+      const redirectUrl = `${window.location.origin}/reset-password`;
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl
+      });
+      
+      return { error };
+    } catch (error) {
+      return { error: error as Error };
+    }
   };
 
   const logout = async () => {
     const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+  };
+
+  // User management (admin only)
+  const fetchAllProfiles = async (): Promise<Profile[]> => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  };
+
+  const updateUserRole = async (userId: string, role: 'ADM' | 'Técnico Tromot' | 'Cliente'): Promise<void> => {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ role })
+      .eq('user_id', userId);
+    
     if (error) throw error;
   };
 
@@ -539,6 +638,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
@@ -565,14 +665,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
     );
 
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+    });
+
     return () => subscription.unsubscribe();
   }, []);
 
   const value: AppContextType = {
     // New Supabase
     user,
+    session,
     profile,
     loading,
+    signUp,
+    resetPassword,
+    fetchAllProfiles,
+    updateUserRole,
     login,
     logout,
     products,
