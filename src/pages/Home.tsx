@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ChevronRight, Star, Eye, Download, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
 import { useApp } from '@/contexts/AppContext';
 import { brands } from '@/lib/data';
 import AdSlot from '@/components/AdSlot';
@@ -18,14 +19,16 @@ export default function Home() {
     vehicles,
     trackEvent
   } = useApp();
-  const {
-    isInstallable,
-    isInstalled,
-    installApp
-  } = usePWA();
+
+  const { isInstallable, isInstalled, installApp } = usePWA();
   const [searchBrand, setSearchBrand] = useState('');
   const [searchModel, setSearchModel] = useState('');
   const [searchYear, setSearchYear] = useState('');
+
+  // Plugin autoplay para carrossel
+  const autoplayPlugin = useCallback(() => 
+    Autoplay({ delay: 2000, stopOnInteraction: true }), []);
+
   const availableModels = searchBrand ? vehicles.filter(v => v.brand === searchBrand).map(v => v.model) : [];
   const availableYears = searchBrand && searchModel ? vehicles.find(v => v.brand === searchBrand && v.model === searchModel)?.years || [] : [];
   const handleQuickSearch = () => {
@@ -92,26 +95,29 @@ export default function Home() {
                 />
               </div>
             </div>
-          ) : (
-            <Carousel className="w-full max-w-4xl mx-auto">
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {banners.map((banner) => (
-                  <CarouselItem key={banner.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                    <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-card">
-                      <img 
-                        src={banner.image_url} 
-                        alt={banner.title}
-                        className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
-                        onClick={() => banner.link_url && window.open(banner.link_url, '_blank')}
-                      />
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="hidden sm:flex" />
-              <CarouselNext className="hidden sm:flex" />
-            </Carousel>
-          )}
+           ) : (
+             <Carousel 
+               className="w-full max-w-4xl mx-auto"
+               plugins={[autoplayPlugin()]}
+             >
+               <CarouselContent className="-ml-2 md:-ml-4">
+                 {banners.map((banner) => (
+                   <CarouselItem key={banner.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                     <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-card">
+                       <img 
+                         src={banner.image_url} 
+                         alt={banner.title}
+                         className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                         onClick={() => banner.link_url && window.open(banner.link_url, '_blank')}
+                       />
+                     </div>
+                   </CarouselItem>
+                 ))}
+               </CarouselContent>
+               <CarouselPrevious className="hidden sm:flex" />
+               <CarouselNext className="hidden sm:flex" />
+             </Carousel>
+           )}
         </section>
       )}
 
