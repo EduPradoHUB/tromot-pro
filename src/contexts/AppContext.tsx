@@ -647,17 +647,39 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           setTimeout(async () => {
             try {
               // Fetch user profile
-              const { data: profileData } = await supabase
+              let { data: profileData } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('user_id', session.user.id)
                 .single();
               
+              // If profile doesn't exist, create one
+              if (!profileData) {
+                const { data: newProfile, error: createError } = await supabase
+                  .from('profiles')
+                  .insert({
+                    user_id: session.user.id,
+                    name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Usuário',
+                    email: session.user.email || '',
+                    role: session.user.email === 'eduardo@tromot.com.br' ? 'ADM' : 'Cliente'
+                  })
+                  .select()
+                  .single();
+                
+                if (createError) {
+                  console.error('Error creating profile:', createError);
+                } else {
+                  profileData = newProfile;
+                }
+              }
+              
               setProfile(profileData);
               // Fetch app data after profile is loaded
               await fetchData();
+              setLoading(false);
             } catch (error) {
-              console.error('Error fetching profile:', error);
+              console.error('Error handling profile:', error);
+              setLoading(false);
             }
           }, 0);
         } else {
@@ -666,9 +688,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           setBanners([]);
           setAdvertisements([]);
           setVehicles([]);
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
