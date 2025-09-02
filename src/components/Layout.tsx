@@ -3,23 +3,20 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Search, Package, User, LogOut, Menu, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApp } from '@/contexts/AppContext';
-
 interface LayoutProps {
   children: React.ReactNode;
 }
-
-export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { profile, logout } = useApp();
+export const Layout: React.FC<LayoutProps> = ({
+  children
+}) => {
+  const {
+    profile,
+    logout
+  } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -28,22 +25,33 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       console.error('Logout error:', error);
     }
   };
-
   const isActive = (path: string) => location.pathname === path;
-
-  const navigationItems = [
-    { name: 'Home', path: '/', icon: Home },
-    { name: 'Manuais', path: '/manuais', icon: Search },
-    ...(profile?.role === 'ADM' ? [
-      { name: 'Dashboard', path: '/dashboard', icon: BarChart3 },
-      { name: 'Admin', path: '/admin', icon: Package },
-      { name: 'Mídia', path: '/midia', icon: Package },
-      { name: 'Usuários', path: '/usuarios', icon: User },
-    ] : []),
-  ];
-
-  return (
-    <div className="min-h-screen bg-background">
+  const navigationItems = [{
+    name: 'Home',
+    path: '/',
+    icon: Home
+  }, {
+    name: 'Manuais',
+    path: '/manuais',
+    icon: Search
+  }, ...(profile?.role === 'ADM' ? [{
+    name: 'Dashboard',
+    path: '/dashboard',
+    icon: BarChart3
+  }, {
+    name: 'Admin',
+    path: '/admin',
+    icon: Package
+  }, {
+    name: 'Mídia',
+    path: '/midia',
+    icon: Package
+  }, {
+    name: 'Usuários',
+    path: '/usuarios',
+    icon: User
+  }] : [])];
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
@@ -54,26 +62,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            {navigationItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive(item.path)
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                }`}
-              >
+            {navigationItems.map(item => <Link key={item.path} to={item.path} className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive(item.path) ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}>
                 <item.icon className="h-4 w-4" />
                 <span>{item.name}</span>
-              </Link>
-            ))}
+              </Link>)}
           </nav>
 
           {/* User Menu */}
           <div className="flex items-center space-x-4">
-            {profile ? (
-              <DropdownMenu>
+            {profile ? <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
@@ -94,8 +91,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       </p>
                     </div>
                   </div>
-                  {profile?.role === 'ADM' && (
-                    <>
+                  {profile?.role === 'ADM' && <>
                       <DropdownMenuItem asChild>
                         <Link to="/dashboard" className="cursor-pointer">
                           <BarChart3 className="mr-2 h-4 w-4" />
@@ -108,8 +104,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                           <span>Dashboard de Mídia</span>
                         </Link>
                       </DropdownMenuItem>
-                    </>
-                  )}
+                    </>}
                   <DropdownMenuItem asChild>
                     <Link to="/perfil" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
@@ -121,12 +116,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <span>Sair</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button asChild>
+              </DropdownMenu> : <Button asChild>
                 <Link to="/login">Entrar</Link>
-              </Button>
-            )}
+              </Button>}
 
             {/* Mobile Menu */}
             <DropdownMenu>
@@ -136,14 +128,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56 bg-background border shadow-lg" align="end">
-                {navigationItems.map((item) => (
-                  <DropdownMenuItem key={item.path} asChild>
+                {navigationItems.map(item => <DropdownMenuItem key={item.path} asChild>
                     <Link to={item.path} className="cursor-pointer">
                       <item.icon className="mr-2 h-4 w-4" />
                       <span>{item.name}</span>
                     </Link>
-                  </DropdownMenuItem>
-                ))}
+                  </DropdownMenuItem>)}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -156,7 +146,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-muted/50 py-8">
+      <footer className="border-t bg-muted/50 py-0">
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
@@ -203,6 +193,5 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
