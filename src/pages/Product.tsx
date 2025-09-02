@@ -21,6 +21,7 @@ import { useApp } from '@/contexts/AppContext';
 import { PostCard } from '@/components/PostCard';
 import { RatingForm } from '@/components/RatingForm';
 import { QuestionForm } from '@/components/QuestionForm';
+import { PostUploadModal } from '@/components/PostUploadModal';
 import { Product, Post, Rating, Question } from '@/lib/types';
 import AdSlot from '@/components/AdSlot';
 
@@ -33,6 +34,7 @@ export default function ProductPage() {
   const [productRatings, setProductRatings] = useState<Rating[]>([]);
   const [productQuestions, setProductQuestions] = useState<Question[]>([]);
   const [answerText, setAnswerText] = useState<{ [key: string]: string }>({});
+  const [showPostModal, setShowPostModal] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -218,7 +220,11 @@ export default function ProductPage() {
               <div className="flex items-center justify-between">
                 <h3 className="font-medium">Instalações da Comunidade</h3>
                 {currentUser && (
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowPostModal(true)}
+                  >
                     <Camera className="h-4 w-4 mr-2" />
                     Compartilhar Instalação
                   </Button>
@@ -415,6 +421,12 @@ export default function ProductPage() {
           )}
         </div>
       </div>
+
+      <PostUploadModal
+        isOpen={showPostModal}
+        onClose={() => setShowPostModal(false)}
+        productId={product.id}
+      />
     </div>
   );
 }
