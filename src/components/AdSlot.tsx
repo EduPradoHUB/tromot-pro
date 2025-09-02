@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { useApp } from '@/contexts/AppContext';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -82,16 +83,16 @@ export default function AdSlot({ slot, className = '', productId }: AdSlotProps)
     return (
       <Card className={`cursor-pointer hover:shadow-lg transition-shadow ${className}`} onClick={handleAdClick}>
         <CardContent className="p-0">
-          <div className="relative">
+          <AspectRatio ratio={5/4} className="relative">
             <img
               src={ad.creative_url}
               alt="Anúncio"
-              className="w-full h-32 object-cover rounded-t-2xl"
+              className="w-full h-full object-cover rounded-t-2xl"
             />
             <Badge className="absolute top-2 right-2 bg-background/90 text-foreground text-xs">
               Patrocinado
             </Badge>
-          </div>
+          </AspectRatio>
           <div className="p-3">
             <p className="font-medium text-sm">{ad.advertiser}</p>
           </div>
