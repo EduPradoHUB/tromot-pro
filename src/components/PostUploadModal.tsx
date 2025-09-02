@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Camera, X, Upload } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Camera, X, Upload, Image } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,8 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
     caption: '',
@@ -47,6 +49,14 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
         });
       }
     }
+  };
+
+  const openCamera = () => {
+    cameraInputRef.current?.click();
+  };
+
+  const openGallery = () => {
+    galleryInputRef.current?.click();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -148,20 +158,45 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
           <div className="space-y-2">
             <Label>Foto da Instalação *</Label>
             {!imagePreview ? (
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-muted-foreground/25 rounded-lg cursor-pointer hover:border-muted-foreground/50 transition-colors">
-                <div className="flex flex-col items-center justify-center py-4">
-                  <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">
-                    Clique para selecionar uma foto
-                  </p>
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-24 flex flex-col gap-2"
+                    onClick={openCamera}
+                  >
+                    <Camera className="h-6 w-6" />
+                    <span className="text-sm">Usar Câmera</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-24 flex flex-col gap-2"
+                    onClick={openGallery}
+                  >
+                    <Image className="h-6 w-6" />
+                    <span className="text-sm">Da Galeria</span>
+                  </Button>
                 </div>
+                
+                {/* Hidden inputs */}
                 <input
+                  ref={cameraInputRef}
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleImageChange}
+                />
+                <input
+                  ref={galleryInputRef}
                   type="file"
                   className="hidden"
                   accept="image/*"
                   onChange={handleImageChange}
                 />
-              </label>
+              </div>
             ) : (
               <div className="relative">
                 <img
