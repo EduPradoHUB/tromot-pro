@@ -147,7 +147,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
       {/* Footer */}
       <footer className="border-t bg-muted/50 py-0">
-        <div className="container">
+        <div className="container py-[20px]">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <div className="mb-4">
