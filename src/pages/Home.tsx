@@ -52,7 +52,7 @@ export default function Home() {
       {/* Hero Section with Banner */}
       <section className="relative bg-gradient-hero text-white overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
-        <div className="relative container md:py-32 py-[31px]">
+        <div className="relative container md:py-32 py-0">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h1 className="text-4xl md:text-6xl font-bold leading-tight">
