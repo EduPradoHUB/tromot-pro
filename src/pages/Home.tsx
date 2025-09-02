@@ -234,7 +234,7 @@ export default function Home() {
       {/* Features */}
       <section className="container py-[16px]">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Por que usar o Tromot Pro?</h2>
+          <h2 className="text-3xl font-bold mb-4">Por que usar o TROMOT Pro?</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Desenvolvido especialmente para instaladores e técnicos, oferecendo tudo que você precisa em um só lugar.
           </p>
