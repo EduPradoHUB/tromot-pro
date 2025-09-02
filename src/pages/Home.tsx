@@ -19,16 +19,20 @@ export default function Home() {
     vehicles,
     trackEvent
   } = useApp();
-
-  const { isInstallable, isInstalled, installApp } = usePWA();
+  const {
+    isInstallable,
+    isInstalled,
+    installApp
+  } = usePWA();
   const [searchBrand, setSearchBrand] = useState('');
   const [searchModel, setSearchModel] = useState('');
   const [searchYear, setSearchYear] = useState('');
 
   // Plugin autoplay para carrossel
-  const autoplayPlugin = useCallback(() => 
-    Autoplay({ delay: 2000, stopOnInteraction: true }), []);
-
+  const autoplayPlugin = useCallback(() => Autoplay({
+    delay: 2000,
+    stopOnInteraction: true
+  }), []);
   const availableModels = searchBrand ? vehicles.filter(v => v.brand === searchBrand).map(v => v.model) : [];
   const availableYears = searchBrand && searchModel ? vehicles.find(v => v.brand === searchBrand && v.model === searchModel)?.years || [] : [];
   const handleQuickSearch = () => {
@@ -48,7 +52,7 @@ export default function Home() {
       {/* Hero Section with Banner */}
       <section className="relative bg-gradient-hero text-white overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
-        <div className="relative container py-20 md:py-32">
+        <div className="relative container md:py-32 py-[103px]">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h1 className="text-4xl md:text-6xl font-bold leading-tight">
@@ -82,44 +86,23 @@ export default function Home() {
       </section>
 
       {/* Admin Banners Section */}
-      {banners.length > 0 && (
-        <section className="px-4 sm:container">
-          {banners.length === 1 ? (
-            <div className="flex justify-center">
+      {banners.length > 0 && <section className="px-4 sm:container">
+          {banners.length === 1 ? <div className="flex justify-center">
               <div className="aspect-[4/5] w-full max-w-sm sm:max-w-md overflow-hidden shadow-card">
-                <img 
-                  src={banners[0].image_url} 
-                  alt={banners[0].title}
-                  className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
-                  onClick={() => banners[0].link_url && window.open(banners[0].link_url, '_blank')}
-                />
+                <img src={banners[0].image_url} alt={banners[0].title} className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => banners[0].link_url && window.open(banners[0].link_url, '_blank')} />
               </div>
-            </div>
-           ) : (
-             <Carousel 
-               className="w-full max-w-4xl mx-auto"
-               plugins={[autoplayPlugin()]}
-             >
+            </div> : <Carousel className="w-full max-w-4xl mx-auto" plugins={[autoplayPlugin()]}>
                <CarouselContent className="-ml-1 sm:-ml-2 md:-ml-4">
-                 {banners.map((banner) => (
-                   <CarouselItem key={banner.id} className="pl-1 sm:pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+                 {banners.map(banner => <CarouselItem key={banner.id} className="pl-1 sm:pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
                      <div className="aspect-[4/5] overflow-hidden shadow-card">
-                       <img 
-                         src={banner.image_url} 
-                         alt={banner.title}
-                         className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
-                         onClick={() => banner.link_url && window.open(banner.link_url, '_blank')}
-                       />
+                       <img src={banner.image_url} alt={banner.title} className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => banner.link_url && window.open(banner.link_url, '_blank')} />
                      </div>
-                   </CarouselItem>
-                 ))}
+                   </CarouselItem>)}
                </CarouselContent>
                <CarouselPrevious className="hidden sm:flex" />
                <CarouselNext className="hidden sm:flex" />
-             </Carousel>
-           )}
-        </section>
-      )}
+             </Carousel>}
+        </section>}
 
       {/* Quick Search */}
       <section className="container">
