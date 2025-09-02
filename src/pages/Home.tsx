@@ -212,7 +212,7 @@ export default function Home() {
                         </div>
                         <div className="flex items-center text-sm text-muted-foreground">
                         <Eye className="h-4 w-4 mr-1" />
-                        {product.compatibility.length} veículos
+                        {product.compatibility.length}
                         </div>
                       </div>
 
