@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Smartphone, CheckCircle, X } from 'lucide-react';
+import { Smartphone, CheckCircle } from 'lucide-react';
 import { usePWA } from '@/hooks/usePWA';
 
 interface AppDownloadDialogProps {
@@ -31,26 +31,16 @@ export function AppDownloadDialog({ open, onOpenChange }: AppDownloadDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <Smartphone className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <DialogTitle className="text-left">Baixe o App TROMOT PRO</DialogTitle>
-                <DialogDescription className="text-left mt-1">
-                  Acesso offline aos manuais e notificações
-                </DialogDescription>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="bg-primary/10 p-2 rounded-full">
+              <Smartphone className="h-6 w-6 text-primary" />
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              className="h-6 w-6 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            <div>
+              <DialogTitle className="text-left">Baixe o App TROMOT PRO</DialogTitle>
+              <DialogDescription className="text-left mt-1">
+                Acesso offline aos manuais e notificações
+              </DialogDescription>
+            </div>
           </div>
         </DialogHeader>
 
