@@ -83,6 +83,7 @@ export default function AdminDashboard() {
   
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [editingAdvertisement, setEditingAdvertisement] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
 
@@ -339,6 +340,51 @@ export default function AdminDashboard() {
       toast({
         title: "Erro",
         description: "Falha ao atualizar categoria.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleEditAdvertisement = (ad: any) => {
+    setEditingAdvertisement(ad);
+    setAdForm({
+      advertiser: ad.advertiser,
+      slot: ad.slot,
+      creative_url: ad.creative_url,
+      creative_aspect_ratio: ad.creative_aspect_ratio,
+      target_url: ad.target_url || '',
+      start_date: ad.start_date,
+      end_date: ad.end_date,
+      daily_cap: ad.daily_cap
+    });
+  };
+
+  const handleUpdateAdvertisement = async () => {
+    try {
+      await updateAdvertisement(editingAdvertisement.id, adForm);
+      
+      setAdForm({
+        advertiser: '',
+        slot: 'home_hero',
+        creative_url: '',
+        creative_aspect_ratio: '4:5',
+        target_url: '',
+        start_date: '',
+        end_date: '',
+        daily_cap: 1000
+      });
+      
+      setEditingAdvertisement(null);
+      setDialogOpen(false);
+      
+      toast({
+        title: "Propaganda atualizada",
+        description: "Propaganda editada com sucesso!"
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar propaganda.",
         variant: "destructive"
       });
     }
@@ -783,7 +829,22 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Propagandas</h2>
             
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <Dialog open={dialogOpen} onOpenChange={(open) => {
+              setDialogOpen(open);
+              if (!open) {
+                setEditingAdvertisement(null);
+                setAdForm({
+                  advertiser: '',
+                  slot: 'home_hero',
+                  creative_url: '',
+                  creative_aspect_ratio: '4:5',
+                  target_url: '',
+                  start_date: '',
+                  end_date: '',
+                  daily_cap: 1000
+                });
+              }
+            }}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
@@ -792,7 +853,7 @@ export default function AdminDashboard() {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Nova Propaganda</DialogTitle>
+                  <DialogTitle>{editingAdvertisement ? 'Editar Propaganda' : 'Nova Propaganda'}</DialogTitle>
                 </DialogHeader>
                 
                 <div className="grid gap-4">
@@ -894,9 +955,9 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   
-                  <Button onClick={handleCreateAdvertisement} disabled={uploadingFile}>
-                    Criar Propaganda
-                  </Button>
+                   <Button onClick={editingAdvertisement ? handleUpdateAdvertisement : handleCreateAdvertisement} disabled={uploadingFile}>
+                     {editingAdvertisement ? 'Atualizar Propaganda' : 'Criar Propaganda'}
+                   </Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -912,14 +973,17 @@ export default function AdminDashboard() {
                       <p className="text-sm text-muted-foreground">{ad.slot}</p>
                       <Badge variant="outline" className="mt-2">{ad.status}</Badge>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => deleteAdvertisement(ad.id)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+                     <div className="flex gap-2">
+                       <Button variant="outline" size="sm" onClick={() => {
+                         handleEditAdvertisement(ad);
+                         setDialogOpen(true);
+                       }}>
+                         <Edit className="w-4 h-4" />
+                       </Button>
+                       <Button variant="outline" size="sm" onClick={() => deleteAdvertisement(ad.id)}>
+                         <Trash2 className="w-4 h-4" />
+                       </Button>
+                     </div>
                   </div>
                 </CardContent>
               </Card>
