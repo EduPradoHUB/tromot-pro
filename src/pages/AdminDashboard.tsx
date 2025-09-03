@@ -81,7 +81,8 @@ export default function AdminDashboard() {
     active: true
   });
   
-  const [editingItem, setEditingItem] = useState<any>(null);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [editingCategory, setEditingCategory] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
 
@@ -258,6 +259,91 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleEditProduct = (product: any) => {
+    setEditingProduct(product);
+    setProductForm({
+      name: product.name,
+      code: product.code,
+      category: product.category,
+      description: product.description || '',
+      image_url: product.image_url || '',
+      manual_url: product.manual_url || '',
+      manual_type: product.manual_type || 'pdf',
+      video_url: product.video_url || '',
+      compatibility: JSON.stringify(product.compatibility || [])
+    });
+  };
+
+  const handleEditCategory = (category: any) => {
+    setEditingCategory(category);
+    setCategoryForm({
+      name: category.name,
+      description: category.description || '',
+      active: category.active
+    });
+  };
+
+  const handleUpdateProduct = async () => {
+    try {
+      await updateProduct(editingProduct.id, {
+        ...productForm,
+        compatibility: JSON.parse(productForm.compatibility)
+      });
+      
+      setProductForm({
+        name: '',
+        code: '',
+        category: '',
+        description: '',
+        image_url: '',
+        manual_url: '',
+        manual_type: 'pdf',
+        video_url: '',
+        compatibility: '[]'
+      });
+      
+      setEditingProduct(null);
+      setDialogOpen(false);
+      
+      toast({
+        title: "Produto atualizado",
+        description: "Produto editado com sucesso!"
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar produto.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleUpdateCategory = async () => {
+    try {
+      await updateCategory(editingCategory.id, categoryForm);
+      
+      setCategoryForm({
+        name: '',
+        description: '',
+        active: true
+      });
+      
+      setEditingCategory(null);
+      setDialogOpen(false);
+      
+      toast({
+        title: "Categoria atualizada",
+        description: "Categoria editada com sucesso!"
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar categoria.",
+        variant: "destructive"
+      });
+    }
+  };
+
 
   return (
     <div className="container py-8 space-y-8">
@@ -280,7 +366,23 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Produtos</h2>
             
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <Dialog open={dialogOpen} onOpenChange={(open) => {
+              setDialogOpen(open);
+              if (!open) {
+                setEditingProduct(null);
+                setProductForm({
+                  name: '',
+                  code: '',
+                  category: '',
+                  description: '',
+                  image_url: '',
+                  manual_url: '',
+                  manual_type: 'pdf',
+                  video_url: '',
+                  compatibility: '[]'
+                });
+              }
+            }}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
@@ -289,7 +391,7 @@ export default function AdminDashboard() {
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Novo Produto</DialogTitle>
+                  <DialogTitle>{editingProduct ? 'Editar Produto' : 'Novo Produto'}</DialogTitle>
                 </DialogHeader>
                 
                 <div className="grid gap-4">
@@ -426,9 +528,9 @@ export default function AdminDashboard() {
                     />
                   </div>
                   
-                  <Button onClick={handleCreateProduct} disabled={uploadingFile}>
-                    {uploadingFile ? 'Enviando...' : 'Criar Produto'}
-                  </Button>
+                   <Button onClick={editingProduct ? handleUpdateProduct : handleCreateProduct} disabled={uploadingFile}>
+                     {uploadingFile ? 'Enviando...' : (editingProduct ? 'Atualizar Produto' : 'Criar Produto')}
+                   </Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -444,14 +546,17 @@ export default function AdminDashboard() {
                       <p className="text-sm text-muted-foreground">{product.code}</p>
                       <Badge variant="outline" className="mt-2">{product.category}</Badge>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => deleteProduct(product.id)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+                     <div className="flex gap-2">
+                       <Button variant="outline" size="sm" onClick={() => {
+                         handleEditProduct(product);
+                         setDialogOpen(true);
+                       }}>
+                         <Edit className="w-4 h-4" />
+                       </Button>
+                       <Button variant="outline" size="sm" onClick={() => deleteProduct(product.id)}>
+                         <Trash2 className="w-4 h-4" />
+                       </Button>
+                     </div>
                   </div>
                 </CardContent>
               </Card>
@@ -464,7 +569,17 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Categorias</h2>
             
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <Dialog open={dialogOpen} onOpenChange={(open) => {
+              setDialogOpen(open);
+              if (!open) {
+                setEditingCategory(null);
+                setCategoryForm({
+                  name: '',
+                  description: '',
+                  active: true
+                });
+              }
+            }}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
@@ -473,7 +588,7 @@ export default function AdminDashboard() {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Nova Categoria</DialogTitle>
+                  <DialogTitle>{editingCategory ? 'Editar Categoria' : 'Nova Categoria'}</DialogTitle>
                 </DialogHeader>
                 
                 <div className="grid gap-4">
@@ -504,9 +619,9 @@ export default function AdminDashboard() {
                     <Label htmlFor="category_active">Ativa</Label>
                   </div>
                   
-                  <Button onClick={handleCreateCategory}>
-                    Criar Categoria
-                  </Button>
+                   <Button onClick={editingCategory ? handleUpdateCategory : handleCreateCategory}>
+                     {editingCategory ? 'Atualizar Categoria' : 'Criar Categoria'}
+                   </Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -524,14 +639,17 @@ export default function AdminDashboard() {
                         {category.active ? "Ativa" : "Inativa"}
                       </Badge>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => deleteCategory(category.id)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+                     <div className="flex gap-2">
+                       <Button variant="outline" size="sm" onClick={() => {
+                         handleEditCategory(category);
+                         setDialogOpen(true);
+                       }}>
+                         <Edit className="w-4 h-4" />
+                       </Button>
+                       <Button variant="outline" size="sm" onClick={() => deleteCategory(category.id)}>
+                         <Trash2 className="w-4 h-4" />
+                       </Button>
+                     </div>
                   </div>
                 </CardContent>
               </Card>
