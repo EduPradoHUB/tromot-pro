@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
 import { Plus, Edit, Trash2, Upload, Eye, EyeOff, Trophy, Medal, Award, FileSpreadsheet } from 'lucide-react';
 import { BulkProductUpload } from '@/components/BulkProductUpload';
+import { PostModeration } from '@/components/PostModeration';
 import { medals, computeUserMedals, getProgressToNextMedal } from '@/lib/gamification';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
@@ -530,13 +531,14 @@ export default function AdminDashboard() {
       </div>
 
       <Tabs defaultValue="products" className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="products">Produtos</TabsTrigger>
           <TabsTrigger value="bulk-upload">Upload em Massa</TabsTrigger>
           <TabsTrigger value="categories">Categorias</TabsTrigger>
           <TabsTrigger value="banners">Banners</TabsTrigger>
           <TabsTrigger value="advertisements">Propagandas</TabsTrigger>
           <TabsTrigger value="vehicles">Veículos</TabsTrigger>
+          <TabsTrigger value="moderation">Moderação</TabsTrigger>
           <TabsTrigger value="ranking">Ranking & Medalhas</TabsTrigger>
         </TabsList>
 
@@ -1324,6 +1326,15 @@ export default function AdminDashboard() {
               </Card>
             ))}
           </div>
+        </TabsContent>
+
+        {/* Moderação Tab */}
+        <TabsContent value="moderation" className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-semibold">Moderação de Posts</h2>
+          </div>
+          
+          <PostModeration />
         </TabsContent>
 
         {/* Ranking & Medalhas Tab */}

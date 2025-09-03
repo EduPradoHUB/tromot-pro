@@ -7,26 +7,42 @@ import { Check, X, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export const PostModeration: React.FC = () => {
-  const { posts, products } = useApp();
+  const { posts, products, moderatePost } = useApp();
   const { toast } = useToast();
   
   const pendingPosts = posts.filter(post => post.status === 'pending');
   
   const handleApprove = async (postId: string) => {
-    // TODO: Implementar aprovação via Supabase
-    toast({
-      title: "Post aprovado",
-      description: "Post foi aprovado e está visível para todos."
-    });
+    try {
+      await moderatePost(postId, 'approved');
+      toast({
+        title: "Post aprovado",
+        description: "Post foi aprovado e está visível para todos."
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao aprovar post.",
+        variant: "destructive"
+      });
+    }
   };
   
   const handleReject = async (postId: string) => {
-    // TODO: Implementar rejeição via Supabase  
-    toast({
-      title: "Post rejeitado",
-      description: "Post foi rejeitado e removido da fila.",
-      variant: "destructive"
-    });
+    try {
+      await moderatePost(postId, 'rejected');
+      toast({
+        title: "Post rejeitado",
+        description: "Post foi rejeitado e removido da fila.",
+        variant: "destructive"
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao rejeitar post.",
+        variant: "destructive"
+      });
+    }
   };
   
   const getProductName = (productId: string) => {

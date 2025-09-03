@@ -173,6 +173,9 @@ interface AppContextType {
   updateCategory: (id: string, data: Partial<CategoryInsert>) => Promise<Category>;
   deleteCategory: (id: string) => Promise<void>;
   
+  // Post moderation functions
+  moderatePost: (id: string, status: 'approved' | 'rejected') => Promise<void>;
+  
   // Profile management
   updateProfile: (data: Partial<Profile>) => Promise<void>;
   
@@ -606,6 +609,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCategories(prev => prev.filter(c => c.id !== id));
   };
 
+  // Function to moderate posts
+  const moderatePost = async (id: string, status: 'approved' | 'rejected'): Promise<void> => {
+    const { error } = await supabase
+      .from('posts')
+      .update({ status })
+      .eq('id', id);
+    
+    if (error) throw error;
+    
+    // Update local state for legacy posts
+    setPosts(prev => prev.map(post => 
+      post.id === id ? { ...post, status } : post
+    ));
+  };
+
   // Function to find product by barcode
   const findProductByBarcode = async (barcode: string): Promise<LegacyProduct | null> => {
     try {
@@ -904,6 +922,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     createCategory,
     updateCategory,
     deleteCategory,
+    moderatePost,
     updateProfile,
     uploadFile,
     fetchData,
