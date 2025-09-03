@@ -122,7 +122,7 @@ export default function ProductPage() {
           onClick={() => setShowBarcodeScanner(true)}
         >
           <ScanLine className="h-4 w-4 mr-2" />
-          Escanear Outro
+          Escanear
         </Button>
       </div>
 
