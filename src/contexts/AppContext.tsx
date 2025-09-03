@@ -191,6 +191,15 @@ interface AppContextType {
   // Barcode scanning
   findProductByBarcode: (barcode: string) => Promise<LegacyProduct | null>;
   
+  // Installation leaderboard and gamification
+  fetchInstallationLeaderboard: () => Promise<Array<{
+    user_id: string;
+    name: string;
+    avatar_url: string | null;
+    role: string;
+    posts_count: number;
+  }>>;
+  
   // Filters
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
@@ -604,6 +613,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       return null;
     }
   };
+  
+  // Installation leaderboard for gamification
+  const fetchInstallationLeaderboard = async () => {
+    const { data, error } = await supabase
+      .rpc('get_installation_leaderboard', { limit_rows: 100 });
+    
+    if (error) {
+      console.error('Error fetching leaderboard:', error);
+      return [];
+    }
+    
+    return data || [];
+  };
 
   // Fetch all data
   const fetchData = async () => {
@@ -873,6 +895,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     trackEvent,
     getDashboardStats,
     findProductByBarcode,
+    fetchInstallationLeaderboard,
     selectedCategory,
     setSelectedCategory,
     selectedBrand,

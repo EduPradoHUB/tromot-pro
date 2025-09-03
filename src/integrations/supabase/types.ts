@@ -496,6 +496,16 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_installation_leaderboard: {
+        Args: { limit_rows?: number }
+        Returns: {
+          avatar_url: string
+          name: string
+          posts_count: number
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }[]
+      }
       get_user_public_info: {
         Args: { user_uuid: string }
         Returns: {
