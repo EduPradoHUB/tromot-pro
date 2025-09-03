@@ -320,7 +320,7 @@ export default function Catalog() {
                       : 'aspect-[4/3] rounded-t-2xl'
                   }`}>
                     <img
-                      src={product.image_url}
+                      src={product.image_url || '/src/assets/photo-unavailable.png'}
                       alt={product.name}
                       className="w-full h-full object-cover"
                     />

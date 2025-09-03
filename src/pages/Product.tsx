@@ -152,7 +152,7 @@ export default function ProductPage() {
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <img
-                      src={product.image_url}
+                      src={product.image_url || '/src/assets/photo-unavailable.png'}
                       alt={product.name}
                       className="w-full aspect-square object-cover rounded-lg"
                     />
