@@ -84,11 +84,9 @@ export default function Home() {
                 Acesse manuais, compartilhe instalações e encontre suporte técnico especializado.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" asChild className="bg-primary hover:bg-primary/90">
-                  <Link to="/manuais">
-                    Explorar Catálogo
-                    <ChevronRight className="ml-2 h-5 w-5" />
-                  </Link>
+                <Button size="lg" className="bg-primary hover:bg-primary/90" onClick={() => setShowBarcodeScanner(true)}>
+                  <ScanLine className="mr-2 h-5 w-5" />
+                  Escanear Código de Barras
                 </Button>
                 {isInstallable && !isInstalled && <Button size="lg" variant="outline" className="border-white hover:bg-white hover:text-primary text-white" onClick={installApp}>
                     <Smartphone className="mr-2 h-5 w-5" />
@@ -102,18 +100,6 @@ export default function Home() {
             {banners.length > 0 && <div className="lg:flex justify-center hidden">
                 <AdSlot slot="home_hero" className="w-80" />
               </div>}
-          </div>
-        </div>
-      </section>
-
-      {/* Barcode Scanner Section */}
-      <section className="container">
-        <div className="flex justify-center">
-          <div className="w-full max-w-md">
-            <Button variant="outline" className="w-full" onClick={() => setShowBarcodeScanner(true)}>
-              <ScanLine className="mr-2 h-4 w-4" />
-              Escanear Código de Barras
-            </Button>
           </div>
         </div>
       </section>
