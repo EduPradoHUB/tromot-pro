@@ -44,7 +44,7 @@ export const medals: Medal[] = [
     id: 'platina',
     name: 'Platina',
     description: '100 instalações compartilhadas',
-    icon: '💎',
+    icon: '🎓',
     postsRequired: 100,
     color: 'text-purple-600'
   }
