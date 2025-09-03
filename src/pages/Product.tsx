@@ -39,6 +39,7 @@ export default function ProductPage() {
   const [answerText, setAnswerText] = useState<{ [key: string]: string }>({});
   const [showPostModal, setShowPostModal] = useState(false);
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
+  const [showInlinePlayer, setShowInlinePlayer] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -90,6 +91,23 @@ export default function ProductPage() {
         variant: "destructive",
       });
     }
+  };
+
+  // Helper functions for video URL processing
+  const getYouTubeId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  const getVimeoId = (url: string) => {
+    const regExp = /(?:vimeo)\.com.*(?:videos|video|channels|)\/([\d]+)/i;
+    const match = url.match(regExp);
+    return match ? match[1] : null;
+  };
+
+  const isDirectVideoFile = (url: string) => {
+    return /\.(mp4|webm|ogg|mov|avi)(\?.*)?$/i.test(url);
   };
 
   if (!product) {
@@ -211,32 +229,77 @@ export default function ProductPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                    <Button 
-                      variant="outline" 
-                      size="lg" 
-                      onClick={() => {
-                        if (product.video_url) {
-                          const opened = window.open(product.video_url, '_blank');
-                          if (!opened) {
-                            toast({
-                              title: "Bloqueado pelo navegador",
-                              description: "Por favor, habilite popups para este site ou clique com o botão direito e selecione 'Abrir em nova aba'.",
-                              variant: "destructive"
-                            });
+                  <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+                    {!showInlinePlayer ? (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Button 
+                          variant="outline" 
+                          size="lg" 
+                          onClick={() => setShowInlinePlayer(true)}
+                        >
+                          <Play className="h-5 w-5 mr-2" />
+                          Assistir Vídeo
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="relative w-full h-full">
+                        <Button 
+                          variant="secondary" 
+                          size="sm"
+                          className="absolute top-2 right-2 z-10"
+                          onClick={() => setShowInlinePlayer(false)}
+                        >
+                          Fechar
+                        </Button>
+                        {(() => {
+                          const youtubeId = getYouTubeId(product.video_url);
+                          const vimeoId = getVimeoId(product.video_url);
+                          
+                          if (youtubeId) {
+                            return (
+                              <iframe
+                                src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1`}
+                                className="w-full h-full rounded-lg"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                              />
+                            );
+                          } else if (vimeoId) {
+                            return (
+                              <iframe
+                                src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1`}
+                                className="w-full h-full rounded-lg"
+                                allow="autoplay; fullscreen; picture-in-picture"
+                                allowFullScreen
+                              />
+                            );
+                          } else if (isDirectVideoFile(product.video_url)) {
+                            return (
+                              <video
+                                src={product.video_url}
+                                className="w-full h-full rounded-lg object-cover"
+                                controls
+                                autoPlay
+                              />
+                            );
+                          } else {
+                            return (
+                              <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+                                <p className="text-sm text-muted-foreground text-center">
+                                  Não foi possível carregar o vídeo inline
+                                </p>
+                                <Button 
+                                  variant="outline"
+                                  onClick={() => window.open(product.video_url, '_blank')}
+                                >
+                                  Abrir em nova aba
+                                </Button>
+                              </div>
+                            );
                           }
-                        } else {
-                          toast({
-                            title: "Vídeo não disponível",
-                            description: "Este produto não possui vídeo demonstrativo.",
-                            variant: "destructive"
-                          });
-                        }
-                      }}
-                    >
-                      <Play className="h-5 w-5 mr-2" />
-                      Assistir Vídeo
-                    </Button>
+                        })()}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
