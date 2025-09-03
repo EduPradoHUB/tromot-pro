@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Camera, X, Upload, Image } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -151,6 +151,9 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
             <Camera className="h-5 w-5" />
             Compartilhar Instalação
           </DialogTitle>
+          <DialogDescription>
+            Compartilhe sua experiência de instalação com a comunidade
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

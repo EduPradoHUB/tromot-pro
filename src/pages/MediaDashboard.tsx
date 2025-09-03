@@ -76,7 +76,9 @@ export default function MediaDashboard() {
             Acompanhe o desempenho dos anúncios e campanhas
           </p>
         </div>
-        
+        <Button onClick={() => window.location.href = '/admin'}>
+          Nova Campanha
+        </Button>
       </div>
 
       {/* Métricas Gerais */}

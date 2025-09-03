@@ -31,6 +31,7 @@ type BarcodeDetectorInstance = {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -175,6 +176,9 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
             <Camera className="h-5 w-5" />
             Escanear Código de Barras
           </DialogTitle>
+          <DialogDescription>
+            Use a câmera para escanear códigos de barras ou digite manualmente
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">
@@ -203,7 +207,10 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
                     </div>
                   </>
                 ) : (
-                  <div className="flex items-center justify-center h-full">
+                  <div 
+                    className="flex items-center justify-center h-full cursor-pointer hover:bg-muted/50 transition-colors"
+                    onClick={startCamera}
+                  >
                     <div className="text-center">
                       <Camera className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
                       <p className="text-sm text-muted-foreground">

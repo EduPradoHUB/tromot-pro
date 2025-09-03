@@ -16,6 +16,8 @@ import MediaDashboard from "./pages/MediaDashboard";
 import Users from "./pages/Users";
 import Login from "./pages/Login";
 import PasswordReset from "./pages/PasswordReset";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -68,6 +70,16 @@ const App = () => (
             <Route path="/usuarios" element={
               <ProtectedRoute requireAdmin>
                 <Layout><Users /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/termos" element={
+              <ProtectedRoute>
+                <Layout><Terms /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/privacidade" element={
+              <ProtectedRoute>
+                <Layout><Privacy /></Layout>
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

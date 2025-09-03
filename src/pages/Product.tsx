@@ -212,7 +212,7 @@ export default function ProductPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                    <Button variant="outline" size="lg">
+                    <Button variant="outline" size="lg" onClick={() => product.video_url && window.open(product.video_url, '_blank')}>
                       <Play className="h-5 w-5 mr-2" />
                       Assistir Vídeo
                     </Button>

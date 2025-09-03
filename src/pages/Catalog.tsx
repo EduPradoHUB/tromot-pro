@@ -33,6 +33,18 @@ export default function Catalog() {
   const [selectedYear, setSelectedYear] = useState('');
   const [sortBy, setSortBy] = useState('name');
 
+  // Aplicar filtros da URL na inicialização
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const brandParam = urlParams.get('brand');
+    const modelParam = urlParams.get('model');
+    const yearParam = urlParams.get('year');
+    
+    if (brandParam && brandParam !== 'Todos') setSelectedBrand(brandParam);
+    if (modelParam && modelParam !== 'Todos') setSelectedModel(modelParam);
+    if (yearParam && yearParam !== 'Todos') setSelectedYear(yearParam);
+  }, []);
+
   const availableModels = selectedBrand && selectedBrand !== 'Todos'
     ? [...new Set(vehicles.filter(v => v.brand === selectedBrand).map(v => v.model))]
     : [];

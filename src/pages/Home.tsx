@@ -112,7 +112,6 @@ export default function Home() {
                     <Smartphone className="mr-2 h-5 w-5" />
                     Instalar App
                   </Button>}
-                {!isInstallable && !isInstalled}
               </div>
             </div>
 
