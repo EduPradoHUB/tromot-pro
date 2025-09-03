@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
-import { Plus, Edit, Trash2, Upload, Eye, EyeOff, Trophy, Medal, Award } from 'lucide-react';
+import { Plus, Edit, Trash2, Upload, Eye, EyeOff, Trophy, Medal, Award, FileSpreadsheet } from 'lucide-react';
+import { BulkProductUpload } from '@/components/BulkProductUpload';
 import { medals, computeUserMedals, getProgressToNextMedal } from '@/lib/gamification';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
@@ -466,8 +467,9 @@ export default function AdminDashboard() {
       </div>
 
       <Tabs defaultValue="products" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="products">Produtos</TabsTrigger>
+          <TabsTrigger value="bulk-upload">Upload em Massa</TabsTrigger>
           <TabsTrigger value="categories">Categorias</TabsTrigger>
           <TabsTrigger value="banners">Banners</TabsTrigger>
           <TabsTrigger value="advertisements">Propagandas</TabsTrigger>
@@ -695,6 +697,11 @@ export default function AdminDashboard() {
               </Card>
             ))}
           </div>
+        </TabsContent>
+
+        {/* Bulk Upload Tab */}
+        <TabsContent value="bulk-upload" className="space-y-6">
+          <BulkProductUpload />
         </TabsContent>
 
         {/* Categories Tab */}
