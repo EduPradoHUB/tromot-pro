@@ -26,31 +26,19 @@ export const Layout: React.FC<LayoutProps> = ({
     }
   };
   const isActive = (path: string) => location.pathname === path;
-  const navigationItems = [{
-    name: 'Home',
-    path: '/',
-    icon: Home
-  }, {
-    name: 'Manuais',
-    path: '/manuais',
-    icon: Search
-  }, ...(profile?.role === 'ADM' ? [{
-    name: 'Dashboard',
-    path: '/dashboard',
-    icon: BarChart3
-  }, {
-    name: 'Admin',
-    path: '/admin',
-    icon: Package
-  }, {
-    name: 'Mídia',
-    path: '/midia',
-    icon: Package
-  }, {
-    name: 'Usuários',
-    path: '/usuarios',
-    icon: User
-  }] : [])];
+const navigationItems = [
+    { name: 'Home', path: '/', icon: Home },
+    { name: 'Manuais', path: '/manuais', icon: Search },
+    ...(profile?.role === 'ADM' ? [
+      { name: 'Dashboard', path: '/dashboard', icon: BarChart3 },
+      { name: 'Admin', path: '/admin', icon: Package },
+      { name: 'Mídia', path: '/midia', icon: Package },
+      { name: 'Usuários', path: '/usuarios', icon: User }
+    ] : profile?.role === 'Técnico Tromot' ? [
+      { name: 'Dashboard', path: '/dashboard', icon: BarChart3 },
+      { name: 'Técnico', path: '/tecnico', icon: Package }
+    ] : [])
+  ];
   return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -106,6 +94,14 @@ export const Layout: React.FC<LayoutProps> = ({
                         </Link>
                       </DropdownMenuItem>
                     </>}
+                  {profile?.role === 'Técnico Tromot' && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/tecnico" className="cursor-pointer">
+                        <Package className="mr-2 h-4 w-4" />
+                        <span>Painel Técnico</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link to="/perfil" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />

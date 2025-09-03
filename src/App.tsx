@@ -12,6 +12,7 @@ import Product from "./pages/Product";
 import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import TechnicianDashboard from "./pages/TechnicianDashboard";
 import MediaDashboard from "./pages/MediaDashboard";
 import Users from "./pages/Users";
 import Login from "./pages/Login";
@@ -60,6 +61,11 @@ const App = () => (
             <Route path="/admin" element={
               <ProtectedRoute requireAdmin>
                 <Layout><AdminDashboard /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/tecnico" element={
+              <ProtectedRoute>
+                <Layout><TechnicianDashboard /></Layout>
               </ProtectedRoute>
             } />
             <Route path="/midia" element={
