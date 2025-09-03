@@ -68,9 +68,9 @@ export function AppDownloadDialog({ open, onOpenChange }: AppDownloadDialogProps
               </Button>
             ) : (
               <>
-                <Button variant="outline" onClick={handleInstallInstructions} className="w-full">
-                  <Smartphone className="mr-2 h-4 w-4" />
-                  Como instalar?
+                <Button onClick={handleInstallInstructions} className="w-full" size="lg">
+                  <Smartphone className="mr-2 h-5 w-5" />
+                  Instale Agora!
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
                   Use o menu do seu navegador para instalar o app
