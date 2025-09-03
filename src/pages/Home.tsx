@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, ChevronRight, Star, Eye, Download, Smartphone } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, ChevronRight, Star, Eye, Download, Smartphone, ScanLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,21 +12,26 @@ import { useApp } from '@/contexts/AppContext';
 import { brands } from '@/lib/data';
 import AdSlot from '@/components/AdSlot';
 import { usePWA } from '@/hooks/usePWA';
+import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
+import { toast } from '@/hooks/use-toast';
 export default function Home() {
   const {
     banners,
     legacyProducts: products,
     vehicles,
-    trackEvent
+    trackEvent,
+    findProductByBarcode
   } = useApp();
   const {
     isInstallable,
     isInstalled,
     installApp
   } = usePWA();
+  const navigate = useNavigate();
   const [searchBrand, setSearchBrand] = useState('');
   const [searchModel, setSearchModel] = useState('');
   const [searchYear, setSearchYear] = useState('');
+  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
 
   // Plugin autoplay para carrossel
   const autoplayPlugin = useCallback(() => Autoplay({
@@ -46,6 +51,24 @@ export default function Home() {
       type: 'view_product',
       product_id: productId
     });
+  };
+
+  const handleBarcodeDetected = async (barcode: string) => {
+    const product = await findProductByBarcode(barcode);
+    
+    if (product) {
+      navigate(`/produto/${product.id}`);
+      toast({
+        title: "Produto encontrado!",
+        description: `Navegando para ${product.name}`,
+      });
+    } else {
+      toast({
+        title: "Produto não encontrado",
+        description: `Nenhum produto encontrado com o código ${barcode}`,
+        variant: "destructive",
+      });
+    }
   };
   const latestProducts = products.slice(0, 6);
   return <div className="space-y-12">
@@ -152,6 +175,18 @@ export default function Home() {
               <Button onClick={handleQuickSearch} className="w-full">
                 <Search className="mr-2 h-4 w-4" />
                 Buscar
+              </Button>
+            </div>
+            
+            {/* Botão de escaneamento de código de barras */}
+            <div className="mt-4 pt-4 border-t">
+              <Button 
+                variant="outline" 
+                className="w-full" 
+                onClick={() => setShowBarcodeScanner(true)}
+              >
+                <ScanLine className="mr-2 h-4 w-4" />
+                Escanear Código de Barras
               </Button>
             </div>
           </CardContent>
@@ -278,5 +313,12 @@ export default function Home() {
           </Card>
         </div>
       </section>
+      
+      {/* Barcode Scanner Dialog */}
+      <BarcodeScannerDialog
+        open={showBarcodeScanner}
+        onOpenChange={setShowBarcodeScanner}
+        onBarcodeDetected={handleBarcodeDetected}
+      />
     </div>;
 }

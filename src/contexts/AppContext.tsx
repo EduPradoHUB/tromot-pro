@@ -188,6 +188,9 @@ interface AppContextType {
   trackEvent: (event: Omit<LegacyAnalyticsEvent, 'id' | 'timestamp'>) => void;
   getDashboardStats: () => DashboardStats;
   
+  // Barcode scanning
+  findProductByBarcode: (barcode: string) => Promise<LegacyProduct | null>;
+  
   // Filters
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
@@ -567,6 +570,41 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCategories(prev => prev.filter(c => c.id !== id));
   };
 
+  // Function to find product by barcode
+  const findProductByBarcode = async (barcode: string): Promise<LegacyProduct | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('barcode_ean', barcode)
+        .eq('status', 'active')
+        .single();
+
+      if (error || !data) {
+        return null;
+      }
+
+      return {
+        id: data.id,
+        name: data.name,
+        code: data.code,
+        category: data.category,
+        compatibility: parseCompatibility(data.compatibility),
+        manual_url: data.manual_url || undefined,
+        manual_type: (data.manual_type as 'pdf' | 'image') || undefined,
+        video_url: data.video_url || undefined,
+        rating_average: data.rating_average || 0,
+        rating_count: data.rating_count || 0,
+        image_url: data.image_url || '',
+        description: data.description || '',
+        status: data.status === 'active' ? 'active' : 'inactive'
+      };
+    } catch (error) {
+      console.error('Error finding product by barcode:', error);
+      return null;
+    }
+  };
+
   // Fetch all data
   const fetchData = async () => {
     try {
@@ -820,6 +858,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     getAdStats,
     trackEvent,
     getDashboardStats,
+    findProductByBarcode,
     selectedCategory,
     setSelectedCategory,
     selectedBrand,

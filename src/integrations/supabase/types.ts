@@ -266,6 +266,7 @@ export type Database = {
       }
       products: {
         Row: {
+          barcode_ean: string | null
           category: string
           code: string
           compatibility: Json | null
@@ -283,6 +284,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          barcode_ean?: string | null
           category: string
           code: string
           compatibility?: Json | null
@@ -300,6 +302,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          barcode_ean?: string | null
           category?: string
           code?: string
           compatibility?: Json | null

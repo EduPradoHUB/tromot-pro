@@ -9,7 +9,8 @@ import {
   Star, 
   MessageCircle,
   Camera,
-  HelpCircle
+  HelpCircle,
+  ScanLine
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,19 +23,22 @@ import { PostCard } from '@/components/PostCard';
 import { RatingForm } from '@/components/RatingForm';
 import { QuestionForm } from '@/components/QuestionForm';
 import { PostUploadModal } from '@/components/PostUploadModal';
+import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
 import { Product, Post, Rating, Question } from '@/lib/types';
 import AdSlot from '@/components/AdSlot';
+import { toast } from '@/hooks/use-toast';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { products, posts, ratings, questions, currentUser, trackEvent, answerQuestion } = useApp();
+  const { products, posts, ratings, questions, currentUser, trackEvent, answerQuestion, findProductByBarcode } = useApp();
   const [product, setProduct] = useState<any>(null);
   const [productPosts, setProductPosts] = useState<Post[]>([]);
   const [productRatings, setProductRatings] = useState<Rating[]>([]);
   const [productQuestions, setProductQuestions] = useState<Question[]>([]);
   const [answerText, setAnswerText] = useState<{ [key: string]: string }>({});
   const [showPostModal, setShowPostModal] = useState(false);
+  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -70,6 +74,24 @@ export default function ProductPage() {
 
   const canAnswerQuestions = currentUser?.role === 'Técnico Tromot' || currentUser?.role === 'ADM';
 
+  const handleBarcodeDetected = async (barcode: string) => {
+    const foundProduct = await findProductByBarcode(barcode);
+    
+    if (foundProduct) {
+      navigate(`/produto/${foundProduct.id}`);
+      toast({
+        title: "Produto encontrado!",
+        description: `Navegando para ${foundProduct.name}`,
+      });
+    } else {
+      toast({
+        title: "Produto não encontrado",
+        description: `Nenhum produto encontrado com o código ${barcode}`,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!product) {
     return (
       <div className="container py-8">
@@ -94,6 +116,14 @@ export default function ProductPage() {
           <h1 className="text-2xl font-bold">{product.name}</h1>
           <p className="text-muted-foreground">Código: {product.code}</p>
         </div>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => setShowBarcodeScanner(true)}
+        >
+          <ScanLine className="h-4 w-4 mr-2" />
+          Escanear Outro
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -426,6 +456,12 @@ export default function ProductPage() {
         isOpen={showPostModal}
         onClose={() => setShowPostModal(false)}
         productId={product.id}
+      />
+      
+      <BarcodeScannerDialog
+        open={showBarcodeScanner}
+        onOpenChange={setShowBarcodeScanner}
+        onBarcodeDetected={handleBarcodeDetected}
       />
     </div>
   );
