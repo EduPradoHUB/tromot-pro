@@ -179,6 +179,20 @@ export default function ProductPage() {
                   </div>
                   <p className="text-muted-foreground">{product.description}</p>
                   
+                  {/* Product Code and EAN */}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">Código:</span>
+                      <Badge variant="secondary">{product.code}</Badge>
+                    </div>
+                    {product.barcode_ean && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">EAN13:</span>
+                        <Badge variant="secondary">{product.barcode_ean}</Badge>
+                      </div>
+                    )}
+                  </div>
+                  
                   {/* Compatibility */}
                   <div>
                     <h3 className="font-medium mb-2">Compatibilidade</h3>
