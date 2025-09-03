@@ -210,7 +210,7 @@ export default function ProductPage() {
                     Manual de Instalação
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="py-4">
                   <Button onClick={handleManualAccess} className="w-full">
                     <Download className="h-4 w-4 mr-2" />
                     Acessar Manual
