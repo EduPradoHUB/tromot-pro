@@ -118,6 +118,26 @@ export default function Home() {
         </div>
       </section>
 
+
+      {/* Admin Banners Section */}
+      {banners.length > 0 && <section className="sm:container px-0">
+          {banners.length === 1 ? <div className="flex justify-center">
+              <div className="aspect-[4/5] w-full max-w-sm sm:max-w-md overflow-hidden shadow-card">
+                <img src={banners[0].image_url} alt={banners[0].title} className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => banners[0].link_url && window.open(banners[0].link_url, '_blank')} />
+              </div>
+            </div> : <Carousel className="w-full max-w-4xl mx-auto" plugins={[autoplayPlugin()]}>
+               <CarouselContent className="-ml-1 sm:-ml-2 md:-ml-4">
+                 {banners.map(banner => <CarouselItem key={banner.id} className="pl-1 sm:pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+                     <div className="aspect-[4/5] overflow-hidden shadow-card">
+                       <img src={banner.image_url} alt={banner.title} className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => banner.link_url && window.open(banner.link_url, '_blank')} />
+                     </div>
+                   </CarouselItem>)}
+               </CarouselContent>
+               <CarouselPrevious className="hidden sm:flex" />
+               <CarouselNext className="hidden sm:flex" />
+             </Carousel>}
+         </section>}
+
       {/* PWA Download Section */}
       <section className="sm:container py-[9px] px-0">
         <div className="flex justify-center">
@@ -161,25 +181,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Admin Banners Section */}
-      {banners.length > 0 && <section className="sm:container px-0">
-          {banners.length === 1 ? <div className="flex justify-center">
-              <div className="aspect-[4/5] w-full max-w-sm sm:max-w-md overflow-hidden shadow-card">
-                <img src={banners[0].image_url} alt={banners[0].title} className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => banners[0].link_url && window.open(banners[0].link_url, '_blank')} />
-              </div>
-            </div> : <Carousel className="w-full max-w-4xl mx-auto" plugins={[autoplayPlugin()]}>
-               <CarouselContent className="-ml-1 sm:-ml-2 md:-ml-4">
-                 {banners.map(banner => <CarouselItem key={banner.id} className="pl-1 sm:pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
-                     <div className="aspect-[4/5] overflow-hidden shadow-card">
-                       <img src={banner.image_url} alt={banner.title} className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => banner.link_url && window.open(banner.link_url, '_blank')} />
-                     </div>
-                   </CarouselItem>)}
-               </CarouselContent>
-               <CarouselPrevious className="hidden sm:flex" />
-               <CarouselNext className="hidden sm:flex" />
-             </Carousel>}
-        </section>}
 
       {/* Quick Search */}
       <section className="container">
