@@ -52,21 +52,19 @@ export default function Home() {
       product_id: productId
     });
   };
-
   const handleBarcodeDetected = async (barcode: string) => {
     const product = await findProductByBarcode(barcode);
-    
     if (product) {
       navigate(`/produto/${product.id}`);
       toast({
         title: "Produto encontrado!",
-        description: `Navegando para ${product.name}`,
+        description: `Navegando para ${product.name}`
       });
     } else {
       toast({
         title: "Produto não encontrado",
         description: `Nenhum produto encontrado com o código ${barcode}`,
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
@@ -75,7 +73,7 @@ export default function Home() {
       {/* Hero Section with Banner */}
       <section className="relative bg-gradient-hero text-white overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
-        <div className="relative container md:py-32 py-0">
+        <div className="relative container md:py-32 py-[10px]">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h1 className="text-4xl md:text-6xl font-bold leading-tight">
@@ -109,7 +107,7 @@ export default function Home() {
       </section>
 
       {/* PWA Download Section */}
-      <section className="px-4 sm:container py-8">
+      <section className="sm:container py-[9px] px-0">
         <div className="flex justify-center">
           <div className="bg-card border rounded-2xl p-6 max-w-md w-full text-center shadow-sm">
             <div className="flex justify-center mb-4">
@@ -121,41 +119,33 @@ export default function Home() {
             <p className="text-muted-foreground mb-4 text-sm">
               Tenha acesso offline aos manuais e receba notificações sobre novos produtos
             </p>
-            {isInstallable && !isInstalled ? (
-              <Button onClick={installApp} className="w-full">
+            {isInstallable && !isInstalled ? <Button onClick={installApp} className="w-full">
                 <Smartphone className="mr-2 h-4 w-4" />
                 Instalar App
-              </Button>
-            ) : isInstalled ? (
-              <div className="flex items-center justify-center text-green-600">
+              </Button> : isInstalled ? <div className="flex items-center justify-center text-green-600">
                 <CheckCircle className="mr-2 h-4 w-4" />
                 <span className="text-sm font-medium">App já instalado</span>
-              </div>
-            ) : (
-              <div className="space-y-2">
+              </div> : <div className="space-y-2">
                 <p className="text-xs text-muted-foreground">
                   Para instalar o app, use o menu do seu navegador
                 </p>
                 <Button variant="outline" className="w-full" onClick={() => {
-                  // Show instructions based on device
-                  const userAgent = navigator.userAgent;
-                  let instructions = "";
-                  
-                  if (userAgent.includes('iPhone') || userAgent.includes('iPad')) {
-                    instructions = "No Safari: toque no ícone de compartilhar e selecione 'Adicionar à Tela de Início'";
-                  } else if (userAgent.includes('Android')) {
-                    instructions = "No Chrome: toque no menu (⋮) e selecione 'Instalar app' ou 'Adicionar à tela inicial'";
-                  } else {
-                    instructions = "No seu navegador, procure pela opção 'Instalar app' ou 'Adicionar à tela inicial' no menu";
-                  }
-                  
-                  alert(instructions);
-                }}>
+              // Show instructions based on device
+              const userAgent = navigator.userAgent;
+              let instructions = "";
+              if (userAgent.includes('iPhone') || userAgent.includes('iPad')) {
+                instructions = "No Safari: toque no ícone de compartilhar e selecione 'Adicionar à Tela de Início'";
+              } else if (userAgent.includes('Android')) {
+                instructions = "No Chrome: toque no menu (⋮) e selecione 'Instalar app' ou 'Adicionar à tela inicial'";
+              } else {
+                instructions = "No seu navegador, procure pela opção 'Instalar app' ou 'Adicionar à tela inicial' no menu";
+              }
+              alert(instructions);
+            }}>
                   <Smartphone className="mr-2 h-4 w-4" />
                   Como instalar?
                 </Button>
-              </div>
-            )}
+              </div>}
           </div>
         </div>
       </section>
@@ -232,11 +222,7 @@ export default function Home() {
             
             {/* Botão de escaneamento de código de barras */}
             <div className="mt-4 pt-4 border-t">
-              <Button 
-                variant="outline" 
-                className="w-full" 
-                onClick={() => setShowBarcodeScanner(true)}
-              >
+              <Button variant="outline" className="w-full" onClick={() => setShowBarcodeScanner(true)}>
                 <ScanLine className="mr-2 h-4 w-4" />
                 Escanear Código de Barras
               </Button>
@@ -367,10 +353,6 @@ export default function Home() {
       </section>
       
       {/* Barcode Scanner Dialog */}
-      <BarcodeScannerDialog
-        open={showBarcodeScanner}
-        onOpenChange={setShowBarcodeScanner}
-        onBarcodeDetected={handleBarcodeDetected}
-      />
+      <BarcodeScannerDialog open={showBarcodeScanner} onOpenChange={setShowBarcodeScanner} onBarcodeDetected={handleBarcodeDetected} />
     </div>;
 }
