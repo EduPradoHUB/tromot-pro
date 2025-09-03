@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useApp } from '@/contexts/AppContext';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, Download, CheckCircle, XCircle, AlertCircle, FileText } from 'lucide-react';
-import { parseCSV, validateProductData, generateCSVTemplate } from '@/lib/csvUtils';
+import { parseFile, validateProductData, generateCSVTemplate, generateExcelTemplate } from '@/lib/csvUtils';
 
 interface ParsedProduct {
   name: string;
@@ -52,29 +52,33 @@ export const BulkProductUpload: React.FC = () => {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    if (selectedFile && (selectedFile.type === 'text/csv' || selectedFile.name.endsWith('.csv'))) {
-      setFile(selectedFile);
-      parseFile(selectedFile);
-    } else {
-      toast({
-        title: "Arquivo inválido",
-        description: "Por favor, selecione um arquivo CSV.",
-        variant: "destructive"
-      });
+    if (selectedFile) {
+      const allowedExtensions = ['.csv', '.xlsx', '.xls'];
+      const hasValidExtension = allowedExtensions.some(ext => selectedFile.name.toLowerCase().endsWith(ext));
+      
+      if (hasValidExtension) {
+        setFile(selectedFile);
+        parseFileData(selectedFile);
+      } else {
+        toast({
+          title: "Arquivo inválido",
+          description: "Por favor, selecione um arquivo CSV ou Excel (.xlsx/.xls).",
+          variant: "destructive"
+        });
+      }
     }
   };
 
-  const parseFile = async (file: File) => {
+  const parseFileData = async (file: File) => {
     try {
-      const text = await file.text();
-      const parsed = parseCSV(text);
+      const parsed = await parseFile(file);
       const validated = parsed.map(item => validateProductData(item));
       setParsedData(validated);
       setShowPreview(true);
     } catch (error) {
       toast({
         title: "Erro ao processar arquivo",
-        description: "Não foi possível processar o arquivo CSV.",
+        description: "Não foi possível processar o arquivo.",
         variant: "destructive"
       });
     }
@@ -91,6 +95,10 @@ export const BulkProductUpload: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const downloadExcelTemplate = () => {
+    generateExcelTemplate();
   };
 
   const handleImport = async () => {
@@ -217,15 +225,24 @@ export const BulkProductUpload: React.FC = () => {
               className="flex items-center gap-2"
             >
               <Download className="h-4 w-4" />
-              Baixar Template
+              Template CSV
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={downloadExcelTemplate}
+              className="flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Template Excel
             </Button>
             
             <div className="flex-1">
-              <Label htmlFor="csvFile">Arquivo CSV</Label>
+              <Label htmlFor="csvFile">Arquivo CSV ou Excel</Label>
               <Input
                 id="csvFile"
                 type="file"
-                accept=".csv"
+                accept=".csv,.xlsx,.xls"
                 onChange={handleFileSelect}
                 ref={fileInputRef}
                 className="mt-1"

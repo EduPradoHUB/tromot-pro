@@ -1,3 +1,5 @@
+import * as XLSX from 'xlsx';
+
 interface ProductCSVRow {
   nome: string;
   codigo: string;
@@ -10,6 +12,17 @@ interface ProductCSVRow {
   video_url?: string;
   compatibilidade?: string;
 }
+
+export const parseFile = async (file: File): Promise<ProductCSVRow[]> => {
+  const fileExtension = file.name.split('.').pop()?.toLowerCase();
+  
+  if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+    return parseExcel(file);
+  } else {
+    const csvText = await file.text();
+    return parseCSV(csvText);
+  }
+};
 
 export const parseCSV = (csvText: string): ProductCSVRow[] => {
   const lines = csvText.split('\n').map(line => line.trim()).filter(line => line);
@@ -33,6 +46,51 @@ export const parseCSV = (csvText: string): ProductCSVRow[] => {
   }
 
   return rows;
+};
+
+const parseExcel = async (file: File): Promise<ProductCSVRow[]> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        
+        if (jsonData.length === 0) {
+          resolve([]);
+          return;
+        }
+        
+        const headers = (jsonData[0] as string[]).map(h => String(h || '').trim());
+        const rows: ProductCSVRow[] = [];
+        
+        for (let i = 1; i < jsonData.length; i++) {
+          const values = jsonData[i] as any[];
+          const row: any = {};
+          
+          headers.forEach((header, index) => {
+            const normalizedHeader = normalizeHeader(header);
+            row[normalizedHeader] = String(values[index] || '').trim();
+          });
+          
+          if (row.nome && row.codigo) {
+            rows.push(row);
+          }
+        }
+        
+        resolve(rows);
+      } catch (error) {
+        reject(error);
+      }
+    };
+    
+    reader.onerror = () => reject(new Error('Erro ao ler arquivo'));
+    reader.readAsArrayBuffer(file);
+  });
 };
 
 const parseCSVLine = (line: string): string[] => {
@@ -208,4 +266,62 @@ export const generateCSVTemplate = (): string => {
   });
 
   return csv;
+};
+
+export const generateExcelTemplate = (): void => {
+  const headers = [
+    'nome',
+    'codigo', 
+    'ean',
+    'categoria',
+    'descricao',
+    'imagem_url',
+    'manual_url',
+    'tipo_manual',
+    'video_url',
+    'compatibilidade'
+  ];
+
+  const exampleRows = [
+    [
+      'Kit Trava Elétrica Universal',
+      'TE-001',
+      '7894567890123',
+      'Travas Elétricas',
+      'Kit completo de trava elétrica para veículos universais',
+      'https://exemplo.com/imagem1.jpg',
+      'https://exemplo.com/manual1.pdf',
+      'pdf',
+      'https://www.youtube.com/watch?v=exemplo1',
+      '[{"brand":"Volkswagen","model":"Gol","years":["2019","2020","2021"]}]'
+    ],
+    [
+      'Alarme Automotivo Premium',
+      'AL-002',
+      '7894567890124', 
+      'Alarmes',
+      'Alarme automotivo com controle remoto',
+      'https://exemplo.com/imagem2.jpg',
+      'https://exemplo.com/manual2.pdf',
+      'pdf',
+      '',
+      '[{"brand":"Fiat","model":"Uno","years":["2018","2019"]}]'
+    ]
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...exampleRows]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Produtos');
+  
+  // Auto-fit columns
+  const colWidths = headers.map((_, i) => {
+    const maxLength = Math.max(
+      headers[i].length,
+      ...exampleRows.map(row => String(row[i] || '').length)
+    );
+    return { width: Math.min(Math.max(maxLength + 2, 10), 50) };
+  });
+  ws['!cols'] = colWidths;
+  
+  XLSX.writeFile(wb, 'template-produtos.xlsx');
 };
