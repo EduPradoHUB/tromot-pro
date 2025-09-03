@@ -66,7 +66,10 @@ export default function AdminDashboard() {
     target_url: '',
     start_date: '',
     end_date: '',
-    daily_cap: 1000
+    daily_cap: 1000,
+    target_type: 'all' as 'all' | 'category' | 'products',
+    target_category: '',
+    target_products: [] as string[]
   });
   
   const [vehicleForm, setVehicleForm] = useState({
@@ -189,7 +192,10 @@ export default function AdminDashboard() {
         target_url: '',
         start_date: '',
         end_date: '',
-        daily_cap: 1000
+        daily_cap: 1000,
+        target_type: 'all',
+        target_category: '',
+        target_products: []
       });
       
       setDialogOpen(false);
@@ -355,7 +361,10 @@ export default function AdminDashboard() {
       target_url: ad.target_url || '',
       start_date: ad.start_date,
       end_date: ad.end_date,
-      daily_cap: ad.daily_cap
+      daily_cap: ad.daily_cap,
+      target_type: ad.target_type || 'all',
+      target_category: ad.target_category || '',
+      target_products: ad.target_products || []
     });
   };
 
@@ -371,7 +380,10 @@ export default function AdminDashboard() {
         target_url: '',
         start_date: '',
         end_date: '',
-        daily_cap: 1000
+        daily_cap: 1000,
+        target_type: 'all',
+        target_category: '',
+        target_products: []
       });
       
       setEditingAdvertisement(null);
@@ -841,7 +853,10 @@ export default function AdminDashboard() {
                   target_url: '',
                   start_date: '',
                   end_date: '',
-                  daily_cap: 1000
+                  daily_cap: 1000,
+                  target_type: 'all',
+                  target_category: '',
+                  target_products: []
                 });
               }
             }}>
@@ -955,9 +970,86 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   
+                  <div>
+                    <Label htmlFor="daily_cap">Limite Diário</Label>
+                    <Input
+                      id="daily_cap"
+                      type="number"
+                      value={adForm.daily_cap}
+                      onChange={(e) => setAdForm({...adForm, daily_cap: parseInt(e.target.value)})}
+                    />
+                  </div>
+                  
+                  {/* Campos de Segmentação */}
+                  <div className="space-y-4 border-t pt-4">
+                    <h4 className="font-medium">Segmentação</h4>
+                    
+                    <div>
+                      <Label htmlFor="target_type">Onde exibir</Label>
+                      <Select value={adForm.target_type} onValueChange={(value: any) => setAdForm({...adForm, target_type: value, target_category: '', target_products: []})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Em todos os produtos</SelectItem>
+                          <SelectItem value="category">Apenas em uma categoria específica</SelectItem>
+                          <SelectItem value="products">Apenas em produtos específicos</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    {adForm.target_type === 'category' && (
+                      <div>
+                        <Label htmlFor="target_category">Categoria</Label>
+                        <Select value={adForm.target_category} onValueChange={(value) => setAdForm({...adForm, target_category: value})}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione a categoria" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.filter(cat => cat.active).map((cat) => (
+                              <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                    
+                    {adForm.target_type === 'products' && (
+                      <div>
+                        <Label>Produtos específicos</Label>
+                        <div className="space-y-2 max-h-40 overflow-y-auto border rounded p-2">
+                          {products.map((product) => (
+                            <div key={product.id} className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                id={`product-${product.id}`}
+                                checked={adForm.target_products.includes(product.id)}
+                                onChange={(e) => {
+                                  const productIds = e.target.checked
+                                    ? [...adForm.target_products, product.id]
+                                    : adForm.target_products.filter(id => id !== product.id);
+                                  setAdForm({...adForm, target_products: productIds});
+                                }}
+                                className="rounded"
+                              />
+                              <label htmlFor={`product-${product.id}`} className="text-sm cursor-pointer">
+                                {product.name} ({product.code})
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                        {adForm.target_products.length > 0 && (
+                          <p className="text-sm text-muted-foreground">
+                            {adForm.target_products.length} produto(s) selecionado(s)
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
                    <Button onClick={editingAdvertisement ? handleUpdateAdvertisement : handleCreateAdvertisement} disabled={uploadingFile}>
-                     {editingAdvertisement ? 'Atualizar Propaganda' : 'Criar Propaganda'}
-                   </Button>
+                      {editingAdvertisement ? 'Atualizar Propaganda' : 'Criar Propaganda'}
+                    </Button>
                 </div>
               </DialogContent>
             </Dialog>

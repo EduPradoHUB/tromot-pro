@@ -183,7 +183,7 @@ interface AppContextType {
   submitRating: (productId: string, rating: number, comment: string) => void;
   submitQuestion: (productId: string, question: string) => void;
   answerQuestion: (questionId: string, answer: string) => void;
-  getActiveAd: (slot: 'home_hero' | 'product_banner' | 'feed_sponsored') => Advertisement | null;
+  getActiveAd: (slot: 'home_hero' | 'product_banner' | 'feed_sponsored', productId?: string, productCategory?: string) => Advertisement | null;
   getAdStats: (adId?: string) => AdStats[];
   trackEvent: (event: Omit<LegacyAnalyticsEvent, 'id' | 'timestamp'>) => void;
   getDashboardStats: () => DashboardStats;
@@ -696,15 +696,29 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     );
   };
 
-  const getActiveAd = (slot: 'home_hero' | 'product_banner' | 'feed_sponsored'): Advertisement | null => {
+  const getActiveAd = (slot: 'home_hero' | 'product_banner' | 'feed_sponsored', productId?: string, productCategory?: string): Advertisement | null => {
     const now = new Date();
     const activeAds = advertisements.filter(ad => {
       const startDate = new Date(ad.start_date);
       const endDate = new Date(ad.end_date);
-      return ad.status === 'active' && 
-             ad.slot === slot &&
-             now >= startDate && 
-             now <= endDate;
+      const isTimeValid = ad.status === 'active' && 
+                         ad.slot === slot &&
+                         now >= startDate && 
+                         now <= endDate;
+      
+      if (!isTimeValid) return false;
+      
+      // Filtrar por tipo de segmentação
+      if (ad.target_type === 'all') {
+        return true;
+      } else if (ad.target_type === 'category' && productCategory && ad.target_category) {
+        return productCategory === ad.target_category;
+      } else if (ad.target_type === 'products' && productId && ad.target_products) {
+        const targetProducts = Array.isArray(ad.target_products) ? ad.target_products : [];
+        return targetProducts.includes(productId);
+      }
+      
+      return false;
     });
     
     return activeAds[0] || null;

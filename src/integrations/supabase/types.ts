@@ -28,6 +28,9 @@ export type Database = {
           slot: string
           start_date: string
           status: Database["public"]["Enums"]["content_status"] | null
+          target_category: string | null
+          target_products: Json | null
+          target_type: string | null
           target_url: string | null
           updated_at: string
         }
@@ -44,6 +47,9 @@ export type Database = {
           slot: string
           start_date: string
           status?: Database["public"]["Enums"]["content_status"] | null
+          target_category?: string | null
+          target_products?: Json | null
+          target_type?: string | null
           target_url?: string | null
           updated_at?: string
         }
@@ -60,6 +66,9 @@ export type Database = {
           slot?: string
           start_date?: string
           status?: Database["public"]["Enums"]["content_status"] | null
+          target_category?: string | null
+          target_products?: Json | null
+          target_type?: string | null
           target_url?: string | null
           updated_at?: string
         }
