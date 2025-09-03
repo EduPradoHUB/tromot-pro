@@ -15,6 +15,7 @@ import { usePWA } from '@/hooks/usePWA';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
 import { AppDownloadDialog } from '@/components/AppDownloadDialog';
 import { toast } from '@/hooks/use-toast';
+
 export default function Home() {
   const {
     banners,
@@ -51,20 +52,24 @@ export default function Home() {
     delay: 2000,
     stopOnInteraction: true
   }), []);
+  
   const availableModels = searchBrand ? vehicles.filter(v => v.brand === searchBrand).map(v => v.model) : [];
   const availableYears = searchBrand && searchModel ? vehicles.find(v => v.brand === searchBrand && v.model === searchModel)?.years || [] : [];
+  
   const handleQuickSearch = () => {
     if (searchBrand || searchModel || searchYear) {
       // Navigate to catalog with filters
       window.location.href = `/manuais?brand=${searchBrand}&model=${searchModel}&year=${searchYear}`;
     }
   };
+  
   const handleProductView = (productId: string) => {
     trackEvent({
       type: 'view_product',
       product_id: productId
     });
   };
+  
   const handleBarcodeDetected = async (barcode: string) => {
     const product = await findProductByBarcode(barcode);
     if (product) {
@@ -81,8 +86,10 @@ export default function Home() {
       });
     }
   };
+  
   const latestProducts = products.slice(0, 6);
-  return <div className="space-y-12">
+  
+  return <div>
       {/* Hero Section with Banner */}
       <section className="relative bg-gradient-hero text-white overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
@@ -117,7 +124,6 @@ export default function Home() {
         </div>
       </section>
 
-
       {/* Admin Banners Section */}
       {banners.length > 0 && <section className="sm:container px-0">
           {banners.length === 1 ? <div className="flex justify-center">
@@ -137,9 +143,8 @@ export default function Home() {
              </Carousel>}
          </section>}
 
-
       {/* Quick Search */}
-      <section className="container">
+      <section className="container mt-12">
         <Card className="shadow-card">
           <CardContent className="p-6">
             <div className="text-center mb-6">
@@ -193,7 +198,7 @@ export default function Home() {
       </section>
 
       {/* Latest Products Carousel */}
-      <section className="container">
+      <section className="container mt-12">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-3xl font-bold mb-2">Novidades</h2>
@@ -266,7 +271,7 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="container py-[16px]">
+      <section className="container py-[16px] mt-12">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Por que usar o TROMOT Pro?</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
