@@ -1,8 +1,10 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Smartphone, CheckCircle } from 'lucide-react';
+import { Smartphone, CheckCircle, ExternalLink } from 'lucide-react';
 import { usePWA } from '@/hooks/usePWA';
+import { IOSInstallInstructions } from './IOSInstallInstructions';
+import { isInIframe, getInstallInstructions, isIOS } from '@/lib/pwaUtils';
 
 interface AppDownloadDialogProps {
   open: boolean;
@@ -10,21 +12,33 @@ interface AppDownloadDialogProps {
 }
 
 export function AppDownloadDialog({ open, onOpenChange }: AppDownloadDialogProps) {
-  const { isInstallable, isInstalled, installApp } = usePWA();
+  const { isInstallable, isInstalled, hasPrompt, installApp } = usePWA();
 
-  const handleInstallInstructions = () => {
-    const userAgent = navigator.userAgent;
-    let instructions = "";
+  const handleInstallClick = async () => {
+    console.log('[PWA Dialog] Install button clicked', { isInstallable, hasPrompt, isInIframe: isInIframe() });
     
-    if (userAgent.includes('iPhone') || userAgent.includes('iPad')) {
-      instructions = "No Safari: toque no ícone de compartilhar e selecione 'Adicionar à Tela de Início'";
-    } else if (userAgent.includes('Android')) {
-      instructions = "No Chrome: toque no menu (⋮) e selecione 'Instalar app' ou 'Adicionar à tela inicial'";
-    } else {
-      instructions = "No seu navegador, procure pela opção 'Instalar app' ou 'Adicionar à tela inicial' no menu";
+    if (isInstallable && hasPrompt) {
+      // Try direct installation
+      const success = await installApp();
+      if (success) {
+        onOpenChange(false);
+        return;
+      }
     }
     
-    alert(instructions);
+    // If we're in iframe, open in new tab with install parameter
+    if (isInIframe()) {
+      console.log('[PWA Dialog] Opening in new tab for installation');
+      const url = `${window.location.origin}${window.location.pathname}?install=1`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+      onOpenChange(false);
+      return;
+    }
+    
+    // Fallback to instructions for iOS and other cases
+    if (!isIOS()) {
+      alert(getInstallInstructions());
+    }
   };
 
   return (
@@ -61,20 +75,35 @@ export function AppDownloadDialog({ open, onOpenChange }: AppDownloadDialogProps
                 <CheckCircle className="h-5 w-5" />
                 <span className="font-medium">App já instalado!</span>
               </div>
-            ) : isInstallable ? (
-              <Button onClick={installApp} className="w-full" size="lg">
-                <Smartphone className="mr-2 h-5 w-5" />
-                Instalar App Agora
-              </Button>
             ) : (
               <>
-                <Button onClick={handleInstallInstructions} className="w-full" size="lg">
+                <Button onClick={handleInstallClick} className="w-full" size="lg">
                   <Smartphone className="mr-2 h-5 w-5" />
-                  Instale Agora!
+                  {isInIframe() ? (
+                    <>
+                      Instale Agora!
+                      <ExternalLink className="ml-2 h-4 w-4" />
+                    </>
+                  ) : (
+                    'Instale Agora!'
+                  )}
                 </Button>
-                <p className="text-xs text-muted-foreground text-center">
-                  Use o menu do seu navegador para instalar o app
-                </p>
+                
+                {isIOS() && !isInstallable && (
+                  <IOSInstallInstructions />
+                )}
+                
+                {!isIOS() && !isInstallable && !isInIframe() && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    {getInstallInstructions()}
+                  </p>
+                )}
+                
+                {isInIframe() && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    Abrirá em nova aba para instalação
+                  </p>
+                )}
               </>
             )}
             

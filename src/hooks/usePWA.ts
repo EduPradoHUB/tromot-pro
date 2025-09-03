@@ -13,6 +13,7 @@ export const usePWA = () => {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [hasPrompt, setHasPrompt] = useState(false);
 
   useEffect(() => {
     // Check if already installed
@@ -23,15 +24,19 @@ export const usePWA = () => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       const event = e as BeforeInstallPromptEvent;
+      console.log('[PWA] beforeinstallprompt event received');
       setInstallPrompt(event);
       setIsInstallable(true);
+      setHasPrompt(true);
     };
 
     // Listen for app installed
     const handleAppInstalled = () => {
+      console.log('[PWA] App installed successfully');
       setIsInstalled(true);
       setIsInstallable(false);
       setInstallPrompt(null);
+      setHasPrompt(false);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -43,25 +48,36 @@ export const usePWA = () => {
     };
   }, []);
 
-  const installApp = async () => {
-    if (!installPrompt) return;
+  const installApp = async (): Promise<boolean> => {
+    if (!installPrompt) {
+      console.log('[PWA] No install prompt available');
+      return false;
+    }
 
     try {
+      console.log('[PWA] Calling installPrompt.prompt()');
       await installPrompt.prompt();
       const choiceResult = await installPrompt.userChoice;
+      
+      console.log('[PWA] User choice:', choiceResult.outcome);
       
       if (choiceResult.outcome === 'accepted') {
         setIsInstallable(false);
         setInstallPrompt(null);
+        setHasPrompt(false);
+        return true;
       }
+      return false;
     } catch (error) {
-      console.error('Error installing PWA:', error);
+      console.error('[PWA] Error installing PWA:', error);
+      return false;
     }
   };
 
   return {
     isInstallable,
     isInstalled,
+    hasPrompt,
     installApp
   };
 };
