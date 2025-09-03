@@ -50,7 +50,7 @@ export default function ProductPage() {
         setProductQuestions(questions.filter(q => q.product_id === id));
         trackEvent({ type: 'view_product', product_id: id, user_id: currentUser?.id });
       } else {
-        navigate('/catalogo');
+        navigate('/manuais');
       }
     }
   }, [id, products, posts, ratings, questions, navigate, trackEvent, currentUser?.id]);
@@ -96,7 +96,7 @@ export default function ProductPage() {
     return (
       <div className="container py-8">
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/catalogo')}>
+          <Button variant="ghost" size="icon" onClick={() => navigate('/manuais')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="text-2xl font-bold">Produto não encontrado</h1>
@@ -109,7 +109,7 @@ export default function ProductPage() {
     <div className="container py-8">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/catalogo')}>
+        <Button variant="ghost" size="icon" onClick={() => navigate('/manuais')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1">

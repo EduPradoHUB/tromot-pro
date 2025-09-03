@@ -43,7 +43,7 @@ export default function Home() {
   const handleQuickSearch = () => {
     if (searchBrand || searchModel || searchYear) {
       // Navigate to catalog with filters
-      window.location.href = `/catalogo?brand=${searchBrand}&model=${searchModel}&year=${searchYear}`;
+      window.location.href = `/manuais?brand=${searchBrand}&model=${searchModel}&year=${searchYear}`;
     }
   };
   const handleProductView = (productId: string) => {
@@ -87,7 +87,7 @@ export default function Home() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="lg" asChild className="bg-primary hover:bg-primary/90">
-                  <Link to="/catalogo">
+                  <Link to="/manuais">
                     Explorar Catálogo
                     <ChevronRight className="ml-2 h-5 w-5" />
                   </Link>
@@ -203,7 +203,7 @@ export default function Home() {
             </p>
           </div>
           <Button variant="outline" asChild>
-            <Link to="/catalogo">
+            <Link to="/manuais">
               Ver Todos
               <ChevronRight className="ml-2 h-4 w-4" />
             </Link>
