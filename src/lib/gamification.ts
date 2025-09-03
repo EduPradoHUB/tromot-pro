@@ -10,7 +10,7 @@ export interface Medal {
 export const medals: Medal[] = [
   {
     id: 'latao',
-    name: 'Latão',
+    name: 'Aspirante',
     description: 'Primeira instalação compartilhada',
     icon: '👍',
     postsRequired: 1,
