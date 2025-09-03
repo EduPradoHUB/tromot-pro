@@ -61,6 +61,7 @@ export default function AdminDashboard() {
   const [productForm, setProductForm] = useState({
     name: '',
     code: '',
+    barcode_ean: '',
     category: '',
     description: '',
     image_url: '',
@@ -150,15 +151,27 @@ export default function AdminDashboard() {
   };
 
   const handleCreateProduct = async () => {
+    // Validate EAN-13
+    if (productForm.barcode_ean && !/^\d{13}$/.test(productForm.barcode_ean)) {
+      toast({
+        title: "EAN-13 inválido",
+        description: "O EAN-13 deve conter exatamente 13 dígitos.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       await createProduct({
         ...productForm,
+        barcode_ean: productForm.barcode_ean || null,
         compatibility: JSON.parse(productForm.compatibility)
       });
       
       setProductForm({
         name: '',
         code: '',
+        barcode_ean: '',
         category: '',
         description: '',
         image_url: '',
@@ -300,6 +313,7 @@ export default function AdminDashboard() {
     setProductForm({
       name: product.name,
       code: product.code,
+      barcode_ean: product.barcode_ean || '',
       category: product.category,
       description: product.description || '',
       image_url: product.image_url || '',
@@ -320,15 +334,27 @@ export default function AdminDashboard() {
   };
 
   const handleUpdateProduct = async () => {
+    // Validate EAN-13
+    if (productForm.barcode_ean && !/^\d{13}$/.test(productForm.barcode_ean)) {
+      toast({
+        title: "EAN-13 inválido",
+        description: "O EAN-13 deve conter exatamente 13 dígitos.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       await updateProduct(editingProduct.id, {
         ...productForm,
+        barcode_ean: productForm.barcode_ean || null,
         compatibility: JSON.parse(productForm.compatibility)
       });
       
       setProductForm({
         name: '',
         code: '',
+        barcode_ean: '',
         category: '',
         description: '',
         image_url: '',
@@ -461,6 +487,7 @@ export default function AdminDashboard() {
                 setProductForm({
                   name: '',
                   code: '',
+                  barcode_ean: '',
                   category: '',
                   description: '',
                   image_url: '',
@@ -500,6 +527,24 @@ export default function AdminDashboard() {
                         onChange={(e) => setProductForm({...productForm, code: e.target.value})}
                       />
                     </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="barcode_ean">EAN-13 (opcional)</Label>
+                    <Input
+                      id="barcode_ean"
+                      value={productForm.barcode_ean}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 13);
+                        setProductForm({...productForm, barcode_ean: value});
+                      }}
+                      placeholder="7891234567890"
+                      inputMode="numeric"
+                      pattern="\d{13}"
+                    />
+                    <p className="text-sm text-muted-foreground mt-1">
+                      13 dígitos para busca por código de barras (ex: 7891234567890)
+                    </p>
                   </div>
                   
                   <div>
