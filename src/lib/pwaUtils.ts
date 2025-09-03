@@ -25,3 +25,16 @@ export const isIOS = (): boolean => {
 export const isAndroid = (): boolean => {
   return /Android/.test(navigator.userAgent);
 };
+
+export const logPWADiagnostics = (): void => {
+  console.log('[PWA Diagnostics] Browser info:', {
+    userAgent: navigator.userAgent,
+    isIOS: isIOS(),
+    isAndroid: isAndroid(),
+    isInIframe: isInIframe(),
+    standalone: window.matchMedia('(display-mode: standalone)').matches,
+    serviceWorkerSupported: 'serviceWorker' in navigator,
+    manifestSupported: 'manifestchange' in window,
+    beforeInstallPromptFired: window.hasOwnProperty('beforeinstallprompt')
+  });
+};

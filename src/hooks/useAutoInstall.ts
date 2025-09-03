@@ -19,30 +19,41 @@ export const useAutoInstall = () => {
       newUrl.searchParams.delete('install');
       window.history.replaceState({}, '', newUrl.toString());
       
-      // Auto-install when prompt becomes available
+      // Auto-install when prompt becomes available with more aggressive polling
+      let checkCount = 0;
+      const maxChecks = 60; // 30 seconds at 500ms intervals
       let timeoutId: NodeJS.Timeout;
       
       const tryAutoInstall = () => {
+        checkCount++;
+        console.log(`[Auto Install] Check ${checkCount}/${maxChecks} - installable: ${isInstallable}, hasPrompt: ${hasPrompt}`);
+        
         if (isInstallable && hasPrompt) {
           console.log('[Auto Install] Attempting automatic installation');
           installApp().then(success => {
             if (success) {
+              console.log('[Auto Install] Installation successful!');
               setShouldShowDialog(false);
+            } else {
+              console.log('[Auto Install] Installation failed, keeping dialog open');
             }
           });
-        } else {
-          // Keep checking for a few seconds
+        } else if (checkCount < maxChecks) {
+          // Keep checking for up to 30 seconds
           timeoutId = setTimeout(tryAutoInstall, 500);
+        } else {
+          console.log('[Auto Install] Max checks reached, stopping auto-install attempts');
         }
       };
       
-      // Start checking after a small delay to let everything initialize
-      timeoutId = setTimeout(tryAutoInstall, 1000);
+      // Start checking immediately
+      timeoutId = setTimeout(tryAutoInstall, 100);
       
-      // Cleanup after 10 seconds to avoid infinite checking
+      // Cleanup after 30 seconds
       const cleanupTimeout = setTimeout(() => {
         clearTimeout(timeoutId);
-      }, 10000);
+        console.log('[Auto Install] Cleanup timeout reached');
+      }, 30000);
       
       return () => {
         clearTimeout(timeoutId);

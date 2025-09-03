@@ -15,29 +15,53 @@ export function AppDownloadDialog({ open, onOpenChange }: AppDownloadDialogProps
   const { isInstallable, isInstalled, hasPrompt, installApp } = usePWA();
 
   const handleInstallClick = async () => {
-    console.log('[PWA Dialog] Install button clicked', { isInstallable, hasPrompt, isInIframe: isInIframe() });
+    console.log('[PWA Dialog] Install button clicked', { 
+      isInstallable, 
+      hasPrompt, 
+      isInIframe: isInIframe(),
+      userAgent: navigator.userAgent,
+      standalone: window.matchMedia('(display-mode: standalone)').matches
+    });
     
-    if (isInstallable && hasPrompt) {
-      // Try direct installation
-      const success = await installApp();
-      if (success) {
-        onOpenChange(false);
-        return;
+    // Force reload service worker to ensure latest version
+    if ('serviceWorker' in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+          console.log('[PWA Dialog] Updating service worker');
+          await registration.update();
+        }
+      } catch (error) {
+        console.log('[PWA Dialog] Service worker update failed:', error);
       }
     }
     
-    // If we're in iframe, open in new tab with install parameter
-    if (isInIframe()) {
-      console.log('[PWA Dialog] Opening in new tab for installation');
-      const url = `${window.location.origin}${window.location.pathname}?install=1`;
-      window.open(url, '_blank', 'noopener,noreferrer');
-      onOpenChange(false);
-      return;
+    // Try direct installation first
+    if (isInstallable && hasPrompt) {
+      console.log('[PWA Dialog] Attempting direct installation');
+      const success = await installApp();
+      if (success) {
+        console.log('[PWA Dialog] Direct installation successful');
+        onOpenChange(false);
+        return;
+      }
+      console.log('[PWA Dialog] Direct installation failed');
     }
     
-    // Fallback to instructions for iOS and other cases
-    if (!isIOS()) {
-      alert(getInstallInstructions());
+    // Always try opening in new tab for better installation experience
+    console.log('[PWA Dialog] Opening in new tab for installation');
+    const url = `${window.location.origin}${window.location.pathname}?install=1&timestamp=${Date.now()}`;
+    const newWindow = window.open(url, '_blank', 'noopener,noreferrer,width=400,height=600');
+    
+    if (newWindow) {
+      console.log('[PWA Dialog] New tab opened successfully');
+      onOpenChange(false);
+    } else {
+      console.log('[PWA Dialog] Failed to open new tab, showing instructions');
+      // Fallback to instructions
+      if (!isIOS()) {
+        alert(getInstallInstructions());
+      }
     }
   };
 
