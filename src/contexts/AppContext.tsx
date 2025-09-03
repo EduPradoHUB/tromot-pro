@@ -9,6 +9,7 @@ type Product = Database['public']['Tables']['products']['Row'];
 type Banner = Database['public']['Tables']['banners']['Row'];
 type Advertisement = Database['public']['Tables']['advertisements']['Row'];  
 type Vehicle = Database['public']['Tables']['vehicles']['Row'];
+type Category = Database['public']['Tables']['categories']['Row'];
 type Post = Database['public']['Tables']['posts']['Row'];
 type Rating = Database['public']['Tables']['ratings']['Row'];
 type Question = Database['public']['Tables']['questions']['Row'];
@@ -19,6 +20,7 @@ type ProductInsert = Database['public']['Tables']['products']['Insert'];
 type BannerInsert = Database['public']['Tables']['banners']['Insert'];
 type AdvertisementInsert = Database['public']['Tables']['advertisements']['Insert'];
 type VehicleInsert = Database['public']['Tables']['vehicles']['Insert'];
+type CategoryInsert = Database['public']['Tables']['categories']['Insert'];
 
 // Legacy interfaces for backward compatibility
 interface LegacyUser {
@@ -140,6 +142,7 @@ interface AppContextType {
   banners: Banner[];
   advertisements: Advertisement[];
   vehicles: Vehicle[];
+  categories: Category[];
   
   // Legacy data (for backward compatibility)
   posts: LegacyPost[];
@@ -163,6 +166,10 @@ interface AppContextType {
   deleteAdvertisement: (id: string) => Promise<void>;
   
   createVehicle: (data: VehicleInsert) => Promise<Vehicle>;
+  
+  createCategory: (data: CategoryInsert) => Promise<Category>;
+  updateCategory: (id: string, data: Partial<CategoryInsert>) => Promise<Category>;
+  deleteCategory: (id: string) => Promise<void>;
   
   // File upload
   uploadFile: (bucket: string, path: string, file: File) => Promise<string>;
@@ -209,6 +216,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [banners, setBanners] = useState<Banner[]>([]);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   
   // Legacy state (mock data for backward compatibility)
   const [posts, setPosts] = useState<LegacyPost[]>([]);
@@ -502,6 +510,45 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return vehicle;
   };
 
+  // CRUD Functions for Categories
+  const createCategory = async (data: CategoryInsert): Promise<Category> => {
+    const { data: category, error } = await supabase
+      .from('categories')
+      .insert(data)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    setCategories(prev => [...prev, category]);
+    return category;
+  };
+
+  const updateCategory = async (id: string, data: Partial<CategoryInsert>): Promise<Category> => {
+    const { data: category, error } = await supabase
+      .from('categories')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    setCategories(prev => prev.map(c => c.id === id ? category : c));
+    return category;
+  };
+
+  const deleteCategory = async (id: string): Promise<void> => {
+    const { error } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+    
+    setCategories(prev => prev.filter(c => c.id !== id));
+  };
+
   // Fetch all data
   const fetchData = async () => {
     try {
@@ -509,18 +556,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         { data: productsData },
         { data: bannersData },
         { data: advertisementsData },
-        { data: vehiclesData }
+        { data: vehiclesData },
+        { data: categoriesData }
       ] = await Promise.all([
         supabase.from('products').select('*'),
         supabase.from('banners').select('*'),
         supabase.from('advertisements').select('*'),
-        supabase.from('vehicles').select('*')
+        supabase.from('vehicles').select('*'),
+        supabase.from('categories').select('*')
       ]);
 
       if (productsData) setProducts(productsData);
       if (bannersData) setBanners(bannersData);
       if (advertisementsData) setAdvertisements(advertisementsData);
       if (vehiclesData) setVehicles(vehiclesData);
+      if (categoriesData) setCategories(categoriesData);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -688,6 +738,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           setBanners([]);
           setAdvertisements([]);
           setVehicles([]);
+          setCategories([]);
           setLoading(false);
         }
       }
@@ -718,6 +769,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     banners,
     advertisements,
     vehicles,
+    categories,
     createProduct,
     updateProduct,
     deleteProduct,
@@ -728,6 +780,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     updateAdvertisement,
     deleteAdvertisement,
     createVehicle,
+    createCategory,
+    updateCategory,
+    deleteCategory,
     uploadFile,
     fetchData,
     

@@ -20,6 +20,7 @@ export default function AdminDashboard() {
     banners, 
     advertisements, 
     vehicles,
+    categories,
     createProduct, 
     updateProduct, 
     deleteProduct,
@@ -30,6 +31,9 @@ export default function AdminDashboard() {
     updateAdvertisement,
     deleteAdvertisement,
     createVehicle,
+    createCategory,
+    updateCategory,
+    deleteCategory,
     uploadFile
   } = useApp();
   
@@ -69,6 +73,12 @@ export default function AdminDashboard() {
     brand: '',
     model: '',
     years: ''
+  });
+  
+  const [categoryForm, setCategoryForm] = useState({
+    name: '',
+    description: '',
+    active: true
   });
   
   const [editingItem, setEditingItem] = useState<any>(null);
@@ -223,7 +233,31 @@ export default function AdminDashboard() {
     }
   };
 
-  const categories = ['Alarmes', 'Vidros Elétricos', 'Travas', 'Sensores', 'Outros'];
+  const handleCreateCategory = async () => {
+    try {
+      await createCategory(categoryForm);
+      
+      setCategoryForm({
+        name: '',
+        description: '',
+        active: true
+      });
+      
+      setDialogOpen(false);
+      
+      toast({
+        title: "Categoria criada",
+        description: "Categoria adicionada com sucesso!"
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao criar categoria.",
+        variant: "destructive"
+      });
+    }
+  };
+
 
   return (
     <div className="container py-8 space-y-8">
@@ -233,8 +267,9 @@ export default function AdminDashboard() {
       </div>
 
       <Tabs defaultValue="products" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="products">Produtos</TabsTrigger>
+          <TabsTrigger value="categories">Categorias</TabsTrigger>
           <TabsTrigger value="banners">Banners</TabsTrigger>
           <TabsTrigger value="advertisements">Propagandas</TabsTrigger>
           <TabsTrigger value="vehicles">Veículos</TabsTrigger>
@@ -284,8 +319,8 @@ export default function AdminDashboard() {
                         <SelectValue placeholder="Selecione a categoria" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        {categories.filter(cat => cat.active).map((cat) => (
+                          <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -414,6 +449,86 @@ export default function AdminDashboard() {
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => deleteProduct(product.id)}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        {/* Categories Tab */}
+        <TabsContent value="categories" className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-semibold">Categorias</h2>
+            
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Nova Categoria
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Nova Categoria</DialogTitle>
+                </DialogHeader>
+                
+                <div className="grid gap-4">
+                  <div>
+                    <Label htmlFor="category_name">Nome</Label>
+                    <Input
+                      id="category_name"
+                      value={categoryForm.name}
+                      onChange={(e) => setCategoryForm({...categoryForm, name: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="category_description">Descrição</Label>
+                    <Textarea
+                      id="category_description"
+                      value={categoryForm.description}
+                      onChange={(e) => setCategoryForm({...categoryForm, description: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="category_active"
+                      checked={categoryForm.active}
+                      onCheckedChange={(checked) => setCategoryForm({...categoryForm, active: checked})}
+                    />
+                    <Label htmlFor="category_active">Ativa</Label>
+                  </div>
+                  
+                  <Button onClick={handleCreateCategory}>
+                    Criar Categoria
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+          
+          <div className="grid gap-4">
+            {categories.map((category) => (
+              <Card key={category.id}>
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold">{category.name}</h3>
+                      <p className="text-sm text-muted-foreground">{category.description}</p>
+                      <Badge variant={category.active ? "default" : "secondary"} className="mt-2">
+                        {category.active ? "Ativa" : "Inativa"}
+                      </Badge>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => deleteCategory(category.id)}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
