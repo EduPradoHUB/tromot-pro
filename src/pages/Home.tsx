@@ -201,7 +201,7 @@ export default function Home() {
       <section className="container mt-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-bold mb-2">Novidades</h2>
+            <h2 className="text-3xl font-bold mb-2">Produtos</h2>
             <p className="text-muted-foreground">
               Últimos produtos adicionados ao catálogo
             </p>
