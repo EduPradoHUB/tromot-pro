@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ChevronRight, Star, Eye, Download, Smartphone, ScanLine } from 'lucide-react';
+import { Search, ChevronRight, Star, Eye, Download, Smartphone, ScanLine, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -104,6 +104,58 @@ export default function Home() {
             {banners.length > 0 && <div className="lg:flex justify-center hidden">
                 <AdSlot slot="home_hero" className="w-80" />
               </div>}
+          </div>
+        </div>
+      </section>
+
+      {/* PWA Download Section */}
+      <section className="px-4 sm:container py-8">
+        <div className="flex justify-center">
+          <div className="bg-card border rounded-2xl p-6 max-w-md w-full text-center shadow-sm">
+            <div className="flex justify-center mb-4">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Smartphone className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <h3 className="font-bold text-lg mb-2">Baixe o App TROMOT PRO</h3>
+            <p className="text-muted-foreground mb-4 text-sm">
+              Tenha acesso offline aos manuais e receba notificações sobre novos produtos
+            </p>
+            {isInstallable && !isInstalled ? (
+              <Button onClick={installApp} className="w-full">
+                <Smartphone className="mr-2 h-4 w-4" />
+                Instalar App
+              </Button>
+            ) : isInstalled ? (
+              <div className="flex items-center justify-center text-green-600">
+                <CheckCircle className="mr-2 h-4 w-4" />
+                <span className="text-sm font-medium">App já instalado</span>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  Para instalar o app, use o menu do seu navegador
+                </p>
+                <Button variant="outline" className="w-full" onClick={() => {
+                  // Show instructions based on device
+                  const userAgent = navigator.userAgent;
+                  let instructions = "";
+                  
+                  if (userAgent.includes('iPhone') || userAgent.includes('iPad')) {
+                    instructions = "No Safari: toque no ícone de compartilhar e selecione 'Adicionar à Tela de Início'";
+                  } else if (userAgent.includes('Android')) {
+                    instructions = "No Chrome: toque no menu (⋮) e selecione 'Instalar app' ou 'Adicionar à tela inicial'";
+                  } else {
+                    instructions = "No seu navegador, procure pela opção 'Instalar app' ou 'Adicionar à tela inicial' no menu";
+                  }
+                  
+                  alert(instructions);
+                }}>
+                  <Smartphone className="mr-2 h-4 w-4" />
+                  Como instalar?
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </section>
