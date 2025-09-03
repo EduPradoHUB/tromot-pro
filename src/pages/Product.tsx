@@ -151,11 +151,11 @@ export default function ProductPage() {
           <Card className="shadow-card">
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-64 object-cover rounded-lg"
-                />
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      className="w-full aspect-square object-cover rounded-lg"
+                    />
                 <div className="space-y-4">
                   <div>
                     <Badge className="mb-2">{product.category}</Badge>
