@@ -166,6 +166,8 @@ interface AppContextType {
   deleteAdvertisement: (id: string) => Promise<void>;
   
   createVehicle: (data: VehicleInsert) => Promise<Vehicle>;
+  updateVehicle: (id: string, data: Partial<VehicleInsert>) => Promise<Vehicle>;
+  deleteVehicle: (id: string) => Promise<void>;
   
   createCategory: (data: CategoryInsert) => Promise<Category>;
   updateCategory: (id: string, data: Partial<CategoryInsert>) => Promise<Category>;
@@ -540,6 +542,31 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return vehicle;
   };
 
+  const updateVehicle = async (id: string, data: Partial<VehicleInsert>): Promise<Vehicle> => {
+    const { data: vehicle, error } = await supabase
+      .from('vehicles')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    setVehicles(prev => prev.map(v => v.id === id ? vehicle : v));
+    return vehicle;
+  };
+
+  const deleteVehicle = async (id: string): Promise<void> => {
+    const { error } = await supabase
+      .from('vehicles')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+    
+    setVehicles(prev => prev.filter(v => v.id !== id));
+  };
+
   // CRUD Functions for Categories
   const createCategory = async (data: CategoryInsert): Promise<Category> => {
     const { data: category, error } = await supabase
@@ -872,6 +899,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     updateAdvertisement,
     deleteAdvertisement,
     createVehicle,
+    updateVehicle,
+    deleteVehicle,
     createCategory,
     updateCategory,
     deleteCategory,

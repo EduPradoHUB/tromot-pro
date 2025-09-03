@@ -33,6 +33,8 @@ export default function AdminDashboard() {
     updateAdvertisement,
     deleteAdvertisement,
     createVehicle,
+    updateVehicle,
+    deleteVehicle,
     createCategory,
     updateCategory,
     deleteCategory,
@@ -107,6 +109,7 @@ export default function AdminDashboard() {
   
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [editingVehicle, setEditingVehicle] = useState<any>(null);
   const [editingAdvertisement, setEditingAdvertisement] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
@@ -279,6 +282,66 @@ export default function AdminDashboard() {
       toast({
         title: "Erro",
         description: "Falha ao criar veículo.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleEditVehicle = (vehicle: any) => {
+    setEditingVehicle(vehicle);
+    setVehicleForm({
+      brand: vehicle.brand,
+      model: vehicle.model,
+      years: vehicle.years.join(', ')
+    });
+    setDialogOpen(true);
+  };
+
+  const handleUpdateVehicle = async () => {
+    if (!editingVehicle) return;
+    
+    try {
+      await updateVehicle(editingVehicle.id, {
+        ...vehicleForm,
+        years: vehicleForm.years.split(',').map(y => y.trim())
+      });
+      
+      setVehicleForm({
+        brand: '',
+        model: '',
+        years: ''
+      });
+      
+      setEditingVehicle(null);
+      setDialogOpen(false);
+      
+      toast({
+        title: "Veículo atualizado",
+        description: "Veículo atualizado com sucesso!"
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar veículo.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDeleteVehicle = async (vehicleId: string) => {
+    if (!confirm('Tem certeza que deseja excluir este veículo?')) return;
+    
+    try {
+      await deleteVehicle(vehicleId);
+      
+      toast({
+        title: "Veículo excluído",
+        description: "Veículo excluído com sucesso!"
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao excluir veículo.",
         variant: "destructive"
       });
     }
@@ -1170,7 +1233,17 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Veículos</h2>
             
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <Dialog open={dialogOpen} onOpenChange={(open) => {
+              setDialogOpen(open);
+              if (!open) {
+                setEditingVehicle(null);
+                setVehicleForm({
+                  brand: '',
+                  model: '',
+                  years: ''
+                });
+              }
+            }}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
@@ -1179,7 +1252,7 @@ export default function AdminDashboard() {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Novo Veículo</DialogTitle>
+                  <DialogTitle>{editingVehicle ? 'Editar Veículo' : 'Novo Veículo'}</DialogTitle>
                 </DialogHeader>
                 
                 <div className="grid gap-4">
@@ -1211,8 +1284,8 @@ export default function AdminDashboard() {
                     />
                   </div>
                   
-                  <Button onClick={handleCreateVehicle}>
-                    Criar Veículo
+                  <Button onClick={editingVehicle ? handleUpdateVehicle : handleCreateVehicle}>
+                    {editingVehicle ? 'Atualizar Veículo' : 'Criar Veículo'}
                   </Button>
                 </div>
               </DialogContent>
@@ -1229,6 +1302,22 @@ export default function AdminDashboard() {
                       <p className="text-sm text-muted-foreground">
                         Anos: {vehicle.years.join(', ')}
                       </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditVehicle(vehicle)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteVehicle(vehicle.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
