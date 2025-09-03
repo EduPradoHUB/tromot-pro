@@ -83,7 +83,7 @@ export default function AdSlot({ slot, className = '', productId }: AdSlotProps)
     return (
       <Card className={`cursor-pointer hover:shadow-lg transition-shadow ${className}`} onClick={handleAdClick}>
         <CardContent className="p-0">
-          <AspectRatio ratio={5/4} className="relative">
+          <AspectRatio ratio={5/3} className="relative">
             <img
               src={ad.creative_url}
               alt="Anúncio"
