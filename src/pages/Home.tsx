@@ -203,7 +203,7 @@ export default function Home() {
           <div>
             <h2 className="text-3xl font-bold mb-2">Produtos</h2>
             <p className="text-muted-foreground">
-              Últimos produtos adicionados ao catálogo
+              Veja todos os produtos do nosso catálogo
             </p>
           </div>
           <Button variant="outline" asChild>
