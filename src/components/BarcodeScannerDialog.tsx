@@ -1,6 +1,33 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { BrowserMultiFormatReader } from '@zxing/browser';
-import { X, Camera, Type } from 'lucide-react';
+import { X, Camera, Type, AlertCircle } from 'lucide-react';
+
+// Tipos para BarcodeDetector API
+interface DetectedBarcode {
+  rawValue: string;
+  format: string;
+  boundingBox?: DOMRectReadOnly;
+  cornerPoints?: Array<{x: number; y: number}>;
+}
+
+interface BarcodeDetectorOptions {
+  formats?: string[];
+}
+
+declare global {
+  interface Window {
+    BarcodeDetector?: {
+      new (options?: BarcodeDetectorOptions): {
+        detect(element: HTMLVideoElement | HTMLImageElement): Promise<DetectedBarcode[]>;
+        getSupportedFormats(): Promise<string[]>;
+      };
+    };
+  }
+}
+
+type BarcodeDetectorInstance = {
+  detect(element: HTMLVideoElement | HTMLImageElement): Promise<DetectedBarcode[]>;
+  getSupportedFormats(): Promise<string[]>;
+};
 import {
   Dialog,
   DialogContent,
@@ -27,8 +54,43 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
   const [manualInput, setManualInput] = useState('');
   const [showManualInput, setShowManualInput] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [barcodeDetector, setBarcodeDetector] = useState<BarcodeDetectorInstance | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const readerRef = useRef<BrowserMultiFormatReader | null>(null);
+  const scanIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Verifica se BarcodeDetector está disponível
+  useEffect(() => {
+    if ('BarcodeDetector' in window && window.BarcodeDetector) {
+      try {
+        const detector = new window.BarcodeDetector({
+          formats: ['code_128', 'code_39', 'ean_13', 'ean_8', 'upc_a', 'upc_e']
+        });
+        setBarcodeDetector(detector);
+      } catch (error) {
+        console.warn('BarcodeDetector não suportado:', error);
+      }
+    }
+  }, []);
+
+  const detectBarcode = async () => {
+    if (!barcodeDetector || !videoRef.current) return;
+    
+    try {
+      const barcodes = await barcodeDetector.detect(videoRef.current);
+      if (barcodes.length > 0) {
+        const barcode = barcodes[0].rawValue;
+        onBarcodeDetected(barcode);
+        stopCamera();
+        onOpenChange(false);
+        toast({
+          title: "Código detectado!",
+          description: `Código de barras: ${barcode}`,
+        });
+      }
+    } catch (error) {
+      console.error('Erro na detecção:', error);
+    }
+  };
 
   const startCamera = async () => {
     try {
@@ -46,23 +108,17 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
         videoRef.current.srcObject = mediaStream;
         await videoRef.current.play();
         
-        // Inicializa o scanner
-        const reader = new BrowserMultiFormatReader();
-        readerRef.current = reader;
-        
-        // Configura detecção contínua
-        reader.decodeFromVideoDevice(undefined, videoRef.current, (result, error) => {
-          if (result) {
-            const barcode = result.getText();
-            onBarcodeDetected(barcode);
-            stopCamera();
-            onOpenChange(false);
-            toast({
-              title: "Código detectado!",
-              description: `Código de barras: ${barcode}`,
-            });
-          }
-        });
+        // Se BarcodeDetector estiver disponível, usa ele
+        if (barcodeDetector) {
+          scanIntervalRef.current = setInterval(detectBarcode, 100);
+        } else {
+          // Fallback: instrui o usuário a usar input manual
+          toast({
+            title: "Scanner automático não disponível",
+            description: "Use o botão 'Digitar' para inserir o código manualmente.",
+            variant: "default",
+          });
+        }
       }
     } catch (error) {
       console.error('Erro ao acessar câmera:', error);
@@ -81,9 +137,9 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
       stream.getTracks().forEach(track => track.stop());
       setStream(null);
     }
-    if (readerRef.current) {
-      // Não há método reset, apenas limpar a referência
-      readerRef.current = null;
+    if (scanIntervalRef.current) {
+      clearInterval(scanIntervalRef.current);
+      scanIntervalRef.current = null;
     }
     setIsScanning(false);
   };
@@ -139,7 +195,10 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
                     </div>
                     <div className="absolute bottom-4 left-4 right-4">
                       <p className="text-white text-sm text-center bg-black/60 rounded-lg px-3 py-2">
-                        Posicione o código de barras dentro da área marcada
+                        {barcodeDetector 
+                          ? "Posicione o código de barras dentro da área marcada" 
+                          : "Câmera ativa. Use 'Digitar' para inserir o código manualmente"
+                        }
                       </p>
                     </div>
                   </>
@@ -209,6 +268,13 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
                 </div>
               </div>
             </>
+          )}
+          
+          {!barcodeDetector && (
+            <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
+              <AlertCircle className="h-4 w-4 flex-shrink-0" />
+              <span>Scanner automático não disponível neste navegador. Use o input manual.</span>
+            </div>
           )}
           
           <p className="text-xs text-muted-foreground text-center">
