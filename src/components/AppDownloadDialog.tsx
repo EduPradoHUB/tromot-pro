@@ -23,21 +23,8 @@ export function AppDownloadDialog({ open, onOpenChange }: AppDownloadDialogProps
       standalone: window.matchMedia('(display-mode: standalone)').matches
     });
     
-    // Force reload service worker to ensure latest version
-    if ('serviceWorker' in navigator) {
-      try {
-        const registration = await navigator.serviceWorker.getRegistration();
-        if (registration) {
-          console.log('[PWA Dialog] Updating service worker');
-          await registration.update();
-        }
-      } catch (error) {
-        console.log('[PWA Dialog] Service worker update failed:', error);
-      }
-    }
-    
-    // Try direct installation first
-    if (isInstallable && hasPrompt) {
+    // Se não estamos em iframe e temos o prompt, instalar diretamente
+    if (!isInIframe() && isInstallable && hasPrompt) {
       console.log('[PWA Dialog] Attempting direct installation');
       const success = await installApp();
       if (success) {
@@ -45,22 +32,22 @@ export function AppDownloadDialog({ open, onOpenChange }: AppDownloadDialogProps
         onOpenChange(false);
         return;
       }
-      console.log('[PWA Dialog] Direct installation failed');
     }
     
-    // Always try opening in new tab for better installation experience
-    console.log('[PWA Dialog] Opening in new tab for installation');
-    const url = `${window.location.origin}${window.location.pathname}?install=1&timestamp=${Date.now()}`;
-    const newWindow = window.open(url, '_blank', 'noopener,noreferrer,width=400,height=600');
+    // Abrir página dedicada de instalação
+    console.log('[PWA Dialog] Opening dedicated install page');
+    const url = `${window.location.origin}/instalar`;
+    const newWindow = window.open(url, '_blank', 'width=500,height=700,scrollbars=yes,resizable=yes');
     
     if (newWindow) {
-      console.log('[PWA Dialog] New tab opened successfully');
+      console.log('[PWA Dialog] Install page opened successfully');
       onOpenChange(false);
     } else {
-      console.log('[PWA Dialog] Failed to open new tab, showing instructions');
-      // Fallback to instructions
-      if (!isIOS()) {
-        alert(getInstallInstructions());
+      console.log('[PWA Dialog] Failed to open install page');
+      // Fallback apenas para iOS
+      if (isIOS()) {
+        // Manter o dialog aberto para mostrar instruções iOS
+        return;
       }
     }
   };
@@ -117,17 +104,9 @@ export function AppDownloadDialog({ open, onOpenChange }: AppDownloadDialogProps
                   <IOSInstallInstructions />
                 )}
                 
-                {!isIOS() && !isInstallable && !isInIframe() && (
-                  <p className="text-xs text-muted-foreground text-center">
-                    {getInstallInstructions()}
-                  </p>
-                )}
-                
-                {isInIframe() && (
-                  <p className="text-xs text-muted-foreground text-center">
-                    Abrirá em nova aba para instalação
-                  </p>
-                )}
+                <p className="text-xs text-muted-foreground text-center">
+                  {isInIframe() ? 'Abrirá em nova aba para instalação' : 'Clique para instalar o app'}
+                </p>
               </>
             )}
             
