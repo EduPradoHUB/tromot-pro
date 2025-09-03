@@ -192,9 +192,7 @@ export const Layout: React.FC<LayoutProps> = ({
               </ul>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-            © 2024 Tromot Indústria Eletrônica. Todos os direitos reservados.
-          </div>
+          <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">© 2025 Tromot Indústria Eletrônica. Todos os direitos reservados.</div>
         </div>
       </footer>
     </div>;
