@@ -324,10 +324,15 @@ export default function Catalog() {
                       alt={product.name}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-3 right-3">
+                    <div className="absolute top-3 right-3 flex flex-col gap-1">
                       <Badge variant="secondary" className="bg-background/90">
                         {product.category}
                       </Badge>
+                      {product.out_of_production && (
+                        <Badge variant="destructive" className="bg-red-500/90 text-white">
+                          Fora de produção
+                        </Badge>
+                      )}
                     </div>
                   </div>
 

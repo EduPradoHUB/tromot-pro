@@ -53,6 +53,7 @@ interface LegacyProduct {
   image_url: string;
   description: string;
   status: 'active' | 'inactive';
+  out_of_production?: boolean;
 }
 
 interface LegacyPost {
@@ -276,7 +277,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     rating_count: product.rating_count || 0,
     image_url: product.image_url || '',
     description: product.description || '',
-    status: product.status === 'active' ? 'active' : 'inactive'
+    status: product.status === 'active' ? 'active' : 'inactive',
+    out_of_production: product.out_of_production || false
   }));
 
   // Fetch user profile
@@ -651,7 +653,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         rating_count: data.rating_count || 0,
         image_url: data.image_url || '',
         description: data.description || '',
-        status: data.status === 'active' ? 'active' : 'inactive'
+        status: data.status === 'active' ? 'active' : 'inactive',
+        out_of_production: data.out_of_production || false
       };
     } catch (error) {
       console.error('Error finding product by barcode:', error);

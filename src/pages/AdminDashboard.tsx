@@ -72,7 +72,8 @@ export default function AdminDashboard() {
     manual_url: '',
     manual_type: 'pdf' as 'pdf' | 'image',
     video_url: '',
-    compatibility: '[]'
+    compatibility: '[]',
+    out_of_production: false
   });
   
   const [bannerForm, setBannerForm] = useState({
@@ -183,7 +184,8 @@ export default function AdminDashboard() {
         manual_url: '',
         manual_type: 'pdf',
         video_url: '',
-        compatibility: '[]'
+        compatibility: '[]',
+        out_of_production: false
       });
       
       setDialogOpen(false);
@@ -385,7 +387,8 @@ export default function AdminDashboard() {
       manual_url: product.manual_url || '',
       manual_type: product.manual_type || 'pdf',
       video_url: product.video_url || '',
-      compatibility: JSON.stringify(product.compatibility || [])
+      compatibility: JSON.stringify(product.compatibility || []),
+      out_of_production: product.out_of_production || false
     });
   };
 
@@ -426,7 +429,8 @@ export default function AdminDashboard() {
         manual_url: '',
         manual_type: 'pdf',
         video_url: '',
-        compatibility: '[]'
+        compatibility: '[]',
+        out_of_production: false
       });
       
       setEditingProduct(null);
@@ -561,7 +565,8 @@ export default function AdminDashboard() {
                   manual_url: '',
                   manual_type: 'pdf',
                   video_url: '',
-                  compatibility: '[]'
+                  compatibility: '[]',
+                  out_of_production: false
                 });
               }
             }}>
@@ -726,9 +731,18 @@ export default function AdminDashboard() {
                       value={productForm.video_url}
                       onChange={(e) => setProductForm({...productForm, video_url: e.target.value})}
                     />
-                  </div>
-                  
-                   <Button onClick={editingProduct ? handleUpdateProduct : handleCreateProduct} disabled={uploadingFile}>
+                   </div>
+                   
+                   <div className="flex items-center space-x-2">
+                     <Switch
+                       id="out_of_production"
+                       checked={productForm.out_of_production}
+                       onCheckedChange={(checked) => setProductForm({...productForm, out_of_production: checked})}
+                     />
+                     <Label htmlFor="out_of_production">Fora de produção</Label>
+                   </div>
+                   
+                    <Button onClick={editingProduct ? handleUpdateProduct : handleCreateProduct} disabled={uploadingFile}>
                      {uploadingFile ? 'Enviando...' : (editingProduct ? 'Atualizar Produto' : 'Criar Produto')}
                    </Button>
                 </div>
@@ -744,7 +758,12 @@ export default function AdminDashboard() {
                     <div>
                       <h3 className="font-semibold">{product.name}</h3>
                       <p className="text-sm text-muted-foreground">{product.code}</p>
-                      <Badge variant="outline" className="mt-2">{product.category}</Badge>
+                      <div className="flex gap-2 mt-2">
+                        <Badge variant="outline">{product.category}</Badge>
+                        {product.out_of_production && (
+                          <Badge variant="destructive">Fora de produção</Badge>
+                        )}
+                      </div>
                     </div>
                      <div className="flex gap-2">
                        <Button variant="outline" size="sm" onClick={() => {
