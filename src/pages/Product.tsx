@@ -212,7 +212,28 @@ export default function ProductPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                    <Button variant="outline" size="lg" onClick={() => product.video_url && window.open(product.video_url, '_blank')}>
+                    <Button 
+                      variant="outline" 
+                      size="lg" 
+                      onClick={() => {
+                        if (product.video_url) {
+                          const opened = window.open(product.video_url, '_blank');
+                          if (!opened) {
+                            toast({
+                              title: "Bloqueado pelo navegador",
+                              description: "Por favor, habilite popups para este site ou clique com o botão direito e selecione 'Abrir em nova aba'.",
+                              variant: "destructive"
+                            });
+                          }
+                        } else {
+                          toast({
+                            title: "Vídeo não disponível",
+                            description: "Este produto não possui vídeo demonstrativo.",
+                            variant: "destructive"
+                          });
+                        }
+                      }}
+                    >
                       <Play className="h-5 w-5 mr-2" />
                       Assistir Vídeo
                     </Button>
