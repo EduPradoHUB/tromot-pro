@@ -106,20 +106,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Barcode Scanner Section */}
-      <section className="container">
-        <div className="flex justify-center">
-          <div className="w-full max-w-md">
-            <Button variant="outline" className="w-full" onClick={() => setShowBarcodeScanner(true)}>
-              <ScanLine className="mr-2 h-4 w-4" />
-              Escanear Código de Barras
-            </Button>
-          </div>
-        </div>
-      </section>
-
       {/* PWA Download Section */}
-      <section className="sm:container py-[9px] px-0">
+      <section className="sm:container py-[9px] mx-0 px-[33px]">
         <div className="flex justify-center">
           <div className="bg-card border rounded-2xl p-6 max-w-md w-full text-center shadow-sm">
             <div className="flex justify-center mb-4">
@@ -229,6 +217,14 @@ export default function Home() {
               <Button onClick={handleQuickSearch} className="w-full">
                 <Search className="mr-2 h-4 w-4" />
                 Buscar
+              </Button>
+            </div>
+            
+            {/* Botão de escaneamento de código de barras */}
+            <div className="mt-4 pt-4 border-t">
+              <Button variant="outline" className="w-full" onClick={() => setShowBarcodeScanner(true)}>
+                <ScanLine className="mr-2 h-4 w-4" />
+                Escanear Código de Barras
               </Button>
             </div>
           </CardContent>
