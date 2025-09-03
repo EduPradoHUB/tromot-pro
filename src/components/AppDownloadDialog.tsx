@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { Smartphone, CheckCircle } from 'lucide-react';
 import { usePWA } from '@/hooks/usePWA';
-import { InstallPWAButton } from './InstallPWAButton';
 
 interface AppDownloadDialogProps {
   open: boolean;
@@ -62,11 +61,21 @@ export function AppDownloadDialog({ open, onOpenChange }: AppDownloadDialogProps
                 <CheckCircle className="h-5 w-5" />
                 <span className="font-medium">App já instalado!</span>
               </div>
-            ) : (
-              <InstallPWAButton size="lg" className="w-full">
+            ) : isInstallable ? (
+              <Button onClick={installApp} className="w-full" size="lg">
                 <Smartphone className="mr-2 h-5 w-5" />
-                {isInstallable ? 'Instalar App Agora' : 'Como Instalar'}
-              </InstallPWAButton>
+                Instalar App Agora
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" onClick={handleInstallInstructions} className="w-full">
+                  <Smartphone className="mr-2 h-4 w-4" />
+                  Como instalar?
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  Use o menu do seu navegador para instalar o app
+                </p>
+              </>
             )}
             
             <Button variant="ghost" onClick={() => onOpenChange(false)} className="w-full">

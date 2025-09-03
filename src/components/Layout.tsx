@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApp } from '@/contexts/AppContext';
-import { InstallPWAButton } from './InstallPWAButton';
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -60,8 +59,6 @@ const navigationItems = [
 
           {/* User Menu */}
           <div className="flex items-center space-x-4">
-            <InstallPWAButton variant="outline" size="sm" className="hidden sm:inline-flex" />
-            
             {profile ? <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">

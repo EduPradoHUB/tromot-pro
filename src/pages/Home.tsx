@@ -12,7 +12,6 @@ import { useApp } from '@/contexts/AppContext';
 import { brands } from '@/lib/data';
 import AdSlot from '@/components/AdSlot';
 import { usePWA } from '@/hooks/usePWA';
-import { InstallPWAButton } from '@/components/InstallPWAButton';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
 import { AppDownloadDialog } from '@/components/AppDownloadDialog';
 import { toast } from '@/hooks/use-toast';
@@ -109,13 +108,10 @@ export default function Home() {
                   <ScanLine className="mr-2 h-5 w-5" />
                   Escanear Código de Barras
                 </Button>
-                {!isInstalled && (
-                  <InstallPWAButton 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-white hover:bg-white hover:text-primary text-white"
-                  />
-                )}
+                {isInstallable && !isInstalled && <Button size="lg" variant="outline" className="border-white hover:bg-white hover:text-primary text-white" onClick={installApp}>
+                    <Smartphone className="mr-2 h-5 w-5" />
+                    Instalar App
+                  </Button>}
               </div>
             </div>
 
