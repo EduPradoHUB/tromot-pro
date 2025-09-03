@@ -202,9 +202,6 @@ export default function Home() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-3xl font-bold mb-2">Produtos</h2>
-            <p className="text-muted-foreground">
-              Veja todos os produtos do nosso catálogo
-            </p>
           </div>
           <Button variant="outline" asChild>
             <Link to="/manuais">
