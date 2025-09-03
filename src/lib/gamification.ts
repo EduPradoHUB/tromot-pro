@@ -12,7 +12,7 @@ export const medals: Medal[] = [
     id: 'latao',
     name: 'Latão',
     description: 'Primeira instalação compartilhada',
-    icon: '🥉',
+    icon: '👍',
     postsRequired: 1,
     color: 'text-amber-700'
   },
