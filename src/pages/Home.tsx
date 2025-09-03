@@ -151,7 +151,7 @@ export default function Home() {
       </section>
 
       {/* Admin Banners Section */}
-      {banners.length > 0 && <section className="px-4 sm:container">
+      {banners.length > 0 && <section className="sm:container px-0">
           {banners.length === 1 ? <div className="flex justify-center">
               <div className="aspect-[4/5] w-full max-w-sm sm:max-w-md overflow-hidden shadow-card">
                 <img src={banners[0].image_url} alt={banners[0].title} className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => banners[0].link_url && window.open(banners[0].link_url, '_blank')} />
