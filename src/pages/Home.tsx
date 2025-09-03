@@ -13,6 +13,7 @@ import { brands } from '@/lib/data';
 import AdSlot from '@/components/AdSlot';
 import { usePWA } from '@/hooks/usePWA';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
+import { AppDownloadDialog } from '@/components/AppDownloadDialog';
 import { toast } from '@/hooks/use-toast';
 export default function Home() {
   const {
@@ -32,6 +33,18 @@ export default function Home() {
   const [searchModel, setSearchModel] = useState('');
   const [searchYear, setSearchYear] = useState('');
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
+  const [showAppDownload, setShowAppDownload] = useState(false);
+
+  // Show app download popup after 3 seconds if not installed
+  React.useEffect(() => {
+    if (!isInstalled) {
+      const timer = setTimeout(() => {
+        setShowAppDownload(true);
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isInstalled]);
 
   // Plugin autoplay para carrossel
   const autoplayPlugin = useCallback(() => Autoplay({
@@ -124,49 +137,6 @@ export default function Home() {
              </Carousel>}
          </section>}
 
-      {/* PWA Download Section */}
-      <section className="sm:container py-[9px] px-0">
-        <div className="flex justify-center">
-          <div className="bg-card border rounded-2xl p-6 max-w-md w-full text-center shadow-sm">
-            <div className="flex justify-center mb-4">
-              <div className="bg-primary/10 p-3 rounded-full">
-                <Smartphone className="h-8 w-8 text-primary" />
-              </div>
-            </div>
-            <h3 className="font-bold text-lg mb-2">Baixe o App TROMOT PRO</h3>
-            <p className="text-muted-foreground mb-4 text-sm">
-              Tenha acesso offline aos manuais e receba notificações sobre novos produtos
-            </p>
-            {isInstallable && !isInstalled ? <Button onClick={installApp} className="w-full">
-                <Smartphone className="mr-2 h-4 w-4" />
-                Instalar App
-              </Button> : isInstalled ? <div className="flex items-center justify-center text-green-600">
-                <CheckCircle className="mr-2 h-4 w-4" />
-                <span className="text-sm font-medium">App já instalado</span>
-              </div> : <div className="space-y-2">
-                <p className="text-xs text-muted-foreground">
-                  Para instalar o app, use o menu do seu navegador
-                </p>
-                <Button variant="outline" className="w-full" onClick={() => {
-              // Show instructions based on device
-              const userAgent = navigator.userAgent;
-              let instructions = "";
-              if (userAgent.includes('iPhone') || userAgent.includes('iPad')) {
-                instructions = "No Safari: toque no ícone de compartilhar e selecione 'Adicionar à Tela de Início'";
-              } else if (userAgent.includes('Android')) {
-                instructions = "No Chrome: toque no menu (⋮) e selecione 'Instalar app' ou 'Adicionar à tela inicial'";
-              } else {
-                instructions = "No seu navegador, procure pela opção 'Instalar app' ou 'Adicionar à tela inicial' no menu";
-              }
-              alert(instructions);
-            }}>
-                  <Smartphone className="mr-2 h-4 w-4" />
-                  Como instalar?
-                </Button>
-              </div>}
-          </div>
-        </div>
-      </section>
 
       {/* Quick Search */}
       <section className="container">
@@ -345,5 +315,8 @@ export default function Home() {
       
       {/* Barcode Scanner Dialog */}
       <BarcodeScannerDialog open={showBarcodeScanner} onOpenChange={setShowBarcodeScanner} onBarcodeDetected={handleBarcodeDetected} />
+      
+      {/* App Download Dialog */}
+      <AppDownloadDialog open={showAppDownload} onOpenChange={setShowAppDownload} />
     </div>;
 }
