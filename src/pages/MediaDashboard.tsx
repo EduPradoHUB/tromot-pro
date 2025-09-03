@@ -3,70 +3,72 @@ import { useApp } from '@/contexts/AppContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@/components/ui/chart';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Eye, MousePointer, Target } from 'lucide-react';
-
 export default function MediaDashboard() {
-  const { currentUser, advertisements, getAdStats } = useApp();
-
+  const {
+    currentUser,
+    advertisements,
+    getAdStats
+  } = useApp();
   if (!currentUser || currentUser.role !== 'ADM') {
-    return (
-      <div className="container py-8">
+    return <div className="container py-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Acesso Restrito</h1>
           <p className="text-muted-foreground">
             Apenas administradores podem acessar o dashboard de mídia.
           </p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
   const activeAds = advertisements.filter(ad => ad.status === 'active');
   const totalImpressions = advertisements.reduce((sum, ad) => sum + ad.impressions_count, 0);
   const totalClicks = advertisements.reduce((sum, ad) => sum + ad.clicks_count, 0);
-  const overallCTR = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+  const overallCTR = totalImpressions > 0 ? totalClicks / totalImpressions * 100 : 0;
 
   // Mock data para gráficos
-  const impressionsData = [
-    { date: '27/08', impressions: 1930, clicks: 45 },
-    { date: '28/08', impressions: 1830, clicks: 38 },
-    { date: '29/08', impressions: 2270, clicks: 43 },
-  ];
-
-  const slotPerformanceData = [
-    { slot: 'Home Hero', impressions: 15420, clicks: 312, ctr: 2.02 },
-    { slot: 'Product Banner', impressions: 8750, clicks: 175, ctr: 2.00 },
-    { slot: 'Feed Sponsored', impressions: 5230, clicks: 94, ctr: 1.80 },
-  ];
-
+  const impressionsData = [{
+    date: '27/08',
+    impressions: 1930,
+    clicks: 45
+  }, {
+    date: '28/08',
+    impressions: 1830,
+    clicks: 38
+  }, {
+    date: '29/08',
+    impressions: 2270,
+    clicks: 43
+  }];
+  const slotPerformanceData = [{
+    slot: 'Home Hero',
+    impressions: 15420,
+    clicks: 312,
+    ctr: 2.02
+  }, {
+    slot: 'Product Banner',
+    impressions: 8750,
+    clicks: 175,
+    ctr: 2.00
+  }, {
+    slot: 'Feed Sponsored',
+    impressions: 5230,
+    clicks: 94,
+    ctr: 1.80
+  }];
   const chartConfig: ChartConfig = {
     impressions: {
       label: "Impressões",
-      color: "hsl(var(--primary))",
+      color: "hsl(var(--primary))"
     },
     clicks: {
       label: "Cliques",
-      color: "hsl(var(--secondary))",
-    },
+      color: "hsl(var(--secondary))"
+    }
   };
-
-  return (
-    <div className="container py-8">
+  return <div className="container py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold">Dashboard de Mídia</h1>
@@ -74,7 +76,7 @@ export default function MediaDashboard() {
             Acompanhe o desempenho dos anúncios e campanhas
           </p>
         </div>
-        <Button>Nova Campanha</Button>
+        
       </div>
 
       {/* Métricas Gerais */}
@@ -145,17 +147,9 @@ export default function MediaDashboard() {
             <ChartContainer config={chartConfig}>
               <BarChart accessibilityLayer data={impressionsData}>
                 <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                />
+                <XAxis dataKey="date" tickLine={false} tickMargin={10} axisLine={false} />
                 <YAxis />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent indicator="dashed" />}
-                />
+                <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
                 <Bar dataKey="impressions" fill="var(--color-impressions)" radius={4} />
                 <Bar dataKey="clicks" fill="var(--color-clicks)" radius={4} />
               </BarChart>
@@ -173,8 +167,7 @@ export default function MediaDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {slotPerformanceData.map((slot, index) => (
-                <div key={index} className="flex items-center justify-between">
+              {slotPerformanceData.map((slot, index) => <div key={index} className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-sm">{slot.slot}</p>
                     <p className="text-xs text-muted-foreground">
@@ -184,8 +177,7 @@ export default function MediaDashboard() {
                   <Badge variant="outline">
                     {slot.ctr.toFixed(2)}% CTR
                   </Badge>
-                </div>
-              ))}
+                </div>)}
             </div>
           </CardContent>
         </Card>
@@ -213,15 +205,13 @@ export default function MediaDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {advertisements.map((ad) => {
-                const ctr = ad.impressions_count > 0 ? (ad.clicks_count / ad.impressions_count) * 100 : 0;
-                return (
-                  <TableRow key={ad.id}>
+              {advertisements.map(ad => {
+              const ctr = ad.impressions_count > 0 ? ad.clicks_count / ad.impressions_count * 100 : 0;
+              return <TableRow key={ad.id}>
                     <TableCell className="font-medium">{ad.advertiser}</TableCell>
                     <TableCell>
                       <Badge variant="outline">
-                        {ad.slot === 'home_hero' ? 'Home Hero' : 
-                         ad.slot === 'product_banner' ? 'Product Banner' : 'Feed Sponsored'}
+                        {ad.slot === 'home_hero' ? 'Home Hero' : ad.slot === 'product_banner' ? 'Product Banner' : 'Feed Sponsored'}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm">
@@ -232,17 +222,14 @@ export default function MediaDashboard() {
                     <TableCell>{ctr.toFixed(2)}%</TableCell>
                     <TableCell>
                       <Badge variant={ad.status === 'active' ? 'default' : 'secondary'}>
-                        {ad.status === 'active' ? 'Ativa' : 
-                         ad.status === 'inactive' ? 'Pausada' : 'Finalizada'}
+                        {ad.status === 'active' ? 'Ativa' : ad.status === 'inactive' ? 'Pausada' : 'Finalizada'}
                       </Badge>
                     </TableCell>
-                  </TableRow>
-                );
-              })}
+                  </TableRow>;
+            })}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 }
