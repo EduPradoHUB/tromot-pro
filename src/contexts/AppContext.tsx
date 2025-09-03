@@ -171,6 +171,9 @@ interface AppContextType {
   updateCategory: (id: string, data: Partial<CategoryInsert>) => Promise<Category>;
   deleteCategory: (id: string) => Promise<void>;
   
+  // Profile management
+  updateProfile: (data: Partial<Profile>) => Promise<void>;
+  
   // File upload
   uploadFile: (bucket: string, path: string, file: File) => Promise<string>;
   
@@ -362,6 +365,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       .eq('user_id', userId);
     
     if (error) throw error;
+  };
+
+  // Profile management
+  const updateProfile = async (data: Partial<Profile>): Promise<void> => {
+    if (!user) throw new Error('User not authenticated');
+    
+    const { error } = await supabase
+      .from('profiles')
+      .update(data)
+      .eq('user_id', user.id);
+    
+    if (error) throw error;
+    
+    // Refresh profile data
+    fetchData();
   };
 
   // File upload function
@@ -783,6 +801,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     createCategory,
     updateCategory,
     deleteCategory,
+    updateProfile,
     uploadFile,
     fetchData,
     

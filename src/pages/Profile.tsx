@@ -3,9 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
+import { AvatarUpload } from '@/components/AvatarUpload';
 
 export default function Profile() {
-  const { profile } = useApp();
+  const { profile, updateProfile } = useApp();
+
+  const handleAvatarUpload = async (avatarUrl: string) => {
+    try {
+      await updateProfile({ avatar_url: avatarUrl });
+    } catch (error) {
+      console.error('Erro ao atualizar avatar:', error);
+    }
+  };
 
   if (!profile) {
     return (
@@ -23,14 +32,13 @@ export default function Profile() {
             <CardTitle>Meu Perfil</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex items-center space-x-4">
-              <Avatar className="h-20 w-20">
-                <AvatarImage src={profile.avatar_url} />
-                <AvatarFallback className="text-2xl">
-                  {profile.name.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
+            <div className="flex flex-col items-center space-y-6 sm:flex-row sm:items-start sm:space-y-0 sm:space-x-6">
+              <AvatarUpload 
+                currentAvatar={profile.avatar_url || undefined}
+                userName={profile.name}
+                onUploadComplete={handleAvatarUpload}
+              />
+              <div className="text-center sm:text-left">
                 <h2 className="text-2xl font-bold">{profile.name}</h2>
                 <p className="text-muted-foreground">{profile.email}</p>
                 {profile.phone && (
