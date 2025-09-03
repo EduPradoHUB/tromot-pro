@@ -9,42 +9,42 @@ export interface Medal {
 
 export const medals: Medal[] = [
   {
-    id: 'fita_isolante',
-    name: 'Fita Isolante',
+    id: 'latao',
+    name: 'Latão',
     description: 'Primeira instalação compartilhada',
-    icon: '🔧',
+    icon: '🥉',
     postsRequired: 1,
-    color: 'text-gray-600'
+    color: 'text-amber-700'
   },
   {
-    id: 'alicate',
-    name: 'Alicate',
+    id: 'bronze',
+    name: 'Bronze',
     description: '10 instalações compartilhadas',
-    icon: '🔨',
+    icon: '🥉',
     postsRequired: 10,
-    color: 'text-blue-600'
+    color: 'text-amber-600'
   },
   {
-    id: 'chave_fenda',
-    name: 'Chave de Fenda',
+    id: 'prata',
+    name: 'Prata',
     description: '25 instalações compartilhadas',
-    icon: '🪛',
+    icon: '🥈',
     postsRequired: 25,
-    color: 'text-green-600'
+    color: 'text-slate-500'
   },
   {
-    id: 'multimetro',
-    name: 'Multímetro',
+    id: 'ouro',
+    name: 'Ouro',
     description: '50 instalações compartilhadas',
-    icon: '⚡',
+    icon: '🥇',
     postsRequired: 50,
     color: 'text-yellow-600'
   },
   {
-    id: 'maleta_ferramentas',
-    name: 'Maleta de Ferramentas',
+    id: 'platina',
+    name: 'Platina',
     description: '100 instalações compartilhadas',
-    icon: '🧰',
+    icon: '💎',
     postsRequired: 100,
     color: 'text-purple-600'
   }
