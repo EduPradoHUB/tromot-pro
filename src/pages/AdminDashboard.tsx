@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
-import { Plus, Edit, Trash2, Upload, Eye, EyeOff, Trophy, Medal, Award, FileSpreadsheet } from 'lucide-react';
+import { Plus, Edit, Trash2, Upload, Eye, EyeOff, Trophy, Medal, Award, FileSpreadsheet, FileText, Image, Check, X } from 'lucide-react';
 import { BulkProductUpload } from '@/components/BulkProductUpload';
 import { PostModeration } from '@/components/PostModeration';
 import { medals, computeUserMedals, getProgressToNextMedal } from '@/lib/gamification';
@@ -754,17 +754,39 @@ export default function AdminDashboard() {
             {products.map((product) => (
               <Card key={product.id}>
                 <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold">{product.name}</h3>
-                      <p className="text-sm text-muted-foreground">{product.code}</p>
-                      <div className="flex gap-2 mt-2">
-                        <Badge variant="outline">{product.category}</Badge>
-                        {product.out_of_production && (
-                          <Badge variant="destructive">Fora de produção</Badge>
-                        )}
-                      </div>
-                    </div>
+                   <div className="flex justify-between items-start">
+                     <div className="flex-1">
+                       <div className="flex items-center gap-3 mb-2">
+                         <h3 className="font-semibold">{product.name}</h3>
+                         <div className="flex gap-1">
+                           {/* Ícone de manual */}
+                           <div className="flex items-center gap-1 px-2 py-1 rounded-md text-xs" 
+                                style={{
+                                  backgroundColor: product.manual_url ? '#dcfce7' : '#fef2f2',
+                                  color: product.manual_url ? '#166534' : '#dc2626'
+                                }}>
+                             <FileText className="w-3 h-3" />
+                             {product.manual_url ? 'Manual' : 'Sem manual'}
+                           </div>
+                           {/* Ícone de foto */}
+                           <div className="flex items-center gap-1 px-2 py-1 rounded-md text-xs"
+                                style={{
+                                  backgroundColor: product.image_url ? '#dcfce7' : '#fef2f2', 
+                                  color: product.image_url ? '#166534' : '#dc2626'
+                                }}>
+                             <Image className="w-3 h-3" />
+                             {product.image_url ? 'Foto' : 'Sem foto'}
+                           </div>
+                         </div>
+                       </div>
+                       <p className="text-sm text-muted-foreground">{product.code}</p>
+                       <div className="flex gap-2 mt-2">
+                         <Badge variant="outline">{product.category}</Badge>
+                         {product.out_of_production && (
+                           <Badge variant="destructive">Fora de produção</Badge>
+                         )}
+                       </div>
+                     </div>
                      <div className="flex gap-2">
                        <Button variant="outline" size="sm" onClick={() => {
                          handleEditProduct(product);
