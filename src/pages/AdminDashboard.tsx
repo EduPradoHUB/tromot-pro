@@ -47,6 +47,9 @@ export default function AdminDashboard() {
   
   const { toast } = useToast();
   
+  // Estado para o sistema de desfazer
+  const [deletedProduct, setDeletedProduct] = useState<any>(null);
+  
   // Load leaderboard on component mount
   useEffect(() => {
     const loadLeaderboard = async () => {
@@ -155,6 +158,71 @@ export default function AdminDashboard() {
       toast({
         title: "Erro",
         description: "Não foi possível atualizar o produto.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Função para deletar produto com opção de desfazer
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      // Encontrar o produto antes de deletar
+      const productToDelete = products.find(p => p.id === productId);
+      if (!productToDelete) return;
+
+      // Salvar o produto para poder desfazer
+      setDeletedProduct(productToDelete);
+
+      // Deletar o produto
+      await deleteProduct(productId);
+
+      // Mostrar toast com opção de desfazer
+      toast({
+        title: "Produto deletado",
+        description: `${productToDelete.name} foi removido.`,
+        action: (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleUndoDelete}
+          >
+            Desfazer
+          </Button>
+        ),
+      });
+
+      // Limpar o produto salvo após 10 segundos se não foi restaurado
+      setTimeout(() => {
+        setDeletedProduct(null);
+      }, 10000);
+
+    } catch (error) {
+      console.error('Erro ao deletar produto:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível deletar o produto.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Função para desfazer a exclusão
+  const handleUndoDelete = async () => {
+    if (!deletedProduct) return;
+
+    try {
+      await createProduct(deletedProduct);
+      setDeletedProduct(null);
+
+      toast({
+        title: "Produto restaurado",
+        description: `${deletedProduct.name} foi restaurado com sucesso.`,
+      });
+    } catch (error) {
+      console.error('Erro ao restaurar produto:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível restaurar o produto.",
         variant: "destructive"
       });
     }
@@ -857,9 +925,9 @@ export default function AdminDashboard() {
                        }}>
                          <Edit className="w-4 h-4" />
                        </Button>
-                       <Button variant="outline" size="sm" onClick={() => deleteProduct(product.id)}>
-                         <Trash2 className="w-4 h-4" />
-                       </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleDeleteProduct(product.id)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                      </div>
                   </div>
                 </CardContent>
