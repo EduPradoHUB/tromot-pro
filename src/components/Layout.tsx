@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Search, Package, User, LogOut, Menu, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApp } from '@/contexts/AppContext';
+import { EditableContent } from '@/components/EditableContent';
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -13,10 +14,41 @@ export const Layout: React.FC<LayoutProps> = ({
 }) => {
   const {
     profile,
-    logout
+    logout,
+    getEditableContent,
+    editableContent
   } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Footer editable content states
+  const [footerDescription, setFooterDescription] = useState('App para instaladores e técnicos de produtos eletrônicos automotivos.');
+  const [supportTitle, setSupportTitle] = useState('Suporte');
+  const [legalTitle, setLegalTitle] = useState('Legal');
+  const [copyright, setCopyright] = useState('© 2025 Tromot Indústria Eletrônica. Todos os direitos reservados.');
+
+  // Update footer content when editable content changes
+  React.useEffect(() => {
+    const descContent = getEditableContent('footer-description');
+    if (descContent?.description) {
+      setFooterDescription(descContent.description);
+    }
+
+    const supportContent = getEditableContent('footer-support-title');
+    if (supportContent?.title) {
+      setSupportTitle(supportContent.title);
+    }
+
+    const legalContent = getEditableContent('footer-legal-title');
+    if (legalContent?.title) {
+      setLegalTitle(legalContent.title);
+    }
+
+    const copyrightContent = getEditableContent('footer-copyright');
+    if (copyrightContent?.description) {
+      setCopyright(copyrightContent.description);
+    }
+  }, [getEditableContent, editableContent]);
   const handleLogout = async () => {
     try {
       await logout();
@@ -153,12 +185,20 @@ const navigationItems = [
                   <span className="text-2xl font-bold text-primary">PRO</span>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground">
-                App para instaladores e técnicos de produtos eletrônicos automotivos.
-              </p>
+              <EditableContent
+                section="footer-description"
+                description={footerDescription}
+                descriptionClassName="text-sm text-muted-foreground"
+                onContentUpdate={(content) => setFooterDescription(content.description || footerDescription)}
+              />
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Suporte</h3>
+              <EditableContent
+                section="footer-support-title"
+                title={supportTitle}
+                titleClassName="font-semibold mb-4"
+                onContentUpdate={(content) => setSupportTitle(content.title || supportTitle)}
+              />
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
                   <a href="tel:+5516993032002" className="hover:text-foreground">
@@ -173,7 +213,12 @@ const navigationItems = [
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Legal</h3>
+              <EditableContent
+                section="footer-legal-title"
+                title={legalTitle}
+                titleClassName="font-semibold mb-4"
+                onContentUpdate={(content) => setLegalTitle(content.title || legalTitle)}
+              />
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
                   <a href="/termos" className="hover:text-foreground">
@@ -188,7 +233,12 @@ const navigationItems = [
               </ul>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">© 2025 Tromot Indústria Eletrônica. Todos os direitos reservados.</div>
+          <EditableContent
+            section="footer-copyright"
+            description={copyright}
+            descriptionClassName="mt-8 pt-8 border-t text-center text-sm text-muted-foreground"
+            onContentUpdate={(content) => setCopyright(content.description || copyright)}
+          />
         </div>
       </footer>
     </div>;
