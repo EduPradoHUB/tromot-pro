@@ -804,11 +804,12 @@ export default function AdminDashboard() {
                            {/* Ícone de manual */}
                            <div className="flex items-center gap-1 px-2 py-1 rounded-md text-xs" 
                                 style={{
-                                  backgroundColor: product.manual_url ? '#dcfce7' : '#fef2f2',
-                                  color: product.manual_url ? '#166534' : '#dc2626'
+                                  backgroundColor: (product.manual_url || product.no_manual_available) ? '#dcfce7' : '#fef2f2',
+                                  color: (product.manual_url || product.no_manual_available) ? '#166534' : '#dc2626'
                                 }}>
                              <FileText className="w-3 h-3" />
-                             {product.manual_url ? 'Manual' : 'Sem manual'}
+                             {product.no_manual_available ? 'Manual não disponível' : 
+                              product.manual_url ? 'Manual' : 'Sem manual'}
                            </div>
                            {/* Ícone de foto */}
                            <div className="flex items-center gap-1 px-2 py-1 rounded-md text-xs"
