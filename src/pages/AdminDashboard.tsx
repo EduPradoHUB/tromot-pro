@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
-import { Plus, Edit, Trash2, Upload, Eye, EyeOff, Trophy, Medal, Award, FileSpreadsheet, FileText, Image, Check, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Upload, Eye, EyeOff, Trophy, Medal, Award, FileSpreadsheet, FileText, Image, Check, X, Search, Filter } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { BulkProductUpload } from '@/components/BulkProductUpload';
@@ -121,6 +121,16 @@ export default function AdminDashboard() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
   
+  // Estados para filtros e busca de produtos
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filters, setFilters] = useState({
+    withoutManual: false,
+    withoutPhoto: false,
+    outOfProduction: false,
+    category: '',
+    missingData: false
+  });
+  
   // Leaderboard state
   const [leaderboard, setLeaderboard] = useState<Array<{
     user_id: string;
@@ -132,6 +142,24 @@ export default function AdminDashboard() {
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(false);
 
   // Usar products diretamente do contexto agora que no_manual_available está incluído
+  
+  // Função para filtrar produtos
+  const filteredProducts = products.filter(product => {
+    // Busca por nome ou código
+    const matchesSearch = searchTerm === '' || 
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.code.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Filtros
+    const matchesFilters = 
+      (!filters.withoutManual || (!product.manual_url && !product.no_manual_available)) &&
+      (!filters.withoutPhoto || !product.image_url) &&
+      (!filters.outOfProduction || product.out_of_production) &&
+      (!filters.category || product.category === filters.category) &&
+      (!filters.missingData || (!product.manual_url && !product.no_manual_available) || !product.image_url);
+      
+    return matchesSearch && matchesFilters;
+  });
 
   const handleNoManualChange = async (productId: string, noManualAvailable: boolean) => {
     console.log('Atualizando produto:', productId, 'no_manual_available:', noManualAvailable);
@@ -629,6 +657,10 @@ export default function AdminDashboard() {
   };
 
 
+  if (!profile || profile.role !== 'ADM') {
+    return <div>Acesso negado. Apenas administradores podem acessar esta página.</div>;
+  }
+
   return (
     <div className="container py-8 space-y-8">
       <div>
@@ -678,6 +710,7 @@ export default function AdminDashboard() {
                   Novo Produto
                 </Button>
               </DialogTrigger>
+              
               <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>{editingProduct ? 'Editar Produto' : 'Novo Produto'}</DialogTitle>
@@ -704,15 +737,11 @@ export default function AdminDashboard() {
                   </div>
                   
                   <div>
-                    <Label htmlFor="barcode_ean">EAN-13 (opcional)</Label>
+                    <Label htmlFor="barcode_ean">Código de Barras/EAN</Label>
                     <Input
                       id="barcode_ean"
                       value={productForm.barcode_ean}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '').slice(0, 13);
-                        setProductForm({...productForm, barcode_ean: value});
-                      }}
-                      placeholder="7891234567890"
+                      onChange={(e) => setProductForm({...productForm, barcode_ean: e.target.value})}
                       inputMode="numeric"
                       pattern="\d{13}"
                     />
@@ -852,84 +881,168 @@ export default function AdminDashboard() {
             </Dialog>
           </div>
           
+          {/* Filtros e Busca */}
+          <div className="space-y-4">
+            <div className="flex gap-4 flex-wrap items-center">
+              <div className="flex-1 min-w-[300px]">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Buscar por nome ou código..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              
+              <Select value={filters.category} onValueChange={(value) => setFilters(prev => ({...prev, category: value}))}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Filtrar por categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Todas as categorias</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.name}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                variant={filters.withoutManual ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilters(prev => ({...prev, withoutManual: !prev.withoutManual}))}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Sem manual
+              </Button>
+              
+              <Button
+                variant={filters.withoutPhoto ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilters(prev => ({...prev, withoutPhoto: !prev.withoutPhoto}))}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Sem foto
+              </Button>
+              
+              <Button
+                variant={filters.outOfProduction ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilters(prev => ({...prev, outOfProduction: !prev.outOfProduction}))}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Fora de produção
+              </Button>
+              
+              <Button
+                variant={filters.missingData ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilters(prev => ({...prev, missingData: !prev.missingData}))}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Faltando dados
+              </Button>
+              
+              {(searchTerm || Object.values(filters).some(f => f)) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setFilters({
+                      withoutManual: false,
+                      withoutPhoto: false,
+                      outOfProduction: false,
+                      category: '',
+                      missingData: false
+                    });
+                  }}
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Limpar filtros
+                </Button>
+              )}
+            </div>
+          </div>
+          
           <div className="grid gap-4">
-            {products
+            {filteredProducts
               .sort((a, b) => {
-                // Considerar produtos com "manual não disponível" como tendo manual
                 const hasManualA = a.manual_url || a.no_manual_available;
                 const hasManualB = b.manual_url || b.no_manual_available;
-                
-                // Calcular score de completude (0 = incompleto, 2 = completo)
                 const scoreA = (hasManualA ? 1 : 0) + (a.image_url ? 1 : 0);
                 const scoreB = (hasManualB ? 1 : 0) + (b.image_url ? 1 : 0);
-                
-                // Produtos menos completos primeiro (mais precisam de edição)
                 return scoreA - scoreB;
               })
               .map((product) => (
               <Card key={product.id}>
                 <CardContent className="p-6">
-                   <div className="flex justify-between items-start">
-                     <div className="flex-1">
-                       <div className="flex items-center gap-3 mb-2">
-                         <h3 className="font-semibold">{product.name}</h3>
-                         <div className="flex gap-1">
-                           {/* Ícone de manual */}
-                           <div className="flex items-center gap-1 px-2 py-1 rounded-md text-xs" 
-                                style={{
-                                  backgroundColor: (product.manual_url || product.no_manual_available) ? '#dcfce7' : '#fef2f2',
-                                  color: (product.manual_url || product.no_manual_available) ? '#166534' : '#dc2626'
-                                }}>
-                             <FileText className="w-3 h-3" />
-                             {product.no_manual_available ? 'Manual não disponível' : 
-                              product.manual_url ? 'Manual' : 'Sem manual'}
-                           </div>
-                           {/* Ícone de foto */}
-                           <div className="flex items-center gap-1 px-2 py-1 rounded-md text-xs"
-                                style={{
-                                  backgroundColor: product.image_url ? '#dcfce7' : '#fef2f2', 
-                                  color: product.image_url ? '#166534' : '#dc2626'
-                                }}>
-                             <Image className="w-3 h-3" />
-                             {product.image_url ? 'Foto' : 'Sem foto'}
-                           </div>
-                         </div>
-                       </div>
-                       <p className="text-sm text-muted-foreground">{product.code}</p>
-                       <div className="flex gap-2 mt-2">
-                         <Badge variant="outline">{product.category}</Badge>
-                         {product.out_of_production && (
-                           <Badge variant="destructive">Fora de produção</Badge>
-                         )}
-                       </div>
-                       
-                       {/* Checkbox para marcar produto sem manual */}
-                       <div className="flex items-center space-x-2 mt-3">
-                         <Checkbox
-                           id={`no-manual-${product.id}`}
-                           checked={product.no_manual_available || false}
-                           onCheckedChange={(checked) => handleNoManualChange(product.id, !!checked)}
-                         />
-                         <label 
-                           htmlFor={`no-manual-${product.id}`} 
-                           className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                         >
-                           Manual não disponível
-                         </label>
-                       </div>
-                     </div>
-                     <div className="flex gap-2">
-                       <Button variant="outline" size="sm" onClick={() => {
-                         handleEditProduct(product);
-                         setDialogOpen(true);
-                       }}>
-                         <Edit className="w-4 h-4" />
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-semibold">{product.name}</h3>
+                        <div className="flex gap-1">
+                          {/* Ícone de manual */}
+                          <div className="flex items-center gap-1 px-2 py-1 rounded-md text-xs" 
+                               style={{
+                                 backgroundColor: (product.manual_url || product.no_manual_available) ? '#dcfce7' : '#fef2f2',
+                                 color: (product.manual_url || product.no_manual_available) ? '#166534' : '#dc2626'
+                               }}>
+                            <FileText className="w-3 h-3" />
+                            {product.no_manual_available ? 'Manual não disponível' : 
+                             product.manual_url ? 'Manual' : 'Sem manual'}
+                          </div>
+                          {/* Ícone de foto */}
+                          <div className="flex items-center gap-1 px-2 py-1 rounded-md text-xs"
+                               style={{
+                                 backgroundColor: product.image_url ? '#dcfce7' : '#fef2f2', 
+                                 color: product.image_url ? '#166534' : '#dc2626'
+                               }}>
+                            <Image className="w-3 h-3" />
+                            {product.image_url ? 'Foto' : 'Sem foto'}
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{product.code}</p>
+                      <div className="flex gap-2 mt-2">
+                        <Badge variant="outline">{product.category}</Badge>
+                        {product.out_of_production && (
+                          <Badge variant="destructive">Fora de produção</Badge>
+                        )}
+                      </div>
+                      
+                      {/* Checkbox para marcar produto sem manual */}
+                      <div className="flex items-center space-x-2 mt-3">
+                        <Checkbox
+                          id={`no-manual-${product.id}`}
+                          checked={product.no_manual_available || false}
+                          onCheckedChange={(checked) => handleNoManualChange(product.id, !!checked)}
+                        />
+                        <label 
+                          htmlFor={`no-manual-${product.id}`} 
+                          className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Manual não disponível
+                        </label>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => {
+                        handleEditProduct(product);
+                        setDialogOpen(true);
+                      }}>
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                       <Button variant="outline" size="sm" onClick={() => handleDeleteProduct(product.id)}>
+                         <Trash2 className="w-4 h-4" />
                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleDeleteProduct(product.id)}>
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                     </div>
-                  </div>
+                    </div>
+                 </div>
                 </CardContent>
               </Card>
             ))}
