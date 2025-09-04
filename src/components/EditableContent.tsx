@@ -109,6 +109,7 @@ export const EditableContent: React.FC<EditableContentProps> = ({
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
               placeholder="Título principal"
+              className="text-black"
             />
           </div>
           
@@ -118,6 +119,7 @@ export const EditableContent: React.FC<EditableContentProps> = ({
               value={editSubtitle}
               onChange={(e) => setEditSubtitle(e.target.value)}
               placeholder="Subtítulo"
+              className="text-black"
             />
           </div>
           
@@ -128,6 +130,7 @@ export const EditableContent: React.FC<EditableContentProps> = ({
               onChange={(e) => setEditDescription(e.target.value)}
               placeholder="Descrição"
               rows={3}
+              className="text-black"
             />
           </div>
           
