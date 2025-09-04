@@ -772,7 +772,7 @@ export default function AdminDashboard() {
           <TabsTrigger value="advertisements">Propagandas</TabsTrigger>
           <TabsTrigger value="vehicles">Veículos</TabsTrigger>
           <TabsTrigger value="moderation">Moderação</TabsTrigger>
-          <TabsTrigger value="ranking">Ranking & Medalhas</TabsTrigger>
+          <TabsTrigger value="ranking">Ranking</TabsTrigger>
         </TabsList>
 
         {/* Products Tab */}
