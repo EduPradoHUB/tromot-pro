@@ -10,7 +10,8 @@ import {
   MessageCircle,
   Camera,
   HelpCircle,
-  ScanLine
+  ScanLine,
+  ShoppingCart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -74,6 +75,17 @@ export default function ProductPage() {
   };
 
   const canAnswerQuestions = currentUser?.role === 'Técnico Tromot' || currentUser?.role === 'ADM';
+
+  const handleBuyNow = async () => {
+    if (product) {
+      await trackEvent({ 
+        type: 'buy_now_click', 
+        product_id: product.id, 
+        user_id: currentUser?.id 
+      });
+      navigate(`/comprar/${product.id}`);
+    }
+  };
 
   const handleBarcodeDetected = async (barcode: string) => {
     const foundProduct = await findProductByBarcode(barcode);
@@ -203,6 +215,18 @@ export default function ProductPage() {
                         </Badge>
                       ))}
                     </div>
+                  </div>
+                  
+                  {/* Buy Now Button */}
+                  <div className="mt-4">
+                    <Button 
+                      onClick={handleBuyNow}
+                      className="w-full bg-tromot-red hover:bg-tromot-red/90"
+                      size="lg"
+                    >
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Comprar Agora
+                    </Button>
                   </div>
                 </div>
               </div>

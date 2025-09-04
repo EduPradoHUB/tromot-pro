@@ -7,13 +7,10 @@ import type { Database } from '@/integrations/supabase/types';
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Product = Database['public']['Tables']['products']['Row'];
 type Banner = Database['public']['Tables']['banners']['Row'];
-type Advertisement = Database['public']['Tables']['advertisements']['Row'];  
+type Advertisement = Database['public']['Tables']['advertisements']['Row'];
 type Vehicle = Database['public']['Tables']['vehicles']['Row'];
 type Category = Database['public']['Tables']['categories']['Row'];
-type Post = Database['public']['Tables']['posts']['Row'];
-type Rating = Database['public']['Tables']['ratings']['Row'];
-type Question = Database['public']['Tables']['questions']['Row'];
-type AnalyticsEvent = Database['public']['Tables']['analytics_events']['Row'];
+type Distributor = Database['public']['Tables']['distributors']['Row'];
 
 // Insert types for creating new records
 type ProductInsert = Database['public']['Tables']['products']['Insert'];
@@ -21,6 +18,7 @@ type BannerInsert = Database['public']['Tables']['banners']['Insert'];
 type AdvertisementInsert = Database['public']['Tables']['advertisements']['Insert'];
 type VehicleInsert = Database['public']['Tables']['vehicles']['Insert'];
 type CategoryInsert = Database['public']['Tables']['categories']['Insert'];
+type DistributorInsert = Database['public']['Tables']['distributors']['Insert'];
 
 // Legacy interfaces for backward compatibility
 interface LegacyUser {
@@ -96,7 +94,7 @@ interface LegacyQuestion {
 
 interface LegacyAnalyticsEvent {
   id: string;
-  type: 'view_product' | 'view_manual' | 'login' | 'new_post' | 'like' | 'rating' | 'question_reply' | 'report_post' | 'ad_impression' | 'ad_click';
+  type: 'view_product' | 'view_manual' | 'login' | 'new_post' | 'like' | 'rating' | 'question_reply' | 'report_post' | 'ad_impression' | 'ad_click' | 'buy_now_click' | 'distributor_contact_click';
   product_id?: string;
   user_id?: string;
   ad_id?: string;
@@ -128,7 +126,7 @@ interface AppContextType {
   profile: Profile | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, name: string, customerType?: 'lojista_instalador' | 'distribuidor_representante' | 'usuario_final', whatsapp?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, name: string, customerType?: 'lojista_instalador' | 'distribuidor_representante' | 'usuario_final', whatsapp?: string, city?: string, state?: string) => Promise<{ error: Error | null }>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
   logout: () => Promise<void>;
   
@@ -145,6 +143,7 @@ interface AppContextType {
   advertisements: Advertisement[];
   vehicles: Vehicle[];
   categories: Category[];
+  distributors: Distributor[];
   
   // Legacy data (for backward compatibility)
   posts: LegacyPost[];
@@ -175,6 +174,10 @@ interface AppContextType {
   updateCategory: (id: string, data: Partial<CategoryInsert>) => Promise<Category>;
   deleteCategory: (id: string) => Promise<void>;
   
+  createDistributor: (data: DistributorInsert) => Promise<Distributor>;
+  updateDistributor: (id: string, data: Partial<DistributorInsert>) => Promise<Distributor>;
+  deleteDistributor: (id: string) => Promise<void>;
+  
   // Post moderation functions
   moderatePost: (id: string, status: 'approved' | 'rejected') => Promise<void>;
   
@@ -192,7 +195,7 @@ interface AppContextType {
   answerQuestion: (questionId: string, answer: string) => void;
   getActiveAd: (slot: 'home_hero' | 'product_banner' | 'feed_sponsored', productId?: string, productCategory?: string) => Advertisement | null;
   getAdStats: (adId?: string) => AdStats[];
-  trackEvent: (event: Omit<LegacyAnalyticsEvent, 'id' | 'timestamp'>) => void;
+  trackEvent: (event: Omit<LegacyAnalyticsEvent, 'id' | 'timestamp'>) => Promise<void>;
   getDashboardStats: () => DashboardStats;
   
   // Barcode scanning
@@ -245,6 +248,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [distributors, setDistributors] = useState<Distributor[]>([]);
   
   // Legacy state (mock data for backward compatibility)
   const [posts, setPosts] = useState<LegacyPost[]>([]);
@@ -321,7 +325,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
-  const signUp = async (email: string, password: string, name: string, customerType?: 'lojista_instalador' | 'distribuidor_representante' | 'usuario_final', whatsapp?: string): Promise<{ error: Error | null }> => {
+  const signUp = async (email: string, password: string, name: string, customerType?: 'lojista_instalador' | 'distribuidor_representante' | 'usuario_final', whatsapp?: string, city?: string, state?: string): Promise<{ error: Error | null }> => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
@@ -346,7 +350,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             email: email,
             role: 'Cliente',
             customer_type: customerType || 'usuario_final',
-            whatsapp: whatsapp || null
+            whatsapp: whatsapp || null,
+            city: city || null,
+            state: state || null
           });
         
         if (profileError) {
@@ -624,6 +630,45 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCategories(prev => prev.filter(c => c.id !== id));
   };
 
+  // CRUD Functions for Distributors
+  const createDistributor = async (data: DistributorInsert): Promise<Distributor> => {
+    const { data: distributor, error } = await supabase
+      .from('distributors')
+      .insert(data)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    setDistributors(prev => [...prev, distributor]);
+    return distributor;
+  };
+
+  const updateDistributor = async (id: string, data: Partial<DistributorInsert>): Promise<Distributor> => {
+    const { data: distributor, error } = await supabase
+      .from('distributors')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    setDistributors(prev => prev.map(d => d.id === id ? distributor : d));
+    return distributor;
+  };
+
+  const deleteDistributor = async (id: string): Promise<void> => {
+    const { error } = await supabase
+      .from('distributors')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+    
+    setDistributors(prev => prev.filter(d => d.id !== id));
+  };
+
   // Function to moderate posts
   const moderatePost = async (id: string, status: 'approved' | 'rejected'): Promise<void> => {
     const { error } = await supabase
@@ -763,13 +808,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         { data: bannersData },
         { data: advertisementsData },
         { data: vehiclesData },
-        { data: categoriesData }
+        { data: categoriesData },
+        { data: distributorsData }
       ] = await Promise.all([
         supabase.from('products').select('*'),
         supabase.from('banners').select('*'),
         supabase.from('advertisements').select('*'),
         supabase.from('vehicles').select('*'),
-        supabase.from('categories').select('*')
+        supabase.from('categories').select('*'),
+        supabase.from('distributors').select('*')
       ]);
 
       if (productsData) setProducts(productsData);
@@ -777,6 +824,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (advertisementsData) setAdvertisements(advertisementsData);
       if (vehiclesData) setVehicles(vehiclesData);
       if (categoriesData) setCategories(categoriesData);
+      if (distributorsData) setDistributors(distributorsData);
       
       // Also fetch editable content
       await fetchEditableContent();
@@ -893,8 +941,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   };
 
-  const trackEvent = (event: Omit<LegacyAnalyticsEvent, 'id' | 'timestamp'>) => {
-    console.log('Analytics Event:', event);
+  const trackEvent = async (event: Omit<LegacyAnalyticsEvent, 'id' | 'timestamp'>) => {
+    try {
+      const { error } = await supabase
+        .from('analytics_events')
+        .insert({
+          event_type: event.type,
+          product_id: event.product_id || null,
+          user_id: event.user_id || (user?.id || null),
+          ad_id: event.ad_id || null,
+          metadata: event.metadata || {}
+        });
+      
+      if (error) {
+        console.error('Error tracking event:', error);
+      }
+    } catch (error) {
+      console.error('Error tracking event:', error);
+    }
   };
 
   // Legacy currentUser for backward compatibility
@@ -962,6 +1026,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           setAdvertisements([]);
           setVehicles([]);
           setCategories([]);
+          setDistributors([]);
           setLoading(false);
         }
       }
@@ -993,6 +1058,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     advertisements,
     vehicles,
     categories,
+    distributors,
     createProduct,
     updateProduct,
     deleteProduct,
@@ -1008,6 +1074,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     createCategory,
     updateCategory,
     deleteCategory,
+    createDistributor,
+    updateDistributor,
+    deleteDistributor,
     moderatePost,
     updateProfile,
     uploadFile,

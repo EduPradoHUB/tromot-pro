@@ -183,6 +183,45 @@ export type Database = {
         }
         Relationships: []
       }
+      distributors: {
+        Row: {
+          active: boolean
+          city: string | null
+          cover_entire_state: boolean
+          created_at: string
+          id: string
+          name: string
+          phone: string | null
+          state: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          active?: boolean
+          city?: string | null
+          cover_entire_state?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          phone?: string | null
+          state: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          active?: boolean
+          city?: string | null
+          cover_entire_state?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          state?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       editable_content: {
         Row: {
           created_at: string
@@ -369,6 +408,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          city: string | null
           created_at: string
           customer_type: Database["public"]["Enums"]["customer_type"] | null
           email: string
@@ -376,12 +416,14 @@ export type Database = {
           name: string
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
+          state: string | null
           updated_at: string
           user_id: string
           whatsapp: string | null
         }
         Insert: {
           avatar_url?: string | null
+          city?: string | null
           created_at?: string
           customer_type?: Database["public"]["Enums"]["customer_type"] | null
           email: string
@@ -389,12 +431,14 @@ export type Database = {
           name: string
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          state?: string | null
           updated_at?: string
           user_id: string
           whatsapp?: string | null
         }
         Update: {
           avatar_url?: string | null
+          city?: string | null
           created_at?: string
           customer_type?: Database["public"]["Enums"]["customer_type"] | null
           email?: string
@@ -402,6 +446,7 @@ export type Database = {
           name?: string
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          state?: string | null
           updated_at?: string
           user_id?: string
           whatsapp?: string | null

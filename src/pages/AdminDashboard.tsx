@@ -26,6 +26,7 @@ export default function AdminDashboard() {
     advertisements, 
     vehicles,
     categories,
+    distributors,
     createProduct, 
     updateProduct, 
     deleteProduct,
@@ -41,6 +42,9 @@ export default function AdminDashboard() {
     createCategory,
     updateCategory,
     deleteCategory,
+    createDistributor,
+    updateDistributor,
+    deleteDistributor,
     uploadFile,
     fetchInstallationLeaderboard
   } = useApp();
@@ -114,10 +118,21 @@ export default function AdminDashboard() {
     active: true
   });
   
+  const [distributorForm, setDistributorForm] = useState({
+    name: '',
+    phone: '',
+    whatsapp: '',
+    state: '',
+    city: '',
+    cover_entire_state: false,
+    active: true
+  });
+  
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [editingVehicle, setEditingVehicle] = useState<any>(null);
   const [editingAdvertisement, setEditingAdvertisement] = useState<any>(null);
+  const [editingDistributor, setEditingDistributor] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
   
@@ -669,10 +684,11 @@ export default function AdminDashboard() {
       </div>
 
       <Tabs defaultValue="products" className="w-full">
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-9">
           <TabsTrigger value="products">Produtos</TabsTrigger>
           <TabsTrigger value="bulk-upload">Upload em Massa</TabsTrigger>
           <TabsTrigger value="categories">Categorias</TabsTrigger>
+          <TabsTrigger value="distributors">Distribuidores</TabsTrigger>
           <TabsTrigger value="banners">Banners</TabsTrigger>
           <TabsTrigger value="advertisements">Propagandas</TabsTrigger>
           <TabsTrigger value="vehicles">Veículos</TabsTrigger>

@@ -11,6 +11,7 @@ import { useAutoInstall } from "@/hooks/useAutoInstall";
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import Product from "./pages/Product";
+import WhereToBuy from "./pages/WhereToBuy";
 import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -47,6 +48,11 @@ function AppContent() {
         <Route path="/produto/:id" element={
           <ProtectedRoute>
             <Layout><Product /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/comprar/:id" element={
+          <ProtectedRoute>
+            <Layout><WhereToBuy /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/perfil" element={

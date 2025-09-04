@@ -15,6 +15,8 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
   const [customerType, setCustomerType] = useState<'lojista_instalador' | 'distribuidor_representante' | 'usuario_final'>('usuario_final');
   const [resetEmail, setResetEmail] = useState('');
   const [formLoading, setFormLoading] = useState(false);
@@ -106,10 +108,19 @@ export default function Login() {
       return;
     }
 
+    if (!city || !state) {
+      toast({
+        title: "Erro",
+        description: "Cidade e estado são obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setFormLoading(true);
 
     try {
-      const { error } = await signUp(email, password, name, customerType, whatsapp);
+      const { error } = await signUp(email, password, name, customerType, whatsapp, city, state);
       
       if (error) {
         if (error.message.includes('User already registered')) {
@@ -285,6 +296,27 @@ export default function Login() {
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(e.target.value)}
                   />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Input
+                      type="text"
+                      placeholder="Estado *"
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      type="text"
+                      placeholder="Cidade *"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
                 
                 <div className="space-y-3">
