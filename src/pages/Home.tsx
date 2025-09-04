@@ -44,6 +44,11 @@ export default function Home() {
     description: 'Acesse manuais, compartilhe instalações e encontre suporte técnico especializado.'
   });
 
+  const [featuresContent, setFeaturesContent] = useState({
+    title: 'Por que usar o TROMOT Pro?',
+    description: 'Desenvolvido especialmente para instaladores e técnicos, oferecendo tudo que você precisa em um só lugar.'
+  });
+
   // Show app download popup after 3 seconds if not installed
   React.useEffect(() => {
     if (!isInstalled) {
@@ -105,6 +110,17 @@ export default function Home() {
         title: content.title || 'Soluções Eletrônicas',
         subtitle: content.subtitle || 'para Instaladores',
         description: content.description || 'Acesse manuais, compartilhe instalações e encontre suporte técnico especializado.'
+      });
+    }
+  }, [getEditableContent, editableContent]);
+
+  // Update features content when editable content changes
+  React.useEffect(() => {
+    const content = getEditableContent('features');
+    if (content) {
+      setFeaturesContent({
+        title: content.title || 'Por que usar o TROMOT Pro?',
+        description: content.description || 'Desenvolvido especialmente para instaladores e técnicos, oferecendo tudo que você precisa em um só lugar.'
       });
     }
   }, [getEditableContent, editableContent]);
@@ -296,10 +312,17 @@ export default function Home() {
       {/* Features */}
       <section className="container py-[16px] mt-12">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Por que usar o TROMOT Pro?</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Desenvolvido especialmente para instaladores e técnicos, oferecendo tudo que você precisa em um só lugar.
-          </p>
+          <EditableContent
+            section="features"
+            title={featuresContent.title}
+            description={featuresContent.description}
+            titleClassName="text-3xl font-bold mb-4"
+            descriptionClassName="text-muted-foreground max-w-2xl mx-auto"
+            onContentUpdate={(content) => setFeaturesContent({
+              title: content.title || featuresContent.title,
+              description: content.description || featuresContent.description
+            })}
+          />
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
