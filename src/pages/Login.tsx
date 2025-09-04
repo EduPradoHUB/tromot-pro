@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { useApp } from '@/contexts/AppContext';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +14,8 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [customerType, setCustomerType] = useState<'lojista_instalador' | 'distribuidor_representante' | 'usuario_final'>('usuario_final');
   const [resetEmail, setResetEmail] = useState('');
   const [formLoading, setFormLoading] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
@@ -105,7 +109,7 @@ export default function Login() {
     setFormLoading(true);
 
     try {
-      const { error } = await signUp(email, password, name);
+      const { error } = await signUp(email, password, name, customerType, whatsapp);
       
       if (error) {
         if (error.message.includes('User already registered')) {
@@ -272,6 +276,36 @@ export default function Login() {
                     required
                     minLength={6}
                   />
+                </div>
+                
+                <div>
+                  <Input
+                    type="tel"
+                    placeholder="WhatsApp (opcional)"
+                    value={whatsapp}
+                    onChange={(e) => setWhatsapp(e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Qual é o seu perfil? *</Label>
+                  <RadioGroup
+                    value={customerType}
+                    onValueChange={(value: 'lojista_instalador' | 'distribuidor_representante' | 'usuario_final') => setCustomerType(value)}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="lojista_instalador" id="lojista" />
+                      <Label htmlFor="lojista">Lojista/Instalador</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="distribuidor_representante" id="distribuidor" />
+                      <Label htmlFor="distribuidor">Distribuidor/Representante</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="usuario_final" id="usuario" />
+                      <Label htmlFor="usuario">Usuário Final</Label>
+                    </div>
+                  </RadioGroup>
                 </div>
                 
                 <div className="space-y-3">

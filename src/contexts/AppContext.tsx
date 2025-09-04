@@ -128,7 +128,7 @@ interface AppContextType {
   profile: Profile | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, name: string, customerType?: 'lojista_instalador' | 'distribuidor_representante' | 'usuario_final', whatsapp?: string) => Promise<{ error: Error | null }>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
   logout: () => Promise<void>;
   
@@ -321,7 +321,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
-  const signUp = async (email: string, password: string, name: string): Promise<{ error: Error | null }> => {
+  const signUp = async (email: string, password: string, name: string, customerType?: 'lojista_instalador' | 'distribuidor_representante' | 'usuario_final', whatsapp?: string): Promise<{ error: Error | null }> => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
@@ -344,7 +344,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             user_id: data.user.id,
             name: name,
             email: email,
-            role: 'Cliente'
+            role: 'Cliente',
+            customer_type: customerType || 'usuario_final',
+            whatsapp: whatsapp || null
           });
         
         if (profileError) {

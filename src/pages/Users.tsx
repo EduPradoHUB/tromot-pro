@@ -156,6 +156,23 @@ export default function Users() {
                       {profile.phone && (
                         <p className="text-sm text-muted-foreground">{profile.phone}</p>
                       )}
+                      {profile.whatsapp && (
+                        <a 
+                          href={`https://wa.me/${profile.whatsapp.replace(/\D/g, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-green-600 hover:underline"
+                        >
+                          WhatsApp: {profile.whatsapp}
+                        </a>
+                      )}
+                      {profile.customer_type && (
+                        <Badge variant="outline" className="text-xs mt-1">
+                          {profile.customer_type === 'lojista_instalador' && 'Lojista/Instalador'}
+                          {profile.customer_type === 'distribuidor_representante' && 'Distribuidor/Representante'}
+                          {profile.customer_type === 'usuario_final' && 'Usuário Final'}
+                        </Badge>
+                      )}
                     </div>
                   </div>
                   

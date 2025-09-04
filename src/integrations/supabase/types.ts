@@ -370,6 +370,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          customer_type: Database["public"]["Enums"]["customer_type"] | null
           email: string
           id: string
           name: string
@@ -377,10 +378,12 @@ export type Database = {
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
           user_id: string
+          whatsapp: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          customer_type?: Database["public"]["Enums"]["customer_type"] | null
           email: string
           id?: string
           name: string
@@ -388,10 +391,12 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
           user_id: string
+          whatsapp?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          customer_type?: Database["public"]["Enums"]["customer_type"] | null
           email?: string
           id?: string
           name?: string
@@ -399,6 +404,7 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
           user_id?: string
+          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -560,6 +566,10 @@ export type Database = {
         | "pending"
         | "approved"
         | "rejected"
+      customer_type:
+        | "lojista_instalador"
+        | "distribuidor_representante"
+        | "usuario_final"
       user_role: "ADM" | "Técnico Tromot" | "Cliente"
     }
     CompositeTypes: {
@@ -689,6 +699,11 @@ export const Constants = {
   public: {
     Enums: {
       content_status: ["active", "inactive", "pending", "approved", "rejected"],
+      customer_type: [
+        "lojista_instalador",
+        "distribuidor_representante",
+        "usuario_final",
+      ],
       user_role: ["ADM", "Técnico Tromot", "Cliente"],
     },
   },

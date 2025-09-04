@@ -44,7 +44,19 @@ export default function Profile() {
                 {profile.phone && (
                   <p className="text-muted-foreground">{profile.phone}</p>
                 )}
-                <Badge className="mt-2">{profile.role}</Badge>
+                {profile.whatsapp && (
+                  <p className="text-muted-foreground">WhatsApp: {profile.whatsapp}</p>
+                )}
+                <div className="flex gap-2 mt-2">
+                  <Badge>{profile.role}</Badge>
+                  {profile.customer_type && (
+                    <Badge variant="outline">
+                      {profile.customer_type === 'lojista_instalador' && 'Lojista/Instalador'}
+                      {profile.customer_type === 'distribuidor_representante' && 'Distribuidor/Representante'}
+                      {profile.customer_type === 'usuario_final' && 'Usuário Final'}
+                    </Badge>
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>
