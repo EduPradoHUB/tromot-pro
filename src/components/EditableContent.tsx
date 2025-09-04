@@ -102,7 +102,7 @@ export const EditableContent: React.FC<EditableContentProps> = ({
       )}
       
       {isEditing ? (
-        <div className="space-y-4 p-4 bg-card/95 backdrop-blur-sm border rounded-lg shadow-lg">
+        <div className="space-y-4 p-4 bg-slate-800/95 backdrop-blur-sm border rounded-lg shadow-lg">
           <div>
             <label className="text-sm font-medium mb-2 block">Título</label>
             <Input
@@ -145,6 +145,7 @@ export const EditableContent: React.FC<EditableContentProps> = ({
               variant="outline" 
               onClick={handleCancel}
               disabled={loading}
+              className="text-black hover:text-black"
             >
               <X className="h-3 w-3 mr-1" />
               Cancelar
