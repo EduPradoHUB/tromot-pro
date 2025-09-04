@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Search, Package, User, LogOut, Menu, BarChart3 } from 'lucide-react';
+import { Home, Search, Package, User, LogOut, Menu, BarChart3, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -64,7 +64,7 @@ const navigationItems = [
     ...(profile?.role === 'ADM' ? [
       { name: 'Dashboard', path: '/dashboard', icon: BarChart3 },
       { name: 'Admin', path: '/admin', icon: Package },
-      { name: 'Mídia', path: '/midia', icon: Package },
+      { name: 'Mídia', path: '/midia', icon: Smartphone },
       { name: 'Usuários', path: '/usuarios', icon: User }
     ] : profile?.role === 'Técnico Tromot' ? [
       { name: 'Dashboard', path: '/dashboard', icon: BarChart3 },
@@ -120,8 +120,8 @@ const navigationItems = [
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/midia" className="cursor-pointer">
-                          <Package className="mr-2 h-4 w-4" />
+                         <Link to="/midia" className="cursor-pointer">
+                          <Smartphone className="mr-2 h-4 w-4" />
                           <span>Dashboard de Mídia</span>
                         </Link>
                       </DropdownMenuItem>
