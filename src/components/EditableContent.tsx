@@ -102,7 +102,7 @@ export const EditableContent: React.FC<EditableContentProps> = ({
       )}
       
       {isEditing ? (
-        <div className="space-y-4 p-4 bg-background/90 backdrop-blur-sm border rounded-lg">
+        <div className="space-y-4 p-4 bg-card/95 backdrop-blur-sm border rounded-lg shadow-lg">
           <div>
             <label className="text-sm font-medium mb-2 block">Título</label>
             <Input
