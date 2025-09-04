@@ -26,7 +26,7 @@ interface LegacyUser {
   name: string;
   email: string;
   phone?: string;
-  role: 'ADM' | 'Técnico Tromot' | 'Cliente';
+  role: 'ADM' | 'Técnico Tromot' | 'Cliente' | 'Suporte Tromot';
   avatar?: string;
 }
 

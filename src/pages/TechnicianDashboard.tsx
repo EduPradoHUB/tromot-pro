@@ -235,6 +235,10 @@ export default function TechnicianDashboard() {
       <div>
         <h1 className="text-3xl font-bold">Dashboard Técnico</h1>
         <p className="text-muted-foreground">Gerencie produtos e categorias</p>
+        {/* Debug: Mostrar papel do usuário */}
+        <p className="text-xs text-muted-foreground mt-2">
+          Usuário: {profile?.name} | Papel: {profile?.role}
+        </p>
       </div>
 
       <Tabs defaultValue="products" className="w-full">
