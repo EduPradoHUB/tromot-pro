@@ -419,7 +419,10 @@ export default function TechnicianDashboard() {
                     <p><strong>Categoria:</strong> {product.category}</p>
                     <p><strong>EAN-13:</strong> {product.barcode_ean || 'N/A'}</p>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" onClick={() => handleEditProduct(product)}>
+                      <Button size="sm" variant="outline" onClick={() => {
+                        handleEditProduct(product);
+                        setDialogOpen(true);
+                      }}>
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => deleteProduct(product.id)}>
@@ -530,7 +533,10 @@ export default function TechnicianDashboard() {
                   <div className="space-y-2 text-sm">
                     <p className="text-muted-foreground">{category.description || 'Sem descrição'}</p>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" onClick={() => handleEditCategory(category)}>
+                      <Button size="sm" variant="outline" onClick={() => {
+                        handleEditCategory(category);
+                        setDialogOpen(true);
+                      }}>
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => deleteCategory(category.id)}>
