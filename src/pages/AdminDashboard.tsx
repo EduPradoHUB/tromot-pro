@@ -301,6 +301,85 @@ export default function AdminDashboard() {
     }
   };
 
+  // Distributor handlers  
+  const handleCreateDistributor = async () => {
+    try {
+      await createDistributor(distributorForm);
+      
+      setDistributorForm({
+        name: '',
+        phone: '',
+        whatsapp: '',
+        state: '',
+        city: '',
+        cover_entire_state: false,
+        active: true
+      });
+      
+      setDialogOpen(false);
+      
+      toast({
+        title: "Sucesso",
+        description: "Distribuidor criado com sucesso."
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao criar distribuidor.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleUpdateDistributor = async () => {
+    if (!editingDistributor) return;
+    
+    try {
+      await updateDistributor(editingDistributor.id, distributorForm);
+      
+      setDistributorForm({
+        name: '',
+        phone: '',
+        whatsapp: '',
+        state: '',
+        city: '',
+        cover_entire_state: false,
+        active: true
+      });
+      
+      setEditingDistributor(null);
+      setDialogOpen(false);
+      
+      toast({
+        title: "Sucesso",
+        description: "Distribuidor atualizado com sucesso."
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar distribuidor.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDeleteDistributor = async (id: string) => {
+    try {
+      await deleteDistributor(id);
+      
+      toast({
+        title: "Sucesso",
+        description: "Distribuidor excluído com sucesso."
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao excluir distribuidor.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleCreateProduct = async () => {
     // Validate EAN-13
     if (productForm.barcode_ean && !/^\d{13}$/.test(productForm.barcode_ean)) {
