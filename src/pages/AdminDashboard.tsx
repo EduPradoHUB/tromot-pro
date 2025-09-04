@@ -751,7 +751,15 @@ export default function AdminDashboard() {
           </div>
           
           <div className="grid gap-4">
-            {products.map((product) => (
+            {products
+              .sort((a, b) => {
+                // Calcular score de completude (0 = incompleto, 2 = completo)
+                const scoreA = (a.manual_url ? 1 : 0) + (a.image_url ? 1 : 0);
+                const scoreB = (b.manual_url ? 1 : 0) + (b.image_url ? 1 : 0);
+                // Produtos menos completos primeiro
+                return scoreA - scoreB;
+              })
+              .map((product) => (
               <Card key={product.id}>
                 <CardContent className="p-6">
                    <div className="flex justify-between items-start">
