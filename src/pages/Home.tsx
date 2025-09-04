@@ -38,13 +38,10 @@ export default function Home() {
   const [searchYear, setSearchYear] = useState('');
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
   const [showAppDownload, setShowAppDownload] = useState(false);
-  const [heroContent, setHeroContent] = useState(() => {
-    const content = getEditableContent('hero');
-    return {
-      title: content?.title || 'Soluções Eletrônicas',
-      subtitle: content?.subtitle || 'para Instaladores',
-      description: content?.description || 'Acesse manuais, compartilhe instalações e encontre suporte técnico especializado.'
-    };
+  const [heroContent, setHeroContent] = useState({
+    title: 'Soluções Eletrônicas',
+    subtitle: 'para Instaladores',
+    description: 'Acesse manuais, compartilhe instalações e encontre suporte técnico especializado.'
   });
 
   // Show app download popup after 3 seconds if not installed
