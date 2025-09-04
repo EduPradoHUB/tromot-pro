@@ -14,6 +14,7 @@ import AdSlot from '@/components/AdSlot';
 import { usePWA } from '@/hooks/usePWA';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
 import { AppDownloadDialog } from '@/components/AppDownloadDialog';
+import { EditableContent } from '@/components/EditableContent';
 import { toast } from '@/hooks/use-toast';
 
 export default function Home() {
@@ -22,7 +23,9 @@ export default function Home() {
     legacyProducts: products,
     vehicles,
     trackEvent,
-    findProductByBarcode
+    findProductByBarcode,
+    getEditableContent,
+    editableContent
   } = useApp();
   const {
     isInstallable,
@@ -35,6 +38,14 @@ export default function Home() {
   const [searchYear, setSearchYear] = useState('');
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
   const [showAppDownload, setShowAppDownload] = useState(false);
+  const [heroContent, setHeroContent] = useState(() => {
+    const content = getEditableContent('hero');
+    return {
+      title: content?.title || 'Soluções Eletrônicas',
+      subtitle: content?.subtitle || 'para Instaladores',
+      description: content?.description || 'Acesse manuais, compartilhe instalações e encontre suporte técnico especializado.'
+    };
+  });
 
   // Show app download popup after 3 seconds if not installed
   React.useEffect(() => {
@@ -88,6 +99,18 @@ export default function Home() {
   };
   
   const latestProducts = products.slice(0, 6);
+
+  // Update hero content when editable content changes
+  React.useEffect(() => {
+    const content = getEditableContent('hero');
+    if (content) {
+      setHeroContent({
+        title: content.title || 'Soluções Eletrônicas',
+        subtitle: content.subtitle || 'para Instaladores',
+        description: content.description || 'Acesse manuais, compartilhe instalações e encontre suporte técnico especializado.'
+      });
+    }
+  }, [getEditableContent, editableContent]);
   
   return <div>
       {/* Hero Section with Banner */}
@@ -96,13 +119,20 @@ export default function Home() {
         <div className="relative container md:py-32 py-[10px]">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-                Soluções Eletrônicas
-                <span className="block text-primary">para Instaladores</span>
-              </h1>
-              <p className="text-xl text-white/90 max-w-md">
-                Acesse manuais, compartilhe instalações e encontre suporte técnico especializado.
-              </p>
+              <EditableContent
+                section="hero"
+                title={heroContent.title}
+                subtitle={heroContent.subtitle}
+                description={heroContent.description}
+                titleClassName="text-4xl md:text-6xl font-bold leading-tight"
+                subtitleClassName="block text-primary"
+                descriptionClassName="text-xl text-white/90 max-w-md"
+                onContentUpdate={(content) => setHeroContent({
+                  title: content.title || heroContent.title,
+                  subtitle: content.subtitle || heroContent.subtitle,
+                  description: content.description || heroContent.description
+                })}
+              />
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="lg" className="bg-primary hover:bg-primary/90" onClick={() => setShowBarcodeScanner(true)}>
                   <ScanLine className="mr-2 h-5 w-5" />

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
@@ -206,6 +206,12 @@ interface AppContextType {
     posts_count: number;
   }>>;
   
+  // Editable content
+  editableContent: any[];
+  fetchEditableContent: () => Promise<void>;
+  updateEditableContent: (section: string, content: { title?: string; subtitle?: string; description?: string }) => Promise<boolean>;
+  getEditableContent: (section: string) => any;
+  
   // Filters
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
@@ -243,6 +249,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [posts, setPosts] = useState<LegacyPost[]>([]);
   const [ratings, setRatings] = useState<LegacyRating[]>([]);
   const [questions, setQuestions] = useState<LegacyQuestion[]>([]);
+  
+  // Editable content state
+  const [editableContent, setEditableContent] = useState<any[]>([]);
   
   // Filters
   const [selectedCategory, setSelectedCategory] = useState('Todos');
@@ -675,6 +684,72 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return data || [];
   };
 
+  // Editable content functions
+  const fetchEditableContent = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('editable_content')
+        .select('*');
+      
+      if (error) {
+        console.error('Error fetching editable content:', error);
+        return;
+      }
+      
+      setEditableContent(data || []);
+    } catch (error) {
+      console.error('Error fetching editable content:', error);
+    }
+  }, []);
+
+  const updateEditableContent = useCallback(async (
+    section: string, 
+    content: { title?: string; subtitle?: string; description?: string }
+  ): Promise<boolean> => {
+    if (!user || profile?.role !== 'ADM') return false;
+    
+    try {
+      const { data, error } = await supabase
+        .from('editable_content')
+        .upsert({
+          section,
+          title: content.title,
+          subtitle: content.subtitle,
+          description: content.description
+        }, {
+          onConflict: 'section'
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error updating editable content:', error);
+        return false;
+      }
+      
+      // Update local state
+      setEditableContent(prev => {
+        const index = prev.findIndex(item => item.section === section);
+        if (index >= 0) {
+          const updated = [...prev];
+          updated[index] = data;
+          return updated;
+        } else {
+          return [...prev, data];
+        }
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Error updating editable content:', error);
+      return false;
+    }
+  }, [user, profile]);
+
+  const getEditableContent = useCallback((section: string) => {
+    return editableContent.find(item => item.section === section);
+  }, [editableContent]);
+
   // Fetch all data
   const fetchData = async () => {
     try {
@@ -697,6 +772,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (advertisementsData) setAdvertisements(advertisementsData);
       if (vehiclesData) setVehicles(vehiclesData);
       if (categoriesData) setCategories(categoriesData);
+      
+      // Also fetch editable content
+      await fetchEditableContent();
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -947,6 +1025,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     getDashboardStats,
     findProductByBarcode,
     fetchInstallationLeaderboard,
+    
+    // Editable content
+    editableContent,
+    fetchEditableContent,
+    updateEditableContent,
+    getEditableContent,
+    
     selectedCategory,
     setSelectedCategory,
     selectedBrand,
