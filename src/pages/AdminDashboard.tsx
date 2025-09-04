@@ -787,10 +787,15 @@ export default function AdminDashboard() {
           <div className="grid gap-4">
             {products
               .sort((a, b) => {
+                // Considerar produtos com "manual não disponível" como tendo manual
+                const hasManualA = a.manual_url || a.no_manual_available;
+                const hasManualB = b.manual_url || b.no_manual_available;
+                
                 // Calcular score de completude (0 = incompleto, 2 = completo)
-                const scoreA = (a.manual_url ? 1 : 0) + (a.image_url ? 1 : 0);
-                const scoreB = (b.manual_url ? 1 : 0) + (b.image_url ? 1 : 0);
-                // Produtos menos completos primeiro
+                const scoreA = (hasManualA ? 1 : 0) + (a.image_url ? 1 : 0);
+                const scoreB = (hasManualB ? 1 : 0) + (b.image_url ? 1 : 0);
+                
+                // Produtos menos completos primeiro (mais precisam de edição)
                 return scoreA - scoreB;
               })
               .map((product) => (
