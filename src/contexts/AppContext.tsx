@@ -973,13 +973,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Auth state management
   useEffect(() => {
+    console.log('🚀 Inicializando AppContext...');
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('🔐 Auth state change:', event, session?.user?.email);
+        
         // Only synchronous state updates here to avoid deadlock
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          console.log('👤 Usuário logado, buscando perfil...');
           // Defer Supabase calls with setTimeout to avoid deadlock
           setTimeout(async () => {
             try {
@@ -1011,15 +1016,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               }
               
               setProfile(profileData);
+              console.log('✅ Perfil carregado:', profileData?.name);
+              
               // Fetch app data after profile is loaded
+              console.log('📊 Buscando dados da aplicação...');
               await fetchData();
+              console.log('✅ Dados carregados, app pronto!');
               setLoading(false);
             } catch (error) {
-              console.error('Error handling profile:', error);
+              console.error('❌ Erro ao carregar perfil/dados:', error);
               setLoading(false);
             }
           }, 0);
         } else {
+          console.log('🚪 Usuário não logado');
           setProfile(null);
           setProducts([]);
           setBanners([]);

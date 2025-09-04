@@ -18,6 +18,8 @@ import { EditableContent } from '@/components/EditableContent';
 import { toast } from '@/hooks/use-toast';
 
 export default function Home() {
+  console.log('🏠 Renderizando componente Home...');
+  
   const {
     banners,
     legacyProducts: products,

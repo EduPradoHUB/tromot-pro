@@ -12,6 +12,8 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({
   children
 }) => {
+  console.log('🏗️ Renderizando Layout...');
+  
   const {
     profile,
     logout,
