@@ -1163,6 +1163,160 @@ export default function AdminDashboard() {
           </div>
         </TabsContent>
 
+        {/* Distributors Tab */}
+        <TabsContent value="distributors" className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-semibold">Distribuidores</h2>
+            
+            <Dialog open={dialogOpen} onOpenChange={(open) => {
+              setDialogOpen(open);
+              if (!open) {
+                setEditingDistributor(null);
+                setDistributorForm({
+                  name: '',
+                  phone: '',
+                  whatsapp: '',
+                  state: '',
+                  city: '',
+                  cover_entire_state: false,
+                  active: true
+                });
+              }
+            }}>
+              <DialogTrigger asChild>
+                <Button onClick={() => setEditingDistributor(null)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Novo Distribuidor
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{editingDistributor ? 'Editar Distribuidor' : 'Novo Distribuidor'}</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="distributor_name">Nome</Label>
+                    <Input
+                      id="distributor_name"
+                      value={distributorForm.name}
+                      onChange={(e) => setDistributorForm({...distributorForm, name: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="phone">Telefone</Label>
+                      <Input
+                        id="phone"
+                        value={distributorForm.phone}
+                        onChange={(e) => setDistributorForm({...distributorForm, phone: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="whatsapp">WhatsApp</Label>
+                      <Input
+                        id="whatsapp"
+                        value={distributorForm.whatsapp}
+                        onChange={(e) => setDistributorForm({...distributorForm, whatsapp: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="state">Estado</Label>
+                      <Input
+                        id="state"
+                        value={distributorForm.state}
+                        onChange={(e) => setDistributorForm({...distributorForm, state: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="city">Cidade</Label>
+                      <Input
+                        id="city"
+                        value={distributorForm.city}
+                        onChange={(e) => setDistributorForm({...distributorForm, city: e.target.value})}
+                        disabled={distributorForm.cover_entire_state}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="cover_entire_state"
+                      checked={distributorForm.cover_entire_state}
+                      onCheckedChange={(checked) => setDistributorForm({...distributorForm, cover_entire_state: checked, city: checked ? '' : distributorForm.city})}
+                    />
+                    <Label htmlFor="cover_entire_state">Atende todo o estado</Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="distributor_active"
+                      checked={distributorForm.active}
+                      onCheckedChange={(checked) => setDistributorForm({...distributorForm, active: checked})}
+                    />
+                    <Label htmlFor="distributor_active">Ativo</Label>
+                  </div>
+                  
+                   <Button onClick={editingDistributor ? handleUpdateDistributor : handleCreateDistributor}>
+                     {editingDistributor ? 'Atualizar Distribuidor' : 'Criar Distribuidor'}
+                   </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+          
+          <div className="grid gap-4">
+            {distributors.map((distributor) => (
+              <Card key={distributor.id}>
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-semibold">{distributor.name}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {distributor.cover_entire_state 
+                          ? `Todo o estado - ${distributor.state}`
+                          : `${distributor.city}, ${distributor.state}`
+                        }
+                      </p>
+                      {distributor.phone && (
+                        <p className="text-sm text-muted-foreground">Tel: {distributor.phone}</p>
+                      )}
+                      {distributor.whatsapp && (
+                        <p className="text-sm text-muted-foreground">WhatsApp: {distributor.whatsapp}</p>
+                      )}
+                      <Badge variant={distributor.active ? "default" : "secondary"}>
+                        {distributor.active ? "Ativo" : "Inativo"}
+                      </Badge>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setEditingDistributor(distributor);
+                        setDistributorForm({
+                          name: distributor.name,
+                          phone: distributor.phone || '',
+                          whatsapp: distributor.whatsapp || '',
+                          state: distributor.state,
+                          city: distributor.city || '',
+                          cover_entire_state: distributor.cover_entire_state,
+                          active: distributor.active
+                        });
+                      }}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleDeleteDistributor(distributor.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
         {/* Banners Tab */}
         <TabsContent value="banners" className="space-y-6">
           <div className="flex justify-between items-center">
