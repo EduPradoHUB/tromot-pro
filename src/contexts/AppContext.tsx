@@ -54,6 +54,7 @@ interface LegacyProduct {
   description: string;
   status: 'active' | 'inactive';
   out_of_production?: boolean;
+  no_manual_available?: boolean;
 }
 
 interface LegacyPost {
@@ -287,7 +288,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     image_url: product.image_url || '',
     description: product.description || '',
     status: product.status === 'active' ? 'active' : 'inactive',
-    out_of_production: product.out_of_production || false
+    out_of_production: product.out_of_production || false,
+    no_manual_available: product.no_manual_available || false
   }));
 
   // Fetch user profile
@@ -663,7 +665,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         image_url: data.image_url || '',
         description: data.description || '',
         status: data.status === 'active' ? 'active' : 'inactive',
-        out_of_production: data.out_of_production || false
+        out_of_production: data.out_of_production || false,
+        no_manual_available: data.no_manual_available || false
       };
     } catch (error) {
       console.error('Error finding product by barcode:', error);

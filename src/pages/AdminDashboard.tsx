@@ -128,14 +128,10 @@ export default function AdminDashboard() {
   }>>([]);
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(false);
 
-  // Products state for local updates
-  const [localProducts, setLocalProducts] = useState(products);
-
-  useEffect(() => {
-    setLocalProducts(products);
-  }, [products]);
+  // Usar products diretamente do contexto agora que no_manual_available está incluído
 
   const handleNoManualChange = async (productId: string, noManualAvailable: boolean) => {
+    console.log('Atualizando produto:', productId, 'no_manual_available:', noManualAvailable);
     try {
       const { error } = await supabase
         .from('products')
@@ -144,12 +140,9 @@ export default function AdminDashboard() {
 
       if (error) throw error;
 
-      // Atualizar o produto na lista local
-      setLocalProducts(prev => prev.map(product => 
-        product.id === productId 
-          ? { ...product, no_manual_available: noManualAvailable }
-          : product
-      ));
+      console.log('Produto atualizado no banco, chamando updateProduct...');
+      // Atualizar no contexto também
+      await updateProduct(productId, { no_manual_available: noManualAvailable });
 
       toast({
         title: noManualAvailable ? "Produto marcado como sem manual" : "Marca removida do produto",
@@ -792,7 +785,7 @@ export default function AdminDashboard() {
           </div>
           
           <div className="grid gap-4">
-            {localProducts
+            {products
               .sort((a, b) => {
                 // Calcular score de completude (0 = incompleto, 2 = completo)
                 const scoreA = (a.manual_url ? 1 : 0) + (a.image_url ? 1 : 0);
