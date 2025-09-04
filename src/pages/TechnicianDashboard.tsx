@@ -55,7 +55,7 @@ export default function TechnicianDashboard() {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // Verificar se o usuário é ADM, Técnico Tromot ou Suporte Tromot
-  if (!profile || (profile.role !== 'ADM' && profile.role !== 'Técnico Tromot' && profile.role !== 'Suporte Tromot')) {
+  if (!profile || !(['ADM', 'Técnico Tromot', 'Suporte Tromot'] as const).includes(profile.role as any)) {
     return (
       <div className="container py-8">
         <p className="text-muted-foreground">Acesso restrito para técnicos, suporte e administradores.</p>
