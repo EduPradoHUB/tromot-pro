@@ -212,7 +212,21 @@ export default function ProductPage() {
           {/* Manual and Video */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Manual */}
-            {product.manual_url && (
+            {product.no_manual_available ? (
+              <Card className="shadow-card">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Manual de Instalação
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="py-4">
+                  <div className="text-center text-muted-foreground py-4">
+                    Manual digital não disponível
+                  </div>
+                </CardContent>
+              </Card>
+            ) : product.manual_url ? (
               <Card className="shadow-card">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -231,7 +245,7 @@ export default function ProductPage() {
                   </Button>
                 </CardContent>
               </Card>
-            )}
+            ) : null}
 
             {/* Video */}
             {product.video_url && (

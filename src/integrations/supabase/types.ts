@@ -316,6 +316,7 @@ export type Database = {
           manual_type: string | null
           manual_url: string | null
           name: string
+          no_manual_available: boolean
           out_of_production: boolean
           rating_average: number | null
           rating_count: number | null
@@ -335,6 +336,7 @@ export type Database = {
           manual_type?: string | null
           manual_url?: string | null
           name: string
+          no_manual_available?: boolean
           out_of_production?: boolean
           rating_average?: number | null
           rating_count?: number | null
@@ -354,6 +356,7 @@ export type Database = {
           manual_type?: string | null
           manual_url?: string | null
           name?: string
+          no_manual_available?: boolean
           out_of_production?: boolean
           rating_average?: number | null
           rating_count?: number | null

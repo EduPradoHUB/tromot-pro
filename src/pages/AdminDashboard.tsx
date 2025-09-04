@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
 import { Plus, Edit, Trash2, Upload, Eye, EyeOff, Trophy, Medal, Award, FileSpreadsheet, FileText, Image, Check, X } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { supabase } from '@/integrations/supabase/client';
 import { BulkProductUpload } from '@/components/BulkProductUpload';
 import { PostModeration } from '@/components/PostModeration';
 import { medals, computeUserMedals, getProgressToNextMedal } from '@/lib/gamification';
@@ -125,6 +127,45 @@ export default function AdminDashboard() {
     posts_count: number;
   }>>([]);
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(false);
+
+  // Products state for local updates
+  const [localProducts, setLocalProducts] = useState(products);
+
+  useEffect(() => {
+    setLocalProducts(products);
+  }, [products]);
+
+  const handleNoManualChange = async (productId: string, noManualAvailable: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ no_manual_available: noManualAvailable })
+        .eq('id', productId);
+
+      if (error) throw error;
+
+      // Atualizar o produto na lista local
+      setLocalProducts(prev => prev.map(product => 
+        product.id === productId 
+          ? { ...product, no_manual_available: noManualAvailable }
+          : product
+      ));
+
+      toast({
+        title: noManualAvailable ? "Produto marcado como sem manual" : "Marca removida do produto",
+        description: noManualAvailable 
+          ? "O produto agora exibirá 'Manual digital não disponível'"
+          : "O produto voltará a exibir o botão de download se houver manual"
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar produto:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o produto.",
+        variant: "destructive"
+      });
+    }
+  };
 
   if (!profile || profile.role !== 'ADM') {
     return (
@@ -751,7 +792,7 @@ export default function AdminDashboard() {
           </div>
           
           <div className="grid gap-4">
-            {products
+            {localProducts
               .sort((a, b) => {
                 // Calcular score de completude (0 = incompleto, 2 = completo)
                 const scoreA = (a.manual_url ? 1 : 0) + (a.image_url ? 1 : 0);
@@ -793,6 +834,21 @@ export default function AdminDashboard() {
                          {product.out_of_production && (
                            <Badge variant="destructive">Fora de produção</Badge>
                          )}
+                       </div>
+                       
+                       {/* Checkbox para marcar produto sem manual */}
+                       <div className="flex items-center space-x-2 mt-3">
+                         <Checkbox
+                           id={`no-manual-${product.id}`}
+                           checked={product.no_manual_available || false}
+                           onCheckedChange={(checked) => handleNoManualChange(product.id, !!checked)}
+                         />
+                         <label 
+                           htmlFor={`no-manual-${product.id}`} 
+                           className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                         >
+                           Manual não disponível
+                         </label>
                        </div>
                      </div>
                      <div className="flex gap-2">
