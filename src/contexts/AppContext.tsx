@@ -422,16 +422,38 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // File upload function
   const uploadFile = async (bucket: string, path: string, file: File): Promise<string> => {
+    console.log('🔄 Iniciando upload:', { bucket, path, fileSize: file.size, fileType: file.type });
+    
+    if (!user) {
+      console.error('❌ Usuário não autenticado para upload');
+      throw new Error('Usuário não autenticado');
+    }
+
+    // Validação de tamanho de arquivo (10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      console.error('❌ Arquivo muito grande:', file.size, 'bytes');
+      throw new Error('Arquivo muito grande. Máximo permitido: 10MB');
+    }
+    
     const { data, error } = await supabase.storage
       .from(bucket)
-      .upload(path, file);
+      .upload(path, file, {
+        cacheControl: '3600',
+        upsert: true,
+        contentType: file.type
+      });
     
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Erro no upload para storage:', error);
+      throw new Error(`Falha no upload: ${error.message}`);
+    }
     
     const { data: { publicUrl } } = supabase.storage
       .from(bucket)
       .getPublicUrl(data.path);
     
+    console.log('✅ Upload concluído com sucesso:', publicUrl);
     return publicUrl;
   };
 
@@ -961,9 +983,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
-  // Legacy currentUser for backward compatibility
-  const currentUser: LegacyUser | null = profile ? {
-    id: profile.id,
+  // Legacy currentUser for backward compatibility - FIXED to use auth user ID
+  const currentUser: LegacyUser | null = profile && user ? {
+    id: user.id, // CRITICAL FIX: Use auth user ID instead of profile.id for RLS compatibility
     name: profile.name,
     email: profile.email,
     phone: profile.phone || undefined,

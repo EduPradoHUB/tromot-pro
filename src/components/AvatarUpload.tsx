@@ -93,12 +93,18 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
 
     setUploading(true);
     try {
+      console.log('🔄 Iniciando upload de avatar...');
+
       const canvas = previewCanvasRef.current;
       const blob = await canvasToBlob(canvas);
       const file = new File([blob], `avatar-${Date.now()}.jpg`, { type: 'image/jpeg' });
       
+      console.log('📷 Avatar processado:', { name: file.name, size: file.size, type: file.type });
+      
       const fileName = `${Date.now()}-${file.name}`;
       const avatarUrl = await uploadFile('avatars', fileName, file);
+      
+      console.log('✅ Upload de avatar concluído:', avatarUrl);
       
       onUploadComplete?.(avatarUrl);
       setOpen(false);
@@ -108,11 +114,22 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
         title: "Sucesso",
         description: "Foto de perfil atualizada com sucesso!"
       });
-    } catch (error) {
-      console.error('Erro no upload:', error);
+    } catch (error: any) {
+      console.error('❌ Erro no upload de avatar:', error);
+      
+      let errorMessage = "Falha ao fazer upload da imagem.";
+      
+      if (error.message?.includes('não autenticado')) {
+        errorMessage = "Você precisa estar logado para alterar sua foto de perfil.";
+      } else if (error.message?.includes('muito grande')) {
+        errorMessage = error.message;
+      } else if (error.message?.includes('upload')) {
+        errorMessage = "Falha no upload. Verifique sua conexão e tente novamente.";
+      }
+
       toast({
         title: "Erro",
-        description: "Falha ao fazer upload da imagem.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
