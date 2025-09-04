@@ -1736,6 +1736,56 @@ export default function AdminDashboard() {
             </Dialog>
           </div>
           
+          {/* Explicativo sobre tamanhos das artes */}
+          <Card className="bg-muted/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <span className="text-xl">📐</span>
+                Guia de Tamanhos para Artes dos Anúncios
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-primary">Banner Home</h4>
+                  <div className="text-sm space-y-1">
+                    <p><strong>Tamanho ideal:</strong> 1080x1350px</p>
+                    <p><strong>Proporção:</strong> 4:5</p>
+                    <p><strong>Local:</strong> Página inicial principal</p>
+                    <p className="text-muted-foreground">Exibido em destaque na home, formato vertical otimizado para mobile</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-primary">Banner Produto</h4>
+                  <div className="text-sm space-y-1">
+                    <p><strong>Tamanho ideal:</strong> 1920x1080px</p>
+                    <p><strong>Proporção:</strong> 16:9</p>
+                    <p><strong>Local:</strong> Páginas de produtos</p>
+                    <p className="text-muted-foreground">Aparece entre o manual e o feed de instalações, formato horizontal</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-primary">Feed Patrocinado</h4>
+                  <div className="text-sm space-y-1">
+                    <p><strong>Tamanho ideal:</strong> 1080x1350px</p>
+                    <p><strong>Proporção:</strong> 4:5</p>
+                    <p><strong>Local:</strong> No meio do feed</p>
+                    <p className="text-muted-foreground">Integrado ao feed de posts, com selo "Patrocinado"</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border-t pt-3 mt-4">
+                <p className="text-sm text-muted-foreground">
+                  <strong>Dica:</strong> As imagens devem ser em alta resolução (mínimo 72 DPI) e em formato JPG ou PNG. 
+                  Evite textos muito pequenos que possam ficar ilegíveis em dispositivos móveis.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          
           <div className="grid gap-4">
             {advertisements.map((ad) => (
               <Card key={ad.id}>
