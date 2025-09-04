@@ -127,7 +127,7 @@ export default function AdminDashboard() {
     withoutManual: false,
     withoutPhoto: false,
     outOfProduction: false,
-    category: '',
+    category: 'all',
     missingData: false
   });
   
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
       (!filters.withoutManual || (!product.manual_url && !product.no_manual_available)) &&
       (!filters.withoutPhoto || !product.image_url) &&
       (!filters.outOfProduction || product.out_of_production) &&
-      (!filters.category || product.category === filters.category) &&
+      (!filters.category || filters.category === 'all' || product.category === filters.category) &&
       (!filters.missingData || (!product.manual_url && !product.no_manual_available) || !product.image_url);
       
     return matchesSearch && matchesFilters;
@@ -901,7 +901,7 @@ export default function AdminDashboard() {
                   <SelectValue placeholder="Filtrar por categoria" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas as categorias</SelectItem>
+                  <SelectItem value="all">Todas as categorias</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.name}>
                       {category.name}
