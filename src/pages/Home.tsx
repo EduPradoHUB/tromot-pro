@@ -64,6 +64,11 @@ export default function Home() {
     description: 'Encontre produtos compatíveis com qualquer veículo de forma rápida e precisa.'
   });
 
+  const [quickSearchContent, setQuickSearchContent] = useState({
+    title: 'Busca Rápida por Veículo',
+    description: 'Encontre produtos compatíveis com seu veículo'
+  });
+
   // Show app download popup after 3 seconds if not installed
   React.useEffect(() => {
     if (!isInstalled) {
@@ -166,6 +171,17 @@ export default function Home() {
       });
     }
   }, [getEditableContent, editableContent]);
+
+  // Update quick search content when editable content changes
+  React.useEffect(() => {
+    const content = getEditableContent('quick-search');
+    if (content) {
+      setQuickSearchContent({
+        title: content.title || 'Busca Rápida por Veículo',
+        description: content.description || 'Encontre produtos compatíveis com seu veículo'
+      });
+    }
+  }, [getEditableContent, editableContent]);
   
   return <div>
       {/* Hero Section with Banner */}
@@ -232,10 +248,17 @@ export default function Home() {
         <Card className="shadow-card">
           <CardContent className="p-6">
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold mb-2">Busca Rápida por Veículo</h2>
-              <p className="text-muted-foreground">
-                Encontre produtos compatíveis com seu veículo
-              </p>
+              <EditableContent
+                section="quick-search"
+                title={quickSearchContent.title}
+                description={quickSearchContent.description}
+                titleClassName="text-2xl font-bold mb-2"
+                descriptionClassName="text-muted-foreground"
+                onContentUpdate={(content) => setQuickSearchContent({
+                  title: content.title || quickSearchContent.title,
+                  description: content.description || quickSearchContent.description
+                })}
+              />
             </div>
             
             <div className="grid md:grid-cols-4 gap-4">
