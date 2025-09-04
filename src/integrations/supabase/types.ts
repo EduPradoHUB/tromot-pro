@@ -577,6 +577,42 @@ export type Database = {
           },
         ]
       }
+      security_audit_log: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string | null
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          new_value: string | null
+          old_value: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string | null
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          new_value?: string | null
+          old_value?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          new_value?: string | null
+          old_value?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       vehicles: {
         Row: {
           brand: string
