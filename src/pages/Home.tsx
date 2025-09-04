@@ -49,6 +49,21 @@ export default function Home() {
     description: 'Desenvolvido especialmente para instaladores e técnicos, oferecendo tudo que você precisa em um só lugar.'
   });
 
+  const [featureCard1, setFeatureCard1] = useState({
+    title: 'Manuais Sempre Disponíveis',
+    description: 'Acesse manuais de instalação em PDF ou imagem, sempre atualizados e organizados por produto.'
+  });
+
+  const [featureCard2, setFeatureCard2] = useState({
+    title: 'Rede Colaborativa', 
+    description: 'Compartilhe suas instalações, veja o trabalho de outros técnicos e aprenda com a comunidade.'
+  });
+
+  const [featureCard3, setFeatureCard3] = useState({
+    title: 'Busca Inteligente',
+    description: 'Encontre produtos compatíveis com qualquer veículo de forma rápida e precisa.'
+  });
+
   // Show app download popup after 3 seconds if not installed
   React.useEffect(() => {
     if (!isInstalled) {
@@ -121,6 +136,33 @@ export default function Home() {
       setFeaturesContent({
         title: content.title || 'Por que usar o TROMOT Pro?',
         description: content.description || 'Desenvolvido especialmente para instaladores e técnicos, oferecendo tudo que você precisa em um só lugar.'
+      });
+    }
+  }, [getEditableContent, editableContent]);
+
+  // Update feature cards content when editable content changes
+  React.useEffect(() => {
+    const content1 = getEditableContent('feature-card-1');
+    if (content1) {
+      setFeatureCard1({
+        title: content1.title || 'Manuais Sempre Disponíveis',
+        description: content1.description || 'Acesse manuais de instalação em PDF ou imagem, sempre atualizados e organizados por produto.'
+      });
+    }
+
+    const content2 = getEditableContent('feature-card-2');
+    if (content2) {
+      setFeatureCard2({
+        title: content2.title || 'Rede Colaborativa',
+        description: content2.description || 'Compartilhe suas instalações, veja o trabalho de outros técnicos e aprenda com a comunidade.'
+      });
+    }
+
+    const content3 = getEditableContent('feature-card-3');
+    if (content3) {
+      setFeatureCard3({
+        title: content3.title || 'Busca Inteligente',
+        description: content3.description || 'Encontre produtos compatíveis com qualquer veículo de forma rápida e precisa.'
       });
     }
   }, [getEditableContent, editableContent]);
@@ -331,10 +373,17 @@ export default function Home() {
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Download className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-semibold mb-2">Manuais Sempre Disponíveis</h3>
-              <p className="text-sm text-muted-foreground">
-                Acesse manuais de instalação em PDF ou imagem, sempre atualizados e organizados por produto.
-              </p>
+              <EditableContent
+                section="feature-card-1"
+                title={featureCard1.title}
+                description={featureCard1.description}
+                titleClassName="font-semibold mb-2"
+                descriptionClassName="text-sm text-muted-foreground"
+                onContentUpdate={(content) => setFeatureCard1({
+                  title: content.title || featureCard1.title,
+                  description: content.description || featureCard1.description
+                })}
+              />
             </CardContent>
           </Card>
 
@@ -343,10 +392,17 @@ export default function Home() {
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Star className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-semibold mb-2">Rede Colaborativa</h3>
-              <p className="text-sm text-muted-foreground">
-                Compartilhe suas instalações, veja o trabalho de outros técnicos e aprenda com a comunidade.
-              </p>
+              <EditableContent
+                section="feature-card-2"
+                title={featureCard2.title}
+                description={featureCard2.description}
+                titleClassName="font-semibold mb-2"
+                descriptionClassName="text-sm text-muted-foreground"
+                onContentUpdate={(content) => setFeatureCard2({
+                  title: content.title || featureCard2.title,
+                  description: content.description || featureCard2.description
+                })}
+              />
             </CardContent>
           </Card>
 
@@ -355,10 +411,17 @@ export default function Home() {
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Search className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-semibold mb-2">Busca Inteligente</h3>
-              <p className="text-sm text-muted-foreground">
-                Encontre produtos compatíveis com qualquer veículo de forma rápida e precisa.
-              </p>
+              <EditableContent
+                section="feature-card-3"
+                title={featureCard3.title}
+                description={featureCard3.description}
+                titleClassName="font-semibold mb-2"
+                descriptionClassName="text-sm text-muted-foreground"
+                onContentUpdate={(content) => setFeatureCard3({
+                  title: content.title || featureCard3.title,
+                  description: content.description || featureCard3.description
+                })}
+              />
             </CardContent>
           </Card>
         </div>
