@@ -54,11 +54,11 @@ export default function TechnicianDashboard() {
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Verificar se o usuário é ADM ou Técnico Tromot
-  if (!profile || (profile.role !== 'ADM' && profile.role !== 'Técnico Tromot')) {
+  // Verificar se o usuário é ADM, Técnico Tromot ou Suporte Tromot
+  if (!profile || (profile.role !== 'ADM' && profile.role !== 'Técnico Tromot' && profile.role !== 'Suporte Tromot')) {
     return (
       <div className="container py-8">
-        <p className="text-muted-foreground">Acesso restrito para técnicos e administradores.</p>
+        <p className="text-muted-foreground">Acesso restrito para técnicos, suporte e administradores.</p>
       </div>
     );
   }
