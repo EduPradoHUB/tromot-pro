@@ -269,9 +269,25 @@ export default function WhereToBuy() {
                 <p>
                   Não encontramos distribuidores cadastrados em {userCity}, {userState}.
                 </p>
-                <p className="mt-2">
-                  Entre em contato conosco para mais informações sobre pontos de venda na sua região.
+                <p className="mt-2 mb-4">
+                  Você pode comprar diretamente na nossa loja oficial online:
                 </p>
+                <Button
+                  onClick={async () => {
+                    await trackEvent({
+                      type: 'buy_now_click',
+                      product_id: id,
+                      metadata: {
+                        source: 'where_to_buy_no_distributors',
+                        user_location: `${userCity}, ${userState}`
+                      }
+                    });
+                    window.open('https://tromotstore.com.br', '_blank');
+                  }}
+                  className="w-full sm:w-auto"
+                >
+                  Comprar na Tromot Store
+                </Button>
               </CardContent>
             </Card>
           )}
