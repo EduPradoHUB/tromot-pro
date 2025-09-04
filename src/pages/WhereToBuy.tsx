@@ -95,27 +95,51 @@ export default function WhereToBuy() {
   };
 
   const handleContactClick = async (distributor: Distributor, type: 'phone' | 'whatsapp') => {
-    // Track the analytics event
-    await trackEvent({
-      type: 'distributor_contact_click',
-      product_id: id,
-      metadata: {
-        distributor_id: distributor.id,
-        contact_type: type,
-        distributor_name: distributor.name,
-        user_location: `${userCity}, ${userState}`
-      }
-    });
+    try {
+      // Log access to distributor contact information for security audit
+      const { error: logError } = await supabase.rpc('log_distributor_access', {
+        p_distributor_id: distributor.id,
+        p_access_type: type === 'phone' ? 'view_phone' : 'view_whatsapp',
+        p_user_location: { 
+          state: userState, 
+          city: userCity,
+          product_id: id
+        }
+      });
 
-    const contact = type === 'phone' ? distributor.phone : distributor.whatsapp;
-    
-    if (type === 'whatsapp' && contact) {
-      // Remove formatting and create WhatsApp link
-      const cleanNumber = contact.replace(/\D/g, '');
-      const message = `Olá! Vi no app TROMOT PRO que vocês são distribuidores na região. Tenho interesse no produto: ${product.name} (${product.code}).`;
-      window.open(`https://wa.me/55${cleanNumber}?text=${encodeURIComponent(message)}`, '_blank');
-    } else if (type === 'phone' && contact) {
-      window.open(`tel:${contact}`, '_self');
+      if (logError) {
+        console.warn('Erro ao registrar acesso ao distribuidor:', logError);
+      }
+
+      // Track the analytics event
+      await trackEvent({
+        type: 'distributor_contact_click',
+        product_id: id,
+        metadata: {
+          distributor_id: distributor.id,
+          contact_type: type,
+          distributor_name: distributor.name,
+          user_location: `${userCity}, ${userState}`
+        }
+      });
+
+      const contact = type === 'phone' ? distributor.phone : distributor.whatsapp;
+      
+      if (type === 'whatsapp' && contact) {
+        // Remove formatting and create WhatsApp link
+        const cleanNumber = contact.replace(/\D/g, '');
+        const message = `Olá! Vi no app TROMOT PRO que vocês são distribuidores na região. Tenho interesse no produto: ${product.name} (${product.code}).`;
+        window.open(`https://wa.me/55${cleanNumber}?text=${encodeURIComponent(message)}`, '_blank');
+      } else if (type === 'phone' && contact) {
+        window.open(`tel:${contact}`, '_self');
+      }
+    } catch (error) {
+      console.error('Erro ao acessar contato do distribuidor:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao acessar informações do distribuidor.",
+        variant: "destructive",
+      });
     }
   };
 

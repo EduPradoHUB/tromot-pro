@@ -183,6 +183,33 @@ export type Database = {
         }
         Relationships: []
       }
+      distributor_access_logs: {
+        Row: {
+          access_type: string
+          created_at: string | null
+          distributor_id: string
+          id: string
+          user_id: string
+          user_location: Json | null
+        }
+        Insert: {
+          access_type: string
+          created_at?: string | null
+          distributor_id: string
+          id?: string
+          user_id: string
+          user_location?: Json | null
+        }
+        Update: {
+          access_type?: string
+          created_at?: string | null
+          distributor_id?: string
+          id?: string
+          user_id?: string
+          user_location?: Json | null
+        }
+        Relationships: []
+      }
       distributors: {
         Row: {
           active: boolean
@@ -602,6 +629,14 @@ export type Database = {
           role: Database["public"]["Enums"]["user_role"]
           user_id: string
         }[]
+      }
+      log_distributor_access: {
+        Args: {
+          p_access_type: string
+          p_distributor_id: string
+          p_user_location?: Json
+        }
+        Returns: undefined
       }
     }
     Enums: {
