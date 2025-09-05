@@ -201,14 +201,6 @@ interface AppContextType {
   // Barcode scanning
   findProductByBarcode: (barcode: string) => Promise<LegacyProduct | null>;
   
-  // Installation leaderboard and gamification
-  fetchInstallationLeaderboard: () => Promise<Array<{
-    user_id: string;
-    name: string;
-    avatar_url: string | null;
-    role: string;
-    posts_count: number;
-  }>>;
   
   // Editable content
   editableContent: any[];
@@ -743,18 +735,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
   
-  // Installation leaderboard for gamification
-  const fetchInstallationLeaderboard = async () => {
-    const { data, error } = await supabase
-      .rpc('get_installation_leaderboard', { limit_rows: 100 });
-    
-    if (error) {
-      console.error('Error fetching leaderboard:', error);
-      return [];
-    }
-    
-    return data || [];
-  };
 
   // Editable content functions
   const fetchEditableContent = useCallback(async () => {
@@ -1130,7 +1110,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     trackEvent,
     getDashboardStats,
     findProductByBarcode,
-    fetchInstallationLeaderboard,
     
     // Editable content
     editableContent,

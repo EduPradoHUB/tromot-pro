@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
 import { Layout } from "@/components/Layout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-// Removido AppDownloadDialog e useAutoInstall - não usados mais globalmente
+
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import Product from "./pages/Product";
@@ -21,7 +21,7 @@ import Login from "./pages/Login";
 import PasswordReset from "./pages/PasswordReset";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
-import InstalarApp from "./pages/InstalarApp";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -92,7 +92,7 @@ function AppContent() {
             <Layout><Privacy /></Layout>
           </ProtectedRoute>
         } />
-        <Route path="/instalar" element={<InstalarApp />} />
+        
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

@@ -12,7 +12,7 @@ import { useApp } from '@/contexts/AppContext';
 import { brands } from '@/lib/data';
 import AdSlot from '@/components/AdSlot';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
-import { PWAInstallButton } from '@/components/PWAInstallButton';
+
 import { EditableContent } from '@/components/EditableContent';
 import { toast } from '@/hooks/use-toast';
 
@@ -28,13 +28,13 @@ export default function Home() {
     getEditableContent,
     editableContent
   } = useApp();
-  // Removido usePWA - agora usado dentro do PWAInstallButton
+  
   const navigate = useNavigate();
   const [searchBrand, setSearchBrand] = useState('');
   const [searchModel, setSearchModel] = useState('');
   const [searchYear, setSearchYear] = useState('');
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
-  // Removido showAppDownload - não usado mais
+  
   const [heroContent, setHeroContent] = useState({
     title: 'Soluções Eletrônicas',
     subtitle: 'para Instaladores',
@@ -66,16 +66,6 @@ export default function Home() {
     description: 'Encontre produtos compatíveis com seu veículo'
   });
 
-  // Auto popup disabled - users can manually access /instalar
-  // React.useEffect(() => {
-  //   if (!isInstalled) {
-  //     const timer = setTimeout(() => {
-  //       setShowAppDownload(true);
-  //     }, 3000);
-  //     
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [isInstalled]);
 
   // Plugin autoplay para carrossel
   const autoplayPlugin = useCallback(() => Autoplay({
@@ -206,11 +196,6 @@ export default function Home() {
                   <ScanLine className="mr-2 h-5 w-5" />
                   Escanear Código de Barras
                 </Button>
-                <PWAInstallButton
-                  className="border-white hover:bg-white hover:text-primary text-white"
-                >
-                  Instalar App
-                </PWAInstallButton>
               </div>
             </div>
 

@@ -8,12 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
-import { Plus, Edit, Trash2, Upload, Eye, EyeOff, Trophy, Medal, Award, FileSpreadsheet, FileText, Image, Check, X, Search, Filter } from 'lucide-react';
+import { Plus, Edit, Trash2, Upload, Eye, EyeOff, FileSpreadsheet, FileText, Image, Check, X, Search, Filter } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { BulkProductUpload } from '@/components/BulkProductUpload';
 import { PostModeration } from '@/components/PostModeration';
-import { medals, computeUserMedals, getProgressToNextMedal } from '@/lib/gamification';
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
@@ -45,8 +45,7 @@ export default function AdminDashboard() {
     createDistributor,
     updateDistributor,
     deleteDistributor,
-    uploadFile,
-    fetchInstallationLeaderboard
+    uploadFile
   } = useApp();
   
   const { toast } = useToast();
@@ -54,22 +53,6 @@ export default function AdminDashboard() {
   // Estado para o sistema de desfazer
   const [deletedProduct, setDeletedProduct] = useState<any>(null);
   
-  // Load leaderboard on component mount
-  useEffect(() => {
-    const loadLeaderboard = async () => {
-      setLoadingLeaderboard(true);
-      try {
-        const data = await fetchInstallationLeaderboard();
-        setLeaderboard(data);
-      } catch (error) {
-        console.error('Error loading leaderboard:', error);
-      } finally {
-        setLoadingLeaderboard(false);
-      }
-    };
-    
-    loadLeaderboard();
-  }, [fetchInstallationLeaderboard]);
   
   const [productForm, setProductForm] = useState({
     name: '',
@@ -146,15 +129,6 @@ export default function AdminDashboard() {
     missingData: false
   });
   
-  // Leaderboard state
-  const [leaderboard, setLeaderboard] = useState<Array<{
-    user_id: string;
-    name: string;
-    avatar_url: string | null;
-    role: string;
-    posts_count: number;
-  }>>([]);
-  const [loadingLeaderboard, setLoadingLeaderboard] = useState(false);
 
   // Usar products diretamente do contexto agora que no_manual_available está incluído
   
@@ -772,7 +746,6 @@ export default function AdminDashboard() {
           <TabsTrigger value="advertisements">Propagandas</TabsTrigger>
           <TabsTrigger value="vehicles">Veículos</TabsTrigger>
           <TabsTrigger value="moderation">Moderação</TabsTrigger>
-          <TabsTrigger value="ranking">Ranking</TabsTrigger>
         </TabsList>
 
         {/* Products Tab */}
@@ -1921,167 +1894,6 @@ export default function AdminDashboard() {
           <PostModeration />
         </TabsContent>
 
-        {/* Ranking & Medalhas Tab */}
-        <TabsContent value="ranking" className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold">Ranking & Sistema de Medalhas</h2>
-            <Button 
-              variant="outline" 
-              onClick={async () => {
-                setLoadingLeaderboard(true);
-                try {
-                  const data = await fetchInstallationLeaderboard();
-                  setLeaderboard(data);
-                  toast({
-                    title: "Dados atualizados",
-                    description: "Ranking foi atualizado com sucesso!"
-                  });
-                } catch (error) {
-                  toast({
-                    title: "Erro",
-                    description: "Falha ao carregar ranking.",
-                    variant: "destructive"
-                  });
-                } finally {
-                  setLoadingLeaderboard(false);
-                }
-              }}
-              disabled={loadingLeaderboard}
-            >
-              {loadingLeaderboard ? 'Carregando...' : 'Atualizar Dados'}
-            </Button>
-          </div>
-
-          {/* Sistema de Medalhas */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Trophy className="h-5 w-5" />
-                Sistema de Medalhas
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                {medals.map((medal) => (
-                  <div key={medal.id} className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl mb-2">{medal.icon}</div>
-                    <h4 className="font-medium text-sm mb-1">{medal.name}</h4>
-                    <p className="text-xs text-muted-foreground mb-2">{medal.description}</p>
-                    <Badge variant="outline" className="text-xs">
-                      {medal.postsRequired} post{medal.postsRequired > 1 ? 's' : ''}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Ranking de Instalações */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Medal className="h-5 w-5" />
-                Ranking de Instalações
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loadingLeaderboard ? (
-                <p className="text-center text-muted-foreground py-8">Carregando ranking...</p>
-              ) : leaderboard.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">Nenhum usuário encontrado no ranking.</p>
-              ) : (
-                <div className="space-y-4">
-                  {leaderboard.map((user, index) => {
-                    const userMedals = computeUserMedals(user.posts_count);
-                    const progress = getProgressToNextMedal(user.posts_count);
-                    const isTopThree = index < 3;
-                    
-                    return (
-                      <div 
-                        key={user.user_id} 
-                        className={`flex items-center gap-4 p-4 rounded-lg border ${
-                          isTopThree ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200' : 'bg-card'
-                        }`}
-                      >
-                        {/* Posição */}
-                        <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm ${
-                          index === 0 ? 'bg-yellow-500 text-white' :
-                          index === 1 ? 'bg-gray-400 text-white' :
-                          index === 2 ? 'bg-amber-600 text-white' :
-                          'bg-muted text-muted-foreground'
-                        }`}>
-                          {index + 1}
-                        </div>
-
-                        {/* Avatar */}
-                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-                          {user.avatar_url ? (
-                            <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                              {user.name.charAt(0).toUpperCase()}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Informações do usuário */}
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-medium">{user.name}</h4>
-                            <Badge variant="outline" className="text-xs">
-                              {user.role}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm font-semibold text-primary">
-                              {user.posts_count} instalações
-                            </span>
-                            {userMedals.length > 0 && (
-                              <div className="flex gap-1">
-                                {userMedals.map((medal) => (
-                                  <span 
-                                    key={medal.id} 
-                                    className="text-lg" 
-                                    title={medal.name}
-                                  >
-                                    {medal.icon}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* Progresso para próxima medalha */}
-                          {progress.percentage < 100 && (
-                            <div className="mt-2">
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <span>Progresso para próxima medalha:</span>
-                                <span className="font-medium">{progress.current}/{progress.target}</span>
-                              </div>
-                              <div className="w-full bg-muted rounded-full h-1.5 mt-1">
-                                <div 
-                                  className="bg-primary h-1.5 rounded-full transition-all duration-300"
-                                  style={{ width: `${progress.percentage}%` }}
-                                ></div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Ícone de destaque para top 3 */}
-                        {isTopThree && (
-                          <div className="text-yellow-500">
-                            <Award className="h-5 w-5" />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );
