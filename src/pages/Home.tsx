@@ -11,8 +11,8 @@ import Autoplay from 'embla-carousel-autoplay';
 import { useApp } from '@/contexts/AppContext';
 import { brands } from '@/lib/data';
 import AdSlot from '@/components/AdSlot';
+import { PWAInstallButton } from '@/components/PWAInstallButton';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
-
 import { EditableContent } from '@/components/EditableContent';
 import { toast } from '@/hooks/use-toast';
 
@@ -65,7 +65,6 @@ export default function Home() {
     title: 'Busca Rápida por Veículo',
     description: 'Encontre produtos compatíveis com seu veículo'
   });
-
 
   // Plugin autoplay para carrossel
   const autoplayPlugin = useCallback(() => Autoplay({
@@ -170,7 +169,8 @@ export default function Home() {
     }
   }, [getEditableContent, editableContent]);
   
-  return <div>
+  return (
+    <div>
       {/* Hero Section with Banner */}
       <section className="relative bg-gradient-hero text-white overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
@@ -196,35 +196,60 @@ export default function Home() {
                   <ScanLine className="mr-2 h-5 w-5" />
                   Escanear Código de Barras
                 </Button>
+                <PWAInstallButton 
+                  className="border-white hover:bg-white hover:text-primary text-white"
+                >
+                  Instalar App
+                </PWAInstallButton>
               </div>
             </div>
 
             {/* Featured Banner */}
-            {banners.length > 0 && <div className="lg:flex justify-center hidden">
+            {banners.length > 0 && (
+              <div className="lg:flex justify-center hidden">
                 <AdSlot slot="home_hero" className="w-80" />
-              </div>}
+              </div>
+            )}
           </div>
         </div>
       </section>
 
       {/* Admin Banners Section */}
-      {banners.length > 0 && <section className="sm:container px-0">
-          {banners.length === 1 ? <div className="flex justify-center">
+      {banners.length > 0 && (
+        <section className="sm:container px-0">
+          {banners.length === 1 ? (
+            <div className="flex justify-center">
               <div className="aspect-[4/5] w-full max-w-sm sm:max-w-md overflow-hidden shadow-card">
-                <img src={banners[0].image_url} alt={banners[0].title} className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => banners[0].link_url && window.open(banners[0].link_url, '_blank')} />
+                <img 
+                  src={banners[0].image_url} 
+                  alt={banners[0].title} 
+                  className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
+                  onClick={() => banners[0].link_url && window.open(banners[0].link_url, '_blank')} 
+                />
               </div>
-            </div> : <Carousel className="w-full max-w-4xl mx-auto" plugins={[autoplayPlugin()]}>
-               <CarouselContent className="-ml-1 sm:-ml-2 md:-ml-4">
-                 {banners.map(banner => <CarouselItem key={banner.id} className="pl-1 sm:pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
-                     <div className="aspect-[4/5] overflow-hidden shadow-card">
-                       <img src={banner.image_url} alt={banner.title} className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => banner.link_url && window.open(banner.link_url, '_blank')} />
-                     </div>
-                   </CarouselItem>)}
-               </CarouselContent>
-               <CarouselPrevious className="hidden sm:flex" />
-               <CarouselNext className="hidden sm:flex" />
-             </Carousel>}
-         </section>}
+            </div>
+          ) : (
+            <Carousel className="w-full max-w-4xl mx-auto" plugins={[autoplayPlugin()]}>
+              <CarouselContent className="-ml-1 sm:-ml-2 md:-ml-4">
+                {banners.map(banner => (
+                  <CarouselItem key={banner.id} className="pl-1 sm:pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+                    <div className="aspect-[4/5] overflow-hidden shadow-card">
+                      <img 
+                        src={banner.image_url} 
+                        alt={banner.title} 
+                        className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
+                        onClick={() => banner.link_url && window.open(banner.link_url, '_blank')} 
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden sm:flex" />
+              <CarouselNext className="hidden sm:flex" />
+            </Carousel>
+          )}
+        </section>
+      )}
 
       {/* Quick Search */}
       <section className="container mt-12">
@@ -250,9 +275,11 @@ export default function Home() {
                   <SelectValue placeholder="Marca" />
                 </SelectTrigger>
                 <SelectContent className="bg-background border shadow-lg">
-                  {brands.filter(b => b !== 'Todos').map(brand => <SelectItem key={brand} value={brand}>
+                  {brands.filter(b => b !== 'Todos').map(brand => (
+                    <SelectItem key={brand} value={brand}>
                       {brand}
-                    </SelectItem>)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -261,9 +288,11 @@ export default function Home() {
                   <SelectValue placeholder="Modelo" />
                 </SelectTrigger>
                 <SelectContent className="bg-background border shadow-lg">
-                  {availableModels.map(model => <SelectItem key={model} value={model}>
+                  {availableModels.map(model => (
+                    <SelectItem key={model} value={model}>
                       {model}
-                    </SelectItem>)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -272,9 +301,11 @@ export default function Home() {
                   <SelectValue placeholder="Ano" />
                 </SelectTrigger>
                 <SelectContent className="bg-background border shadow-lg">
-                  {availableYears.map(year => <SelectItem key={year} value={year}>
+                  {availableYears.map(year => (
+                    <SelectItem key={year} value={year}>
                       {year}
-                    </SelectItem>)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -303,11 +334,16 @@ export default function Home() {
 
         <Carousel className="w-full">
           <CarouselContent className="-ml-2 md:-ml-4">
-            {latestProducts.map(product => <CarouselItem key={product.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+            {latestProducts.map(product => (
+              <CarouselItem key={product.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
                 <Card className="shadow-card hover:shadow-lg transition-shadow">
                   <CardContent className="p-0">
                     <div className="aspect-[4/3] relative overflow-hidden rounded-t-2xl">
-                      <img src={product.image_url || '/src/assets/photo-unavailable.png'} alt={product.name} className="w-full h-full object-cover" />
+                      <img 
+                        src={product.image_url || '/src/assets/photo-unavailable.png'} 
+                        alt={product.name} 
+                        className="w-full h-full object-cover" 
+                      />
                       <div className="absolute top-3 right-3">
                         <Badge variant="secondary" className="bg-background/90">
                           {product.category}
@@ -337,8 +373,8 @@ export default function Home() {
                           </span>
                         </div>
                         <div className="flex items-center text-sm text-muted-foreground">
-                        <Eye className="h-4 w-4 mr-1" />
-                        {product.compatibility.length}
+                          <Eye className="h-4 w-4 mr-1" />
+                          {product.compatibility.length}
                         </div>
                       </div>
 
@@ -350,7 +386,8 @@ export default function Home() {
                     </div>
                   </CardContent>
                 </Card>
-              </CarouselItem>)}
+              </CarouselItem>
+            ))}
           </CarouselContent>
           <CarouselPrevious className="hidden sm:flex" />
           <CarouselNext className="hidden sm:flex" />
@@ -439,5 +476,6 @@ export default function Home() {
         onOpenChange={setShowBarcodeScanner}
         onBarcodeDetected={handleBarcodeDetected}
       />
-    </div>;
+    </div>
+  );
 }
