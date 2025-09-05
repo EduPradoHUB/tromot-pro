@@ -11,10 +11,8 @@ import Autoplay from 'embla-carousel-autoplay';
 import { useApp } from '@/contexts/AppContext';
 import { brands } from '@/lib/data';
 import AdSlot from '@/components/AdSlot';
-import { usePWA } from '@/hooks/usePWA';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
-import { isInIframe } from '@/lib/pwaUtils';
-import { AppDownloadDialog } from '@/components/AppDownloadDialog';
+import { PWAInstallButton } from '@/components/PWAInstallButton';
 import { EditableContent } from '@/components/EditableContent';
 import { toast } from '@/hooks/use-toast';
 
@@ -30,18 +28,13 @@ export default function Home() {
     getEditableContent,
     editableContent
   } = useApp();
-  const {
-    isInstallable,
-    isInstalled,
-    hasPrompt,
-    installApp
-  } = usePWA();
+  // Removido usePWA - agora usado dentro do PWAInstallButton
   const navigate = useNavigate();
   const [searchBrand, setSearchBrand] = useState('');
   const [searchModel, setSearchModel] = useState('');
   const [searchYear, setSearchYear] = useState('');
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
-  const [showAppDownload, setShowAppDownload] = useState(false);
+  // Removido showAppDownload - não usado mais
   const [heroContent, setHeroContent] = useState({
     title: 'Soluções Eletrônicas',
     subtitle: 'para Instaladores',
@@ -213,49 +206,11 @@ export default function Home() {
                   <ScanLine className="mr-2 h-5 w-5" />
                   Escanear Código de Barras
                 </Button>
-                {!isInstalled && <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-white hover:bg-white hover:text-primary text-white" 
-                    onClick={async () => {
-                      console.log('[Home] Install button clicked', { 
-                        isInstallable, 
-                        hasPrompt, 
-                        isInIframe: isInIframe(),
-                        standalone: window.matchMedia('(display-mode: standalone)').matches 
-                      });
-                      
-                      if (isInstallable && hasPrompt && !isInIframe()) {
-                        console.log('[Home] Attempting direct installation');
-                        const success = await installApp();
-                        if (success) {
-                          console.log('[Home] Installation successful');
-                          return;
-                        }
-                      }
-                      
-                      // Show simple browser-specific instruction
-                      const userAgent = navigator.userAgent;
-                      let message = '';
-                      
-                      if (userAgent.includes('Chrome')) {
-                        message = 'No Chrome: Menu (⋮) > "Instalar app"';
-                      } else if (userAgent.includes('Edge')) {
-                        message = 'No Edge: Menu (...) > "Instalar este site como app"';
-                      } else if (userAgent.includes('Firefox')) {
-                        message = 'No Firefox: não suporta instalação de PWA';
-                      } else if (userAgent.includes('Safari')) {
-                        message = 'No Safari: ícone compartilhar > "Adicionar à Tela de Início"';
-                      } else {
-                        message = 'Procure por "Instalar app" no menu do navegador';
-                      }
-                      
-                      alert(message);
-                    }}
-                  >
-                    <Smartphone className="mr-2 h-5 w-5" />
-                    Instalar App
-                  </Button>}
+                <PWAInstallButton
+                  className="border-white hover:bg-white hover:text-primary text-white"
+                >
+                  Instalar App
+                </PWAInstallButton>
               </div>
             </div>
 
@@ -494,9 +449,10 @@ export default function Home() {
       </section>
       
       {/* Barcode Scanner Dialog */}
-      <BarcodeScannerDialog open={showBarcodeScanner} onOpenChange={setShowBarcodeScanner} onBarcodeDetected={handleBarcodeDetected} />
-      
-      {/* App Download Dialog */}
-      <AppDownloadDialog open={showAppDownload} onOpenChange={setShowAppDownload} />
+      <BarcodeScannerDialog
+        open={showBarcodeScanner}
+        onOpenChange={setShowBarcodeScanner}
+        onBarcodeDetected={handleBarcodeDetected}
+      />
     </div>;
 }

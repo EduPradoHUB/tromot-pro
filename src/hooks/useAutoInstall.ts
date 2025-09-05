@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { usePWA } from './usePWA';
 
 export const useAutoInstall = () => {
-  const [shouldShowDialog, setShouldShowDialog] = useState(false);
   const { isInstallable, installApp, hasPrompt } = usePWA();
 
   useEffect(() => {
@@ -11,21 +10,29 @@ export const useAutoInstall = () => {
     const shouldInstall = urlParams.get('install') === '1';
     
     if (shouldInstall) {
-      console.log('[Auto Install] Install parameter detected');
-      setShouldShowDialog(true);
+      console.log('[Auto Install] Install parameter detected, attempting automatic installation');
       
       // Clean up URL
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.delete('install');
       window.history.replaceState({}, '', newUrl.toString());
       
-      // Não fazer auto-install automático - apenas mostrar o dialog
-      console.log('[Auto Install] Showing install dialog, no automatic installation');
+      // Tentar instalação automática após pequeno delay
+      setTimeout(async () => {
+        if (isInstallable && hasPrompt) {
+          console.log('[Auto Install] Attempting automatic installation');
+          const success = await installApp();
+          if (success) {
+            console.log('[Auto Install] Automatic installation successful');
+          } else {
+            console.log('[Auto Install] Automatic installation failed');
+          }
+        } else {
+          console.log('[Auto Install] Not installable or no prompt available');
+        }
+      }, 1000);
     }
   }, [isInstallable, hasPrompt, installApp]);
 
-  return {
-    shouldShowDialog,
-    setShouldShowDialog
-  };
+  return {};
 };

@@ -6,8 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
 import { Layout } from "@/components/Layout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { AppDownloadDialog } from "@/components/AppDownloadDialog";
-import { useAutoInstall } from "@/hooks/useAutoInstall";
+// Removido AppDownloadDialog e useAutoInstall - não usados mais globalmente
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import Product from "./pages/Product";
@@ -28,8 +27,6 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 function AppContent() {
-  const { shouldShowDialog, setShouldShowDialog } = useAutoInstall();
-
   return (
     <>
       <Routes>
@@ -98,10 +95,6 @@ function AppContent() {
         <Route path="/instalar" element={<InstalarApp />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <AppDownloadDialog 
-        open={shouldShowDialog} 
-        onOpenChange={setShouldShowDialog} 
-      />
     </>
   );
 }

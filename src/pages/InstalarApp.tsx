@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Smartphone, CheckCircle, X, Loader2 } from 'lucide-react';
-import { IOSInstallInstructions } from '@/components/IOSInstallInstructions';
 import { isIOS, logPWADiagnostics } from '@/lib/pwaUtils';
+import { useAutoInstall } from '@/hooks/useAutoInstall';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -20,6 +20,9 @@ export default function InstalarApp() {
   const [isInstalled, setIsInstalled] = useState(false);
   const [installAttempted, setInstallAttempted] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
+  
+  // Usar o hook de auto instalação
+  useAutoInstall();
 
   const addLog = (message: string) => {
     console.log(`[Install Page] ${message}`);
