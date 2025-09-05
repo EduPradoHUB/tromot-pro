@@ -33,6 +33,7 @@ export default function Home() {
   const {
     isInstallable,
     isInstalled,
+    hasPrompt,
     installApp
   } = usePWA();
   const navigate = useNavigate();
@@ -215,26 +216,41 @@ export default function Home() {
                 {!isInstalled && <Button 
                     size="lg" 
                     variant="outline" 
-                    className="border-white hover:bg-white hover:text-primary text-red-500" 
+                    className="border-white hover:bg-white hover:text-primary text-white" 
                     onClick={async () => {
-                      console.log('[Home] Install button clicked');
-                      console.log('[Home] isInIframe:', isInIframe());
-                      console.log('[Home] isInstallable:', isInstallable);
+                      console.log('[Home] Install button clicked', { 
+                        isInstallable, 
+                        hasPrompt, 
+                        isInIframe: isInIframe(),
+                        standalone: window.matchMedia('(display-mode: standalone)').matches 
+                      });
                       
-                      if (isInIframe()) {
-                        console.log('[Home] Opening install page in new tab');
-                        window.open('/instalar', '_blank');
-                      } else if (isInstallable) {
+                      if (isInstallable && hasPrompt && !isInIframe()) {
                         console.log('[Home] Attempting direct installation');
                         const success = await installApp();
-                        if (!success) {
-                          console.log('[Home] Direct install failed, opening install page');
-                          window.location.href = '/instalar';
+                        if (success) {
+                          console.log('[Home] Installation successful');
+                          return;
                         }
-                      } else {
-                        console.log('[Home] No install prompt available, redirecting to install page');
-                        window.location.href = '/instalar';
                       }
+                      
+                      // Show simple browser-specific instruction
+                      const userAgent = navigator.userAgent;
+                      let message = '';
+                      
+                      if (userAgent.includes('Chrome')) {
+                        message = 'No Chrome: Menu (⋮) > "Instalar app"';
+                      } else if (userAgent.includes('Edge')) {
+                        message = 'No Edge: Menu (...) > "Instalar este site como app"';
+                      } else if (userAgent.includes('Firefox')) {
+                        message = 'No Firefox: não suporta instalação de PWA';
+                      } else if (userAgent.includes('Safari')) {
+                        message = 'No Safari: ícone compartilhar > "Adicionar à Tela de Início"';
+                      } else {
+                        message = 'Procure por "Instalar app" no menu do navegador';
+                      }
+                      
+                      alert(message);
                     }}
                   >
                     <Smartphone className="mr-2 h-5 w-5" />

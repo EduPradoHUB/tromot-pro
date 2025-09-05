@@ -23,8 +23,8 @@ export function AppDownloadDialog({ open, onOpenChange }: AppDownloadDialogProps
       standalone: window.matchMedia('(display-mode: standalone)').matches
     });
     
-    // Se não estamos em iframe e temos o prompt, instalar diretamente
-    if (!isInIframe() && isInstallable && hasPrompt) {
+    // Tentar instalação direta primeiro
+    if (isInstallable && hasPrompt && !isInIframe()) {
       console.log('[PWA Dialog] Attempting direct installation');
       const success = await installApp();
       if (success) {
@@ -34,22 +34,25 @@ export function AppDownloadDialog({ open, onOpenChange }: AppDownloadDialogProps
       }
     }
     
-    // Abrir página dedicada de instalação
-    console.log('[PWA Dialog] Opening dedicated install page');
-    const url = `${window.location.origin}/instalar`;
-    const newWindow = window.open(url, '_blank', 'width=500,height=700,scrollbars=yes,resizable=yes');
+    // Se não conseguiu instalar diretamente, mostrar instruções específicas do browser
+    const userAgent = navigator.userAgent;
+    let message = '';
     
-    if (newWindow) {
-      console.log('[PWA Dialog] Install page opened successfully');
-      onOpenChange(false);
+    if (userAgent.includes('Chrome')) {
+      message = 'Para instalar:\n1. Clique no menu (⋮) do Chrome\n2. Selecione "Instalar app"';
+    } else if (userAgent.includes('Edge')) {
+      message = 'Para instalar:\n1. Clique no menu (...) do Edge\n2. Selecione "Instalar este site como app"';
+    } else if (userAgent.includes('Firefox')) {
+      message = 'O Firefox não suporta instalação de PWA.\nUse Chrome ou Edge para instalar o app.';
+    } else if (isIOS()) {
+      // Manter o dialog aberto para iOS
+      return;
     } else {
-      console.log('[PWA Dialog] Failed to open install page');
-      // Fallback apenas para iOS
-      if (isIOS()) {
-        // Manter o dialog aberto para mostrar instruções iOS
-        return;
-      }
+      message = 'Procure pela opção "Instalar app" no menu do seu navegador.';
     }
+    
+    alert(message);
+    onOpenChange(false);
   };
 
   return (

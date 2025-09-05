@@ -197,15 +197,22 @@ export default function InstalarApp() {
                   Instalar Agora
                 </Button>
               ) : isIOS() ? (
-                <IOSInstallInstructions />
+                <div className="text-center py-4 space-y-3">
+                  <p className="text-sm font-medium">Para instalar no iPhone/iPad:</p>
+                  <div className="text-sm text-muted-foreground space-y-2">
+                    <p>1. Abra este site no Safari</p>
+                    <p>2. Toque no ícone de compartilhar (↗)</p>
+                    <p>3. Selecione "Adicionar à Tela de Início"</p>
+                  </div>
+                </div>
               ) : (
-                <div className="text-center py-4">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Este navegador não suporta instalação automática.
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Procure pela opção "Adicionar à tela inicial" no menu do seu navegador.
-                  </p>
+                <div className="text-center py-4 space-y-3">
+                  <p className="text-sm font-medium">Como instalar:</p>
+                  <div className="text-sm text-muted-foreground space-y-2">
+                    <p><strong>Chrome:</strong> Menu (⋮) {'>'} "Instalar app"</p>
+                    <p><strong>Edge:</strong> Menu (...) {'>'} "Instalar este site como app"</p>
+                    <p><strong>Firefox:</strong> Não suporta PWA - use Chrome/Edge</p>
+                  </div>
                 </div>
               )}
             </>
