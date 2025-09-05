@@ -18,6 +18,10 @@ import { toast } from '@/hooks/use-toast';
 
 export default function Home() {
   console.log('🏠 Renderizando componente Home...');
+  console.log('🔍 Verificando useApp...', typeof useApp);
+  
+  const appContext = useApp();
+  console.log('✅ useApp funcionando!', appContext);
   
   const {
     banners,
@@ -27,7 +31,7 @@ export default function Home() {
     findProductByBarcode,
     getEditableContent,
     editableContent
-  } = useApp();
+  } = appContext;
   
   const navigate = useNavigate();
   const [searchBrand, setSearchBrand] = useState('');
