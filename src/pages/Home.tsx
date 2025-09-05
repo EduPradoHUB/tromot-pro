@@ -72,16 +72,16 @@ export default function Home() {
     description: 'Encontre produtos compatíveis com seu veículo'
   });
 
-  // Show app download popup after 3 seconds if not installed
-  React.useEffect(() => {
-    if (!isInstalled) {
-      const timer = setTimeout(() => {
-        setShowAppDownload(true);
-      }, 3000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isInstalled]);
+  // Auto popup disabled - users can manually access /instalar
+  // React.useEffect(() => {
+  //   if (!isInstalled) {
+  //     const timer = setTimeout(() => {
+  //       setShowAppDownload(true);
+  //     }, 3000);
+  //     
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [isInstalled]);
 
   // Plugin autoplay para carrossel
   const autoplayPlugin = useCallback(() => Autoplay({
@@ -223,17 +223,17 @@ export default function Home() {
                       
                       if (isInIframe()) {
                         console.log('[Home] Opening install page in new tab');
-                        window.open('/instalar?install=1', '_blank');
+                        window.open('/instalar', '_blank');
                       } else if (isInstallable) {
                         console.log('[Home] Attempting direct installation');
                         const success = await installApp();
                         if (!success) {
                           console.log('[Home] Direct install failed, opening install page');
-                          window.location.href = '/instalar?install=1';
+                          window.location.href = '/instalar';
                         }
                       } else {
                         console.log('[Home] No install prompt available, redirecting to install page');
-                        window.location.href = '/instalar?install=1';
+                        window.location.href = '/instalar';
                       }
                     }}
                   >
