@@ -666,6 +666,14 @@ export type Database = {
           user_id: string
         }[]
       }
+      is_authenticated_user: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_profile_owner: {
+        Args: { profile_user_id: string }
+        Returns: boolean
+      }
       log_distributor_access: {
         Args: {
           p_access_type: string
@@ -673,6 +681,10 @@ export type Database = {
           p_user_location?: Json
         }
         Returns: undefined
+      }
+      mask_sensitive_data: {
+        Args: { phone_input: string; whatsapp_input: string }
+        Returns: Json
       }
     }
     Enums: {
