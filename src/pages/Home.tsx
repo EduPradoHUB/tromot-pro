@@ -13,6 +13,7 @@ import { brands } from '@/lib/data';
 import AdSlot from '@/components/AdSlot';
 import { usePWA } from '@/hooks/usePWA';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
+import { isInIframe } from '@/lib/pwaUtils';
 import { AppDownloadDialog } from '@/components/AppDownloadDialog';
 import { EditableContent } from '@/components/EditableContent';
 import { toast } from '@/hooks/use-toast';
@@ -211,7 +212,21 @@ export default function Home() {
                   <ScanLine className="mr-2 h-5 w-5" />
                   Escanear Código de Barras
                 </Button>
-                {isInstallable && !isInstalled && <Button size="lg" variant="outline" className="border-white hover:bg-white hover:text-primary text-white" onClick={installApp}>
+                {!isInstalled && <Button 
+                    size="lg" 
+                    variant="outline" 
+                    className="border-white hover:bg-white hover:text-primary text-white" 
+                    onClick={() => {
+                      if (isInIframe()) {
+                        // Open in new tab if in iframe
+                        window.open('/instalar?install=1', '_blank');
+                      } else if (isInstallable) {
+                        installApp();
+                      } else {
+                        setShowAppDownload(true);
+                      }
+                    }}
+                  >
                     <Smartphone className="mr-2 h-5 w-5" />
                     Instalar App
                   </Button>}

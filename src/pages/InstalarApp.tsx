@@ -30,11 +30,17 @@ export default function InstalarApp() {
     addLog('Página de instalação carregada');
     logPWADiagnostics();
 
+    console.log('[Install] Component mounted');
+    console.log('[Install] User Agent:', navigator.userAgent);
+    console.log('[Install] Display mode:', window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser');
+    console.log('[Install] Service Worker supported:', 'serviceWorker' in navigator);
+    console.log('[Install] Is in iframe:', window.self !== window.top);
+
     // Verificar se já está instalado
     const checkInstalled = () => {
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
       if (isStandalone) {
-        addLog('App já está instalado');
+        addLog('App já está instalado (modo standalone detectado)');
         setIsInstalled(true);
         setIsWaiting(false);
         return;
@@ -47,10 +53,13 @@ export default function InstalarApp() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistration().then(registration => {
         if (registration) {
-          addLog('Atualizando Service Worker...');
+          addLog(`Service Worker encontrado: ${registration.scope}`);
+          setLogs(prev => [...prev, `SW scriptURL: ${registration.active?.scriptURL || 'none'}`]);
           registration.update().then(() => {
-            addLog('Service Worker atualizado');
+            addLog('Service Worker atualizado com sucesso');
           });
+        } else {
+          addLog('Nenhum Service Worker registrado encontrado');
         }
       });
     }
@@ -59,22 +68,22 @@ export default function InstalarApp() {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       const event = e as BeforeInstallPromptEvent;
-      addLog('beforeinstallprompt recebido!');
+      addLog(`beforeinstallprompt recebido! Plataformas: ${event.platforms.join(', ')}`);
       setInstallPrompt(event);
       setIsWaiting(false);
       
       // Tentar instalação automática imediatamente
       setTimeout(() => {
-        if (!installAttempted) {
+        if (!installAttempted && !isInstalled) {
           addLog('Tentando instalação automática...');
           handleInstall(event);
         }
-      }, 500);
+      }, 1000);
     };
 
     // Listener para appinstalled
     const handleAppInstalled = () => {
-      addLog('App instalado com sucesso!');
+      addLog('App instalado com sucesso! 🎉');
       setIsInstalled(true);
       setInstallPrompt(null);
       setIsWaiting(false);
@@ -86,37 +95,42 @@ export default function InstalarApp() {
     // Timeout para parar de esperar
     const timeout = setTimeout(() => {
       if (!installPrompt && !isInstalled) {
-        addLog('Timeout atingido - beforeinstallprompt não foi disparado');
+        const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const message = isIOSDevice 
+          ? 'iOS detectado - use "Adicionar à Tela de Início" no Safari' 
+          : 'Nenhum prompt de instalação (normal em alguns navegadores)';
+        addLog(message);
         setIsWaiting(false);
       }
-    }, 10000);
+    }, 5000);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
       clearTimeout(timeout);
     };
-  }, []);
+  }, [installAttempted, isInstalled]);
 
   const handleInstall = async (prompt?: BeforeInstallPromptEvent) => {
     const promptToUse = prompt || installPrompt;
     if (!promptToUse) {
       addLog('Nenhum prompt de instalação disponível');
+      setLogs(prev => [...prev, 'Sem beforeinstallprompt - pode ser iOS ou navegador sem suporte']);
       return;
     }
 
     setInstallAttempted(true);
     
     try {
-      addLog('Chamando prompt.prompt()...');
+      addLog('Exibindo diálogo de instalação...');
       await promptToUse.prompt();
       const choiceResult = await promptToUse.userChoice;
       
-      addLog(`Escolha do usuário: ${choiceResult.outcome}`);
+      addLog(`Resposta do usuário: ${choiceResult.outcome}`);
       
       if (choiceResult.outcome === 'accepted') {
-        addLog('Usuário aceitou a instalação');
-        setIsInstalled(true);
+        addLog('Usuário aceitou a instalação - aguardando evento appinstalled');
+        // setIsInstalled será chamado pelo evento appinstalled
       } else {
         addLog('Usuário recusou a instalação');
       }
@@ -124,7 +138,7 @@ export default function InstalarApp() {
       setInstallPrompt(null);
     } catch (error) {
       addLog(`Erro na instalação: ${error}`);
-      console.error('[Install Page] Erro:', error);
+      console.error('[Install Page] Erro durante instalação:', error);
     }
   };
 

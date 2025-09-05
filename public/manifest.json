@@ -4,24 +4,52 @@
   "description": "App para instaladores e técnicos de produtos eletrônicos automotivos",
   "start_url": "/",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
   "background_color": "#ffffff",
   "theme_color": "#1a365d",
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "pt-BR",
   "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Catálogo",
+      "short_name": "Catálogo",
+      "description": "Acesse o catálogo de produtos",
+      "url": "/manuais",
+      "icons": [
+        {
+          "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
   "icons": [
     {
       "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

@@ -1,9 +1,11 @@
-const CACHE_NAME = 'tromot-pro-v3';
+const CACHE_NAME = 'tromot-pro-v4';
 const urlsToCache = [
   '/',
   '/manifest.json',
   '/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png'
 ];
+
+console.log('[SW] Service Worker starting up, cache version:', CACHE_NAME);
 
 // Immediately claim clients and skip waiting
 self.addEventListener('install', event => {
@@ -45,6 +47,25 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // Handle navigation requests (for SPA routing)
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      caches.match('/').then(response => {
+        return response || fetch('/').then(fetchResponse => {
+          const responseToCache = fetchResponse.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put('/', responseToCache);
+          });
+          return fetchResponse;
+        });
+      }).catch(() => {
+        // Fallback for offline navigation
+        return caches.match('/');
+      })
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -64,13 +85,18 @@ self.addEventListener('fetch', event => {
           const responseToCache = response.clone();
           const url = event.request.url;
           
-          if (url.includes('.js') || url.includes('.css') || url.includes('/manifest.json')) {
+          // Cache JS, CSS, manifest, and images
+          if (url.includes('.js') || url.includes('.css') || url.includes('/manifest.json') || 
+              url.includes('.png') || url.includes('.jpg') || url.includes('.jpeg') || url.includes('.webp')) {
             caches.open(CACHE_NAME).then(cache => {
               cache.put(event.request, responseToCache);
             });
           }
 
           return response;
+        }).catch(() => {
+          // Return cached version if network fails
+          return caches.match(event.request);
         });
       })
   );
