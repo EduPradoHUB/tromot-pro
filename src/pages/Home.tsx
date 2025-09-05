@@ -216,14 +216,24 @@ export default function Home() {
                     size="lg" 
                     variant="outline" 
                     className="border-white hover:bg-white hover:text-primary text-red-500" 
-                    onClick={() => {
+                    onClick={async () => {
+                      console.log('[Home] Install button clicked');
+                      console.log('[Home] isInIframe:', isInIframe());
+                      console.log('[Home] isInstallable:', isInstallable);
+                      
                       if (isInIframe()) {
-                        // Open in new tab if in iframe
+                        console.log('[Home] Opening install page in new tab');
                         window.open('/instalar?install=1', '_blank');
                       } else if (isInstallable) {
-                        installApp();
+                        console.log('[Home] Attempting direct installation');
+                        const success = await installApp();
+                        if (!success) {
+                          console.log('[Home] Direct install failed, opening install page');
+                          window.location.href = '/instalar?install=1';
+                        }
                       } else {
-                        setShowAppDownload(true);
+                        console.log('[Home] No install prompt available, redirecting to install page');
+                        window.location.href = '/instalar?install=1';
                       }
                     }}
                   >
