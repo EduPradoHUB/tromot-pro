@@ -215,7 +215,7 @@ export default function Home() {
                 {!isInstalled && <Button 
                     size="lg" 
                     variant="outline" 
-                    className="border-white hover:bg-white hover:text-primary text-white" 
+                    className="border-white hover:bg-white hover:text-primary text-red-500" 
                     onClick={() => {
                       if (isInIframe()) {
                         // Open in new tab if in iframe
