@@ -126,7 +126,8 @@ export default function AdminDashboard() {
     withoutPhoto: false,
     outOfProduction: false,
     category: 'all',
-    missingData: false
+    missingData: false,
+    withoutCategory: false
   });
   
 
@@ -145,7 +146,8 @@ export default function AdminDashboard() {
       (!filters.withoutPhoto || !product.image_url) &&
       (!filters.outOfProduction || product.out_of_production) &&
       (!filters.category || filters.category === 'all' || product.category === filters.category) &&
-      (!filters.missingData || (!product.manual_url && !product.no_manual_available) || !product.image_url);
+      (!filters.missingData || (!product.manual_url && !product.no_manual_available) || !product.image_url) &&
+      (!filters.withoutCategory || !product.category || product.category.trim() === '');
       
     return matchesSearch && matchesFilters;
   });
@@ -1016,6 +1018,15 @@ export default function AdminDashboard() {
                 Faltando dados
               </Button>
               
+              <Button
+                variant={filters.withoutCategory ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilters(prev => ({...prev, withoutCategory: !prev.withoutCategory}))}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Sem categoria
+              </Button>
+              
               {(searchTerm || Object.values(filters).some(f => f)) && (
                 <Button
                   variant="ghost"
@@ -1027,7 +1038,8 @@ export default function AdminDashboard() {
                       withoutPhoto: false,
                       outOfProduction: false,
                       category: '',
-                      missingData: false
+                      missingData: false,
+                      withoutCategory: false
                     });
                   }}
                 >
