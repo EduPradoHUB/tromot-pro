@@ -322,7 +322,7 @@ export default function Catalog() {
                     <img
                       src={product.image_url || '/src/assets/photo-unavailable.png'}
                       alt={product.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain bg-muted/30"
                     />
                     <div className="absolute top-3 right-3 flex flex-col gap-1">
                       <Badge variant="secondary" className="bg-background/90">

@@ -166,7 +166,7 @@ export default function ProductPage() {
                     <img
                       src={product.image_url || '/src/assets/photo-unavailable.png'}
                       alt={product.name}
-                      className="w-full aspect-square object-cover rounded-lg"
+                      className="w-full aspect-square object-contain bg-muted/30 rounded-lg"
                     />
                 <div className="space-y-4">
                   <div>
