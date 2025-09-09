@@ -1,96 +1,178 @@
-const CACHE_NAME = 'tromot-pro-v1';
-const urlsToCache = [
+// PWA Service Worker para TROMOT PRO
+const VERSION = 'v2.0.0';
+const STATIC_CACHE = `tromot-pro-static-${VERSION}`;
+const RUNTIME_CACHE = `tromot-pro-runtime-${VERSION}`;
+const IMAGE_CACHE = `tromot-pro-images-${VERSION}`;
+
+// Recursos essenciais para cache estático
+const STATIC_ASSETS = [
   '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
+  '/manifest.json',
   '/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png'
 ];
 
-// Install event
+// Instalar Service Worker
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Installing...');
+  console.log('[SW] Installing version:', VERSION);
+  
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches.open(STATIC_CACHE)
       .then((cache) => {
-        console.log('[Service Worker] Caching app shell');
-        return cache.addAll(urlsToCache);
+        console.log('[SW] Precaching static assets');
+        return cache.addAll(STATIC_ASSETS);
       })
       .then(() => {
-        console.log('[Service Worker] Skip waiting');
+        console.log('[SW] Skip waiting to activate immediately');
         return self.skipWaiting();
+      })
+      .catch((error) => {
+        console.error('[SW] Installation failed:', error);
       })
   );
 });
 
-// Activate event
+// Ativar Service Worker
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Activating...');
+  console.log('[SW] Activating version:', VERSION);
+  
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('[Service Worker] Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => {
-      console.log('[Service Worker] Claiming clients');
-      return self.clients.claim();
-    })
+    Promise.all([
+      // Limpar caches antigos
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheName !== STATIC_CACHE && 
+                cacheName !== RUNTIME_CACHE && 
+                cacheName !== IMAGE_CACHE) {
+              console.log('[SW] Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      }),
+      // Assumir controle de todas as páginas
+      self.clients.claim()
+    ])
   );
 });
 
-// Fetch event
+// Interceptar requisições
 self.addEventListener('fetch', (event) => {
-  // Handle navigation requests
-  if (event.request.mode === 'navigate') {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Ignorar requisições não-HTTP
+  if (!request.url.startsWith('http')) return;
+
+  // Navegação - Network First com fallback para cache
+  if (request.mode === 'navigate') {
     event.respondWith(
-      caches.match('/')
+      fetch(request)
         .then((response) => {
-          return response || fetch(event.request);
+          // Cache da página se válida
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(RUNTIME_CACHE).then((cache) => {
+              cache.put(request, responseClone);
+            });
+          }
+          return response;
         })
         .catch(() => {
-          return caches.match('/');
+          // Fallback para cache ou página inicial
+          return caches.match(request) || caches.match('/');
         })
     );
     return;
   }
 
-  // Handle other requests
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        if (response) {
-          return response;
-        }
+  // Assets estáticos - Cache First
+  if (request.destination === 'script' || 
+      request.destination === 'style' ||
+      url.pathname.endsWith('.js') ||
+      url.pathname.endsWith('.css') ||
+      url.pathname.endsWith('.woff2') ||
+      url.pathname.endsWith('.woff')) {
+    
+    event.respondWith(
+      caches.match(request).then((cachedResponse) => {
+        if (cachedResponse) return cachedResponse;
 
-        return fetch(event.request).then((response) => {
-          // Check if we received a valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
-          }
-
-          // Clone the response
-          const responseToCache = response.clone();
-
-          // Cache specific file types
-          const url = new URL(event.request.url);
-          if (url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|ico)$/)) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseToCache);
+        return fetch(request).then((response) => {
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(STATIC_CACHE).then((cache) => {
+              cache.put(request, responseClone);
             });
           }
-
           return response;
-        }).catch(() => {
-          // Fallback for offline
-          return caches.match(event.request);
         });
       })
+    );
+    return;
+  }
+
+  // Imagens - Cache First com cache separado
+  if (request.destination === 'image' ||
+      url.pathname.match(/\.(jpg|jpeg|png|gif|webp|svg|ico)$/)) {
+    
+    event.respondWith(
+      caches.match(request).then((cachedResponse) => {
+        if (cachedResponse) return cachedResponse;
+
+        return fetch(request).then((response) => {
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(IMAGE_CACHE).then((cache) => {
+              cache.put(request, responseClone);
+            });
+          }
+          return response;
+        });
+      })
+    );
+    return;
+  }
+
+  // API calls - Network First
+  if (url.pathname.includes('/api/') || 
+      url.hostname.includes('supabase')) {
+    
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          // Cache apenas GET requests bem-sucedidos
+          if (request.method === 'GET' && response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(RUNTIME_CACHE).then((cache) => {
+              cache.put(request, responseClone);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Fallback para cache se offline
+          if (request.method === 'GET') {
+            return caches.match(request);
+          }
+          throw new Error('Network error and no cache available');
+        })
+    );
+    return;
+  }
+
+  // Outras requisições - Network First
+  event.respondWith(
+    fetch(request).catch(() => caches.match(request))
   );
+});
+
+// Mensagens do cliente (para forçar atualização)
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('[SW] Force update requested');
+    self.skipWaiting();
+  }
 });
 
 // Push notification event

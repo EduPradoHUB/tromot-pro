@@ -12,6 +12,7 @@
   "scope": "/",
   "lang": "pt-BR",
   "categories": ["productivity", "utilities"],
+  "prefer_related_applications": false,
   "shortcuts": [
     {
       "name": "Catálogo",
