@@ -127,7 +127,8 @@ export default function AdminDashboard() {
     outOfProduction: false,
     category: 'all',
     missingData: false,
-    withoutCategory: false
+    withoutCategory: false,
+    withoutEAN: false
   });
   
 
@@ -147,7 +148,8 @@ export default function AdminDashboard() {
       (!filters.outOfProduction || product.out_of_production) &&
       (!filters.category || filters.category === 'all' || product.category === filters.category) &&
       (!filters.missingData || (!product.manual_url && !product.no_manual_available) || !product.image_url) &&
-      (!filters.withoutCategory || !product.category || product.category.trim() === '');
+      (!filters.withoutCategory || !product.category || product.category.trim() === '') &&
+      (!filters.withoutEAN || !product.barcode_ean || product.barcode_ean.trim() === '');
       
     return matchesSearch && matchesFilters;
   });
@@ -1027,6 +1029,15 @@ export default function AdminDashboard() {
                 Sem categoria
               </Button>
               
+              <Button
+                variant={filters.withoutEAN ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilters(prev => ({...prev, withoutEAN: !prev.withoutEAN}))}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Sem EAN13
+              </Button>
+              
               {(searchTerm || Object.values(filters).some(f => f)) && (
                 <Button
                   variant="ghost"
@@ -1039,7 +1050,8 @@ export default function AdminDashboard() {
                       outOfProduction: false,
                       category: '',
                       missingData: false,
-                      withoutCategory: false
+                      withoutCategory: false,
+                      withoutEAN: false
                     });
                   }}
                 >
