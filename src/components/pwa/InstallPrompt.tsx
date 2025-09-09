@@ -38,9 +38,19 @@ export const InstallPrompt = () => {
   }, [isInstallable, isInstalled]);
 
   const handleInstall = async () => {
+    console.log('[PWA] Install button clicked');
     const success = await installApp();
+    
+    // Se o prompt nativo funcionou, fechar o modal
     if (success) {
+      console.log('[PWA] Native installation successful');
       setShowPrompt(false);
+    } else {
+      console.log('[PWA] Installation handled via manual instructions');
+      // Para instruções manuais, aguardar um pouco e fechar o modal
+      setTimeout(() => {
+        setShowPrompt(false);
+      }, 1000);
     }
   };
 
