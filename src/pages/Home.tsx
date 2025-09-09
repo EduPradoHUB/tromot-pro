@@ -201,7 +201,7 @@ export default function Home() {
                   Escanear Código de Barras
                 </Button>
                 <PWAInstallButton 
-                  className="border-white hover:bg-white hover:text-primary text-white"
+                  className="border-white hover:bg-white text-primary hover:text-primary"
                 >
                   Instalar App
                 </PWAInstallButton>
