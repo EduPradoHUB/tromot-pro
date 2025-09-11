@@ -27,6 +27,8 @@ export default function AdminDashboard() {
     vehicles,
     categories,
     distributors,
+    editableContent,
+    updateSectionVisibility,
     createProduct, 
     updateProduct, 
     deleteProduct,
@@ -748,6 +750,7 @@ export default function AdminDashboard() {
           <TabsTrigger value="distributors">Distribuidores</TabsTrigger>
           <TabsTrigger value="banners">Banners</TabsTrigger>
           <TabsTrigger value="advertisements">Propagandas</TabsTrigger>
+          <TabsTrigger value="content">Conteúdo</TabsTrigger>
           <TabsTrigger value="vehicles">Veículos</TabsTrigger>
           <TabsTrigger value="moderation">Moderação</TabsTrigger>
         </TabsList>
@@ -1809,6 +1812,48 @@ export default function AdminDashboard() {
               </Card>
             ))}
           </div>
+        </TabsContent>
+
+        {/* Content Tab */}
+        <TabsContent value="content" className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-semibold">Visibilidade de Seções</h2>
+          </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Controle de Exibição</CardTitle>
+              <p className="text-muted-foreground">
+                Gerencie quais seções aparecem no aplicativo
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {editableContent.map((content) => (
+                <div key={content.section} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <h4 className="font-semibold">{content.title || content.section}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Seção: {content.section}
+                    </p>
+                    {content.description && (
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {content.description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      checked={content.visible !== false}
+                      onCheckedChange={(checked) => updateSectionVisibility(content.section, checked)}
+                    />
+                    <span className="text-sm">
+                      {content.visible !== false ? 'Visível' : 'Oculta'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Vehicles Tab */}

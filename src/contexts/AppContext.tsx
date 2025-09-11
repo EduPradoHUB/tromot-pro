@@ -206,6 +206,7 @@ interface AppContextType {
   editableContent: any[];
   fetchEditableContent: () => Promise<void>;
   updateEditableContent: (section: string, content: { title?: string; subtitle?: string; description?: string }) => Promise<boolean>;
+  updateSectionVisibility: (section: string, visible: boolean) => Promise<boolean>;
   getEditableContent: (section: string) => any;
   
   // Filters
@@ -798,6 +799,41 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, [user, profile]);
 
+  const updateSectionVisibility = useCallback(async (
+    section: string, 
+    visible: boolean
+  ): Promise<boolean> => {
+    if (!user || profile?.role !== 'ADM') return false;
+    
+    try {
+      const { data, error } = await supabase
+        .from('editable_content')
+        .update({ visible })
+        .eq('section', section)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error updating section visibility:', error);
+        return false;
+      }
+      
+      // Update local state
+      setEditableContent(prev => 
+        prev.map(item => 
+          item.section === section 
+            ? { ...item, visible }
+            : item
+        )
+      );
+      
+      return true;
+    } catch (error) {
+      console.error('Error updating section visibility:', error);
+      return false;
+    }
+  }, [user, profile]);
+
   const getEditableContent = useCallback((section: string) => {
     return editableContent.find(item => item.section === section);
   }, [editableContent]);
@@ -1115,6 +1151,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     editableContent,
     fetchEditableContent,
     updateEditableContent,
+    updateSectionVisibility,
     getEditableContent,
     
     selectedCategory,

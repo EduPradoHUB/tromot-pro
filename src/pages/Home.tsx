@@ -256,9 +256,10 @@ export default function Home() {
       )}
 
       {/* Quick Search */}
-      <section className="container mt-12">
-        <Card className="shadow-card">
-          <CardContent className="p-6">
+      {getEditableContent('quick-search')?.visible !== false && (
+        <section className="container mt-12">
+          <Card className="shadow-card">
+            <CardContent className="p-6">
             <div className="text-center mb-6">
               <EditableContent
                 section="quick-search"
@@ -321,6 +322,7 @@ export default function Home() {
           </CardContent>
         </Card>
       </section>
+      )}
 
       {/* Latest Products Carousel */}
       <section className="container mt-12">

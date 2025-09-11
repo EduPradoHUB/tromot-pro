@@ -258,6 +258,7 @@ export type Database = {
           subtitle: string | null
           title: string | null
           updated_at: string
+          visible: boolean | null
         }
         Insert: {
           created_at?: string
@@ -267,6 +268,7 @@ export type Database = {
           subtitle?: string | null
           title?: string | null
           updated_at?: string
+          visible?: boolean | null
         }
         Update: {
           created_at?: string
@@ -276,6 +278,7 @@ export type Database = {
           subtitle?: string | null
           title?: string | null
           updated_at?: string
+          visible?: boolean | null
         }
         Relationships: []
       }
