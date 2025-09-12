@@ -806,12 +806,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (!user || profile?.role !== 'ADM') return false;
     
     try {
+      // Usar upsert para inserir se não existe ou atualizar se existe
       const { data, error } = await supabase
         .from('editable_content')
-        .update({ visible })
-        .eq('section', section)
-        .select()
-        .single();
+        .upsert(
+          { 
+            section, 
+            visible,
+            title: section,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          },
+          { 
+            onConflict: 'section',
+            ignoreDuplicates: false 
+          }
+        )
+        .select();
       
       if (error) {
         console.error('Error updating section visibility:', error);
@@ -819,13 +830,27 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
       
       // Update local state
-      setEditableContent(prev => 
-        prev.map(item => 
-          item.section === section 
-            ? { ...item, visible }
-            : item
-        )
-      );
+      setEditableContent(prev => {
+        const existingIndex = prev.findIndex(item => item.section === section);
+        if (existingIndex >= 0) {
+          // Atualizar item existente
+          return prev.map(item => 
+            item.section === section 
+              ? { ...item, visible }
+              : item
+          );
+        } else {
+          // Adicionar novo item
+          return [...prev, { 
+            section, 
+            visible, 
+            title: section,
+            id: data?.[0]?.id,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }];
+        }
+      });
       
       return true;
     } catch (error) {
