@@ -75,41 +75,46 @@ export default function InstallApp() {
 
   if (isInstalled) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-lg border-0">
           <CardHeader className="text-center">
             <div className="flex items-center justify-center mb-4">
-              <div className="bg-green-100 p-3 rounded-full">
-                <CheckCircle className="h-8 w-8 text-green-600" />
+              <div className="bg-green-500/10 p-4 rounded-3xl">
+                <CheckCircle className="h-10 w-10 text-green-600" />
               </div>
             </div>
-            <CardTitle className="text-xl">App Instalado!</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
+            <CardTitle className="text-2xl text-primary">TROMOT PRO Instalado!</CardTitle>
             <p className="text-muted-foreground">
-              O TROMOT PRO já está instalado no seu dispositivo.
+              O app está pronto para usar no seu dispositivo
             </p>
-            
+          </CardHeader>
+          <CardContent className="text-center space-y-6">
             {isSupported && permission !== 'granted' && (
-              <>
-                <Separator />
-                <div className="space-y-3">
-                  <h4 className="font-medium flex items-center justify-center gap-2">
-                    <Bell className="h-4 w-4" />
-                    Ativar Notificações
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Receba notificações sobre novos produtos e atualizações
-                  </p>
-                  <Button onClick={handleRequestNotifications} variant="outline" size="sm">
-                    Ativar Notificações
-                  </Button>
+              <div className="bg-gradient-card rounded-2xl p-4 border border-border/50">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <Bell className="h-5 w-5 text-tromot-red" />
+                  <h4 className="font-semibold text-primary">Ativar Notificações</h4>
                 </div>
-              </>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Receba alertas sobre novos produtos e atualizações importantes
+                </p>
+                <Button 
+                  onClick={handleRequestNotifications} 
+                  variant="outline" 
+                  className="border-tromot-red text-tromot-red hover:bg-tromot-red/5"
+                >
+                  <Bell className="mr-2 h-4 w-4" />
+                  Permitir Notificações
+                </Button>
+              </div>
             )}
             
-            <Button onClick={() => window.location.href = '/'} className="w-full">
-              Abrir App
+            <Button 
+              onClick={() => window.location.href = '/'} 
+              className="w-full bg-tromot-red hover:bg-tromot-red/90 text-white font-semibold py-4 text-lg"
+              size="lg"
+            >
+              Abrir TROMOT PRO
             </Button>
           </CardContent>
         </Card>
@@ -119,7 +124,7 @@ export default function InstallApp() {
 
   if (showInstructions) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-4">
           <PWAInstallInstructions onClose={() => setShowInstructions(false)} />
           
@@ -127,9 +132,10 @@ export default function InstallApp() {
             <Button 
               onClick={() => window.location.href = '/'} 
               variant="outline"
-              className="w-full"
+              className="w-full border-tromot-red text-tromot-red hover:bg-tromot-red/5"
+              size="lg"
             >
-              Voltar ao App
+              Voltar ao TROMOT PRO
             </Button>
           </div>
         </div>
@@ -138,99 +144,108 @@ export default function InstallApp() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex items-center justify-center mb-4">
-            <div className="bg-primary/10 p-3 rounded-full">
-              <Smartphone className="h-8 w-8 text-primary" />
+    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-lg border-0 bg-card">
+        <CardHeader className="text-center pb-4">
+          <div className="space-y-6">
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-gradient-to-br from-tromot-red to-tromot-red/80 rounded-3xl flex items-center justify-center mx-auto">
+                <Smartphone className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold text-primary">TROMOT PRO</h1>
+              <p className="text-muted-foreground">App profissional para instaladores</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gradient-card rounded-2xl p-4 text-center border border-border/50">
+                <div className="w-10 h-10 bg-tromot-red/10 rounded-xl flex items-center justify-center mx-auto mb-2">
+                  <Download className="w-5 h-5 text-tromot-red" />
+                </div>
+                <h3 className="font-semibold text-sm">Acesso Offline</h3>
+                <p className="text-xs text-muted-foreground mt-1">Manuais sempre disponíveis</p>
+              </div>
+              <div className="bg-gradient-card rounded-2xl p-4 text-center border border-border/50">
+                <div className="w-10 h-10 bg-tromot-red/10 rounded-xl flex items-center justify-center mx-auto mb-2">
+                  <Smartphone className="w-5 h-5 text-tromot-red" />
+                </div>
+                <h3 className="font-semibold text-sm">App Nativo</h3>
+                <p className="text-xs text-muted-foreground mt-1">Experiência otimizada</p>
+              </div>
             </div>
           </div>
-          <CardTitle className="text-xl">Instalar TROMOT PRO</CardTitle>
-          <div className="flex justify-center">
-            <Badge variant="outline" className="text-xs">
+          
+          <div className="flex justify-center mt-4">
+            <Badge variant="outline" className="text-xs bg-tromot-red/5 text-tromot-red border-tromot-red/20">
               Progressive Web App
             </Badge>
           </div>
         </CardHeader>
+        
         <CardContent className="space-y-6">
-          <div className="text-center">
-            <p className="text-muted-foreground mb-4">
-              Instale o TROMOT PRO no seu dispositivo para uma experiência completa e acesso offline.
-            </p>
-          </div>
-
-          {/* Installation Features */}
-          <div className="space-y-3">
-            <h4 className="font-medium">Por que instalar?</h4>
-            <div className="grid gap-2 text-sm">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Acesso rápido na tela inicial</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Funciona offline</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Notificações de atualizações</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Experiência nativa</span>
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Installation Button */}
-          <div className="space-y-3">
-            {isInstallable && hasPrompt ? (
+          <div className="space-y-4">
+            {(isInstallable && hasPrompt) ? (
               <Button 
                 onClick={handleInstall} 
+                size="lg" 
+                className="w-full bg-tromot-red hover:bg-tromot-red/90 text-white font-semibold py-4 text-lg"
                 disabled={installing}
-                className="w-full"
-                size="lg"
               >
-                <Download className="mr-2 h-5 w-5" />
-                {installing ? 'Instalando...' : 'Instalar Agora'}
+                {installing ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    Instalando TROMOT PRO...
+                  </div>
+                ) : (
+                  <>
+                    <Download className="w-5 h-5 mr-2" />
+                    Instalar TROMOT PRO Agora
+                  </>
+                )}
               </Button>
             ) : (
               <Button 
-                onClick={() => setShowInstructions(true)}
-                variant="outline"
-                className="w-full"
-                size="lg"
+                onClick={() => setShowInstructions(true)} 
+                size="lg" 
+                className="w-full bg-tromot-red hover:bg-tromot-red/90 text-white font-semibold py-4 text-lg"
               >
-                <Smartphone className="mr-2 h-5 w-5" />
-                Ver Instruções
+                <Smartphone className="w-5 h-5 mr-2" />
+                Ver Instruções de Instalação
               </Button>
             )}
-            
-            {/* Notifications */}
-            {isSupported && permission === 'default' && (
-              <Button 
-                onClick={handleRequestNotifications}
-                variant="outline"
-                className="w-full"
-              >
-                <Bell className="mr-2 h-4 w-4" />
-                Ativar Notificações
-              </Button>
-            )}
-          </div>
 
-          <div className="text-center">
             <Button 
-              onClick={() => window.location.href = '/'} 
-              variant="ghost"
-              size="sm"
+              variant="outline" 
+              size="lg" 
+              className="w-full border-tromot-red text-tromot-red hover:bg-tromot-red/5"
+              onClick={() => window.location.href = '/'}
             >
-              Usar no navegador
+              Usar no Navegador
             </Button>
           </div>
+
+          {/* Notifications */}
+          {isSupported && permission === 'default' && (
+            <>
+              <Separator className="bg-border/50" />
+              <div className="text-center space-y-3">
+                <h4 className="font-medium flex items-center justify-center gap-2 text-primary">
+                  <Bell className="h-4 w-4" />
+                  Ativar Notificações
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  Receba alertas sobre novos produtos e atualizações
+                </p>
+                <Button 
+                  onClick={handleRequestNotifications}
+                  variant="outline"
+                  className="border-tromot-red/20 text-tromot-red hover:bg-tromot-red/5"
+                >
+                  <Bell className="mr-2 h-4 w-4" />
+                  Permitir Notificações
+                </Button>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

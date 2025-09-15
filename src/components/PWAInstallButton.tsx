@@ -28,7 +28,9 @@ export function PWAInstallButton({
   }
 
   // Debug: sempre logar o estado para debug
-  console.log('[PWAInstallButton] State:', { isInstallable, isInstalled, hasPrompt });
+      console.log('[PWAInstallButton] State:', { isInstallable, isInstalled, hasPrompt });
+      console.log('[PWA] User Agent:', navigator.userAgent);
+      console.log('[PWA] Standalone Mode:', window.matchMedia('(display-mode: standalone)').matches);
   
   const handleClick = async () => {
     console.log('[PWAInstallButton] Install button clicked');
@@ -48,11 +50,11 @@ export function PWAInstallButton({
       <Button 
         size={size} 
         variant={variant} 
-        className={className}
+        className={`${className} transition-all duration-200 hover:scale-105`}
         onClick={handleClick}
       >
         {showIcon && <Smartphone className="mr-2 h-5 w-5" />}
-        {children || 'Instalar App'}
+        {children || 'Instalar TROMOT PRO'}
       </Button>
       
       <PWAInstallDialog 

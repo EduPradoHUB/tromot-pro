@@ -1,5 +1,5 @@
 // PWA Service Worker para TROMOT PRO
-const VERSION = 'v2.0.0';
+const VERSION = 'v2.1.0';
 const STATIC_CACHE = `tromot-pro-static-${VERSION}`;
 const RUNTIME_CACHE = `tromot-pro-runtime-${VERSION}`;
 const IMAGE_CACHE = `tromot-pro-images-${VERSION}`;
@@ -8,7 +8,8 @@ const IMAGE_CACHE = `tromot-pro-images-${VERSION}`;
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png'
+  '/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png',
+  '/install-app'
 ];
 
 // Instalar Service Worker
@@ -180,26 +181,24 @@ self.addEventListener('push', (event) => {
   console.log('[Service Worker] Push received');
   
   const options = {
-    body: event.data ? event.data.text() : 'Nova atualização disponível!',
+    body: event.data ? event.data.text() : 'Nova atualização do TROMOT PRO disponível!',
     icon: '/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png',
     badge: '/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png',
-    vibrate: [100, 50, 100],
+    vibrate: [200, 100, 200],
     data: {
       dateOfArrival: Date.now(),
-      primaryKey: 1
+      primaryKey: 'tromot-notification'
     },
     actions: [
       {
         action: 'explore',
-        title: 'Abrir App',
-        icon: '/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png'
-      },
-      {
-        action: 'close',
-        title: 'Fechar',
+        title: 'Abrir TROMOT PRO',
         icon: '/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png'
       }
-    ]
+    ],
+    tag: 'tromot-update',
+    requireInteraction: false,
+    silent: false
   };
 
   event.waitUntil(

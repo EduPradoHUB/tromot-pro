@@ -27,13 +27,13 @@ export const InstallPrompt = () => {
       }
     }
 
-    // Mostrar o prompt após 3 segundos (mais rápido)
+    // Mostrar o prompt após 2 segundos conforme solicitado
     const timer = setTimeout(() => {
       if (isInstallable && !isInstalled) {
-        console.log('[InstallPrompt] Showing install prompt');
+        console.log('[InstallPrompt] Showing install prompt after 2 seconds');
         setShowPrompt(true);
       }
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [isInstallable, isInstalled]);
@@ -85,23 +85,35 @@ export const InstallPrompt = () => {
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="bg-muted/50 rounded-lg p-4">
-            <h4 className="font-medium mb-2">Benefícios do app:</h4>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Acesso offline aos manuais</li>
-              <li>• Notificações de novos produtos</li>
-              <li>• Experiência mais rápida</li>
-              <li>• Ícone na tela inicial</li>
+          <div className="bg-gradient-card rounded-2xl p-4 border border-border/50">
+            <h4 className="font-semibold mb-3 text-primary">Benefícios do TROMOT PRO:</h4>
+            <ul className="text-sm space-y-2">
+              <li className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-tromot-red rounded-full"></div>
+                Acesso offline aos manuais técnicos
+              </li>
+              <li className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-tromot-red rounded-full"></div>
+                Notificações de novos produtos e atualizações
+              </li>
+              <li className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-tromot-red rounded-full"></div>
+                Interface otimizada para instaladores
+              </li>
+              <li className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-tromot-red rounded-full"></div>
+                Acesso rápido direto da tela inicial
+              </li>
             </ul>
           </div>
 
-          <div className="flex gap-2">
-            <Button onClick={handleInstall} className="flex-1">
+          <div className="flex gap-3">
+            <Button onClick={handleInstall} className="flex-1 bg-tromot-red hover:bg-tromot-red/90" size="lg">
               <Download className="w-4 h-4 mr-2" />
-              Instalar App
+              Instalar TROMOT PRO
             </Button>
-            <Button variant="outline" onClick={handleDismiss}>
-              Agora não
+            <Button variant="outline" onClick={handleDismiss} size="lg">
+              Depois
             </Button>
           </div>
 

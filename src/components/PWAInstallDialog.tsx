@@ -30,47 +30,52 @@ export const PWAInstallDialog = ({ open, onOpenChange, onInstall }: PWAInstallDi
     
     if (isIOS) {
       return {
-        title: 'Instalar no Safari (iOS)',
-        icon: <Smartphone className="w-6 h-6" />,
+        title: 'Instalar no iPhone/iPad',
+        icon: <Smartphone className="w-6 h-6 text-tromot-red" />,
         steps: [
-          'Toque no ícone de compartilhar (□↑) na barra inferior',
-          'Selecione "Adicionar à Tela de Início"',
-          'Toque em "Adicionar" para confirmar'
+          'Toque no ícone de compartilhamento (□↑) na barra inferior do Safari',
+          'Role para baixo até encontrar "Adicionar à Tela de Início"',
+          'Toque em "Adicionar à Tela de Início"',
+          'Confirme tocando em "Adicionar" no canto superior direito',
+          'O TROMOT PRO agora aparecerá como um app na sua tela inicial!'
         ]
       };
     }
     
     if (userAgent.includes('chrome')) {
       return {
-        title: 'Instalar no Chrome',
-        icon: <Chrome className="w-6 h-6" />,
+        title: 'Instalar no Android (Chrome)',
+        icon: <Chrome className="w-6 h-6 text-tromot-red" />,
         steps: [
-          'Toque no menu do Chrome (⋮) no canto superior direito',
-          'Selecione "Instalar app" ou "Adicionar à tela inicial"',
-          'Confirme tocando em "Instalar"'
+          'Toque nos três pontos (⋮) no canto superior direito do Chrome',
+          'Selecione "Adicionar à tela inicial" ou "Instalar app"',
+          'Confirme tocando em "Adicionar" ou "Instalar"',
+          'O TROMOT PRO será instalado como um app nativo no seu dispositivo!'
         ]
       };
     }
     
     if (userAgent.includes('edge')) {
       return {
-        title: 'Instalar no Edge',
-        icon: <Palette className="w-6 h-6" />,
+        title: 'Instalar no Microsoft Edge',
+        icon: <Palette className="w-6 h-6 text-tromot-red" />,
         steps: [
-          'Toque no menu (...) no canto superior direito',
-          'Vá em "Aplicativos"',
-          'Selecione "Instalar este site como um aplicativo"'
+          'Clique nos três pontos (...) no canto superior direito do Edge',
+          'Selecione "Apps" > "Instalar este site como um app"',
+          'Clique em "Instalar" na janela que aparecer',
+          'O TROMOT PRO será instalado como um aplicativo no seu computador!'
         ]
       };
     }
     
     return {
-      title: 'Instalar App',
-      icon: <Download className="w-6 h-6" />,
+      title: 'Instalar no seu navegador',
+      icon: <Download className="w-6 h-6 text-tromot-red" />,
       steps: [
-        'Abra este site no Chrome ou Edge',
-        'Procure pela opção "Instalar app" no menu',
-        'Confirme a instalação'
+        'Procure pelo ícone de instalação (⬇️) na barra de endereços do seu navegador',
+        'Clique no ícone de instalação quando aparecer',
+        'Confirme clicando em "Instalar" na janela que abrir',
+        'Se não aparecer o ícone, tente usando o Chrome ou Edge para uma melhor experiência'
       ]
     };
   };
@@ -79,70 +84,90 @@ export const PWAInstallDialog = ({ open, onOpenChange, onInstall }: PWAInstallDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-full text-primary">
-                {instructions.icon}
-              </div>
-              <div>
-                <DialogTitle className="text-lg font-semibold">
-                  {instructions.title}
-                </DialogTitle>
-                <DialogDescription className="text-sm text-muted-foreground">
-                  TROMOT PRO - Acesso rápido aos manuais
-                </DialogDescription>
-              </div>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-3 bg-gradient-to-br from-tromot-red to-tromot-red/80 rounded-2xl">
+              <Smartphone className="w-6 h-6 text-white" />
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              className="h-8 w-8 p-0"
-            >
-              <X className="w-4 h-4" />
-            </Button>
+            <div>
+              <DialogTitle className="text-xl font-bold text-primary">
+                Instalar TROMOT PRO
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground">
+                Transforme seu navegador em um app nativo
+              </DialogDescription>
+            </div>
           </div>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="bg-muted/50 rounded-lg p-4">
-            <h4 className="font-medium mb-3">Como instalar:</h4>
-            <ol className="text-sm text-muted-foreground space-y-2">
+        <div className="space-y-6">
+          {/* Benefícios */}
+          <div className="bg-gradient-card rounded-2xl p-4 border border-border/50">
+            <h4 className="font-semibold mb-3 text-primary">Por que instalar?</h4>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-tromot-red rounded-full"></div>
+                <span>Acesso offline</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-tromot-red rounded-full"></div>
+                <span>Mais velocidade</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-tromot-red rounded-full"></div>
+                <span>Notificações push</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-tromot-red rounded-full"></div>
+                <span>Ícone na tela inicial</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Instruções */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              {instructions.icon}
+              <h3 className="font-semibold text-lg">{instructions.title}</h3>
+            </div>
+            
+            <div className="bg-muted/30 rounded-2xl p-4 space-y-3">
               {instructions.steps.map((step, index) => (
-                <li key={index} className="flex gap-3">
-                  <span className="flex-shrink-0 w-5 h-5 bg-primary text-primary-foreground rounded-full text-xs flex items-center justify-center font-medium">
+                <div key={index} className="flex gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 bg-tromot-red text-white rounded-full flex items-center justify-center text-xs font-bold">
                     {index + 1}
-                  </span>
-                  <span>{step}</span>
-                </li>
+                  </div>
+                  <p className="text-sm leading-relaxed">{step}</p>
+                </div>
               ))}
-            </ol>
+            </div>
           </div>
 
-          <div className="bg-muted/50 rounded-lg p-4">
-            <h4 className="font-medium mb-2">Benefícios do app:</h4>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Acesso offline aos manuais</li>
-              <li>• Notificações de novos produtos</li>
-              <li>• Experiência mais rápida e fluida</li>
-              <li>• Ícone na tela inicial do seu dispositivo</li>
-            </ul>
-          </div>
-
-          <div className="flex gap-2">
-            <Button onClick={handleInstall} disabled={isInstalling} className="flex-1">
-              <Download className="w-4 h-4 mr-2" />
-              {isInstalling ? 'Instalando...' : 'Tentar Instalar'}
+          {/* Botões */}
+          <div className="flex gap-3 pt-2">
+            <Button 
+              onClick={handleInstall} 
+              className="flex-1 bg-tromot-red hover:bg-tromot-red/90" 
+              size="lg"
+              disabled={isInstalling}
+            >
+              {isInstalling ? (
+                <>Instalando...</>
+              ) : (
+                <>
+                  <Download className="w-4 h-4 mr-2" />
+                  Tentar Instalação Automática
+                </>
+              )}
             </Button>
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" onClick={() => onOpenChange(false)} size="lg">
               Fechar
             </Button>
           </div>
 
-          <p className="text-xs text-muted-foreground text-center">
-            Se não conseguir instalar, siga as instruções acima ou use o app diretamente no navegador
+          <p className="text-xs text-muted-foreground text-center leading-relaxed">
+            Se a instalação automática não funcionar, siga as instruções acima para instalar manualmente
           </p>
         </div>
       </DialogContent>
