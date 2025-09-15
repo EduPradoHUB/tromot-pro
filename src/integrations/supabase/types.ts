@@ -649,6 +649,18 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_distributor_contact_secure: {
+        Args: { distributor_id: string }
+        Returns: {
+          city: string
+          cover_entire_state: boolean
+          id: string
+          name: string
+          phone: string
+          state: string
+          whatsapp: string
+        }[]
+      }
       get_distributor_full_contact: {
         Args: { distributor_id: string }
         Returns: {
@@ -706,6 +718,21 @@ export type Database = {
         Returns: Json
       }
       search_distributors_masked: {
+        Args: { p_city?: string; p_state?: string }
+        Returns: {
+          active: boolean
+          city: string
+          cover_entire_state: boolean
+          created_at: string
+          has_contact: boolean
+          id: string
+          name: string
+          phone_display: string
+          state: string
+          whatsapp_display: string
+        }[]
+      }
+      search_distributors_secure: {
         Args: { p_city?: string; p_state?: string }
         Returns: {
           active: boolean

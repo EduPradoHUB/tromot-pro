@@ -26,13 +26,13 @@ export type DistributorContact = {
 };
 
 /**
- * Busca distribuidores com dados mascarados (seguro para exibição geral)
- * Agora usando função sem SECURITY DEFINER para maior segurança
+ * Busca distribuidores com dados mascarados (seguro para exibição por região)
+ * Agora usando função segura que restringe acesso por localização do usuário
  */
 export const fetchDistributorsPublic = async (state?: string, city?: string): Promise<DistributorPublic[]> => {
   try {
     const { data, error } = await supabase
-      .rpc('search_distributors_masked', {
+      .rpc('search_distributors_secure', {
         p_state: state || null,
         p_city: city || null
       });
@@ -50,13 +50,13 @@ export const fetchDistributorsPublic = async (state?: string, city?: string): Pr
 };
 
 /**
- * Obtém dados completos de contato de um distributor específico
- * Agora usando função sem SECURITY DEFINER que usa RLS policies
+ * Obtém dados completos de contato de um distribuidor específico
+ * Agora usando função segura que verifica localização do usuário
  */
 export const getDistributorContact = async (distributorId: string): Promise<DistributorContact | null> => {
   try {
     const { data, error } = await supabase
-      .rpc('get_distributor_full_contact', {
+      .rpc('get_distributor_contact_secure', {
         distributor_id: distributorId
       });
 
