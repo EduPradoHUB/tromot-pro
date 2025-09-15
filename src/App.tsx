@@ -1,14 +1,9 @@
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/contexts/SimpleAppContext";
-import { Layout } from "@/components/Layout";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { InstallPrompt } from "@/components/pwa/InstallPrompt";
-import { UpdateManager } from "@/components/UpdateManager";
 
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
@@ -44,13 +39,11 @@ function AppContent() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AppProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
     </AppProvider>
   </QueryClientProvider>
 );
