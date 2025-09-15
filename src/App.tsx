@@ -1,58 +1,14 @@
 import React from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AppProvider } from "@/contexts/SimpleAppContext";
-import { Layout } from "@/components/Layout";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { InstallPrompt } from "@/components/pwa/InstallPrompt";
-import { UpdateManager } from "@/components/UpdateManager";
 
-import Home from "./pages/Home";
-import Catalog from "./pages/Catalog";
-import Product from "./pages/Product";
-import WhereToBuy from "./pages/WhereToBuy";
-import Profile from "./pages/Profile";
-import Dashboard from "./pages/Dashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import TechnicianDashboard from "./pages/TechnicianDashboard";
-import MediaDashboard from "./pages/MediaDashboard";
-import Users from "./pages/Users";
-import Login from "./pages/Login";
-import PasswordReset from "./pages/PasswordReset";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
+const queryClient = undefined;
 
-import InstallApp from "./pages/InstallApp";
-import NotFound from "./pages/NotFound";
-
-const queryClient = new QueryClient();
-
-function AppContent() {
-  return (
-    <>
-      <Routes>
-        <Route path="/login" element={<div>Login temporário</div>} />
-        <Route path="*" element={<div>TROMOT PRO - App funcionando!</div>} />
-      </Routes>
-    </>
-  );
-}
+// Componente temporariamente simplificado
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AppProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </TooltipProvider>
-    </AppProvider>
-  </QueryClientProvider>
+  <div>
+    <h1>TROMOT PRO - Teste Básico</h1>
+    <p>App funcionando!</p>
+  </div>
 );
 
 export default App;
