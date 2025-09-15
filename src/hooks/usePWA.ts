@@ -15,23 +15,24 @@ const isIOS = () => {
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 };
 
-// Detectar se já está instalado
+// Detectar se já está instalado - mais permissivo para evitar false positives
 const checkInstallationStatus = () => {
-  // PWA instalado (modo standalone)
+  // PWA instalado (modo standalone) - só considerar se estiver realmente standalone
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
   
-  // iOS Safari "Add to Home Screen"
+  // iOS Safari "Add to Home Screen" - verificação mais rigorosa
   const isIOSInstalled = isIOS() && (window.navigator as any).standalone === true;
   
-  // Chrome/Edge PWA
-  const isPWAInstalled = isStandalone;
+  // Verificar se está rodando em app nativo (Capacitor)
+  const isCapacitor = !!(window as any).Capacitor;
   
-  return isIOSInstalled || isPWAInstalled;
+  // Só considerar instalado se realmente estiver em modo standalone ou for app nativo
+  return (isStandalone && !window.location.search.includes('forceHideBadge')) || isIOSInstalled || isCapacitor;
 };
 
 export const usePWA = () => {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstallable, setIsInstallable] = useState(false);
+  const [isInstallable, setIsInstallable] = useState(true); // Mais permissivo - sempre mostrar opção
   const [isInstalled, setIsInstalled] = useState(false);
   const [hasPrompt, setHasPrompt] = useState(false);
 
@@ -43,10 +44,14 @@ export const usePWA = () => {
     setIsInstalled(installed);
     console.log('[PWA] Installation status:', installed);
 
-    // iOS não dispara beforeinstallprompt, mas é "instalável" via Add to Home Screen
-    if (isIOS()) {
+    // Sempre considerar instalável, a não ser que já esteja instalado
+    if (!installed) {
       setIsInstallable(true);
-      console.log('[PWA] iOS detected - installable via Add to Home Screen');
+      if (isIOS()) {
+        console.log('[PWA] iOS detected - installable via Add to Home Screen');
+      } else {
+        console.log('[PWA] Browser detected - installable with manual instructions as fallback');
+      }
     }
 
     // Verificar se já existe o prompt capturado (pode acontecer antes do React carregar)

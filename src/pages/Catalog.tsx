@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/sheet';
 import { useApp } from '@/contexts/AppContext';
 import { categories, brands } from '@/lib/data';
+import { PWAInstallButton } from '@/components/PWAInstallButton';
 
 export default function Catalog() {
   const { legacyProducts: products, vehicles, trackEvent } = useApp();
@@ -208,11 +209,16 @@ export default function Catalog() {
     <div className="container py-8">
       <div className="mb-8">
         <div className="flex items-center justify-between mb-6">
-          <div>
+          <div className="flex-1">
             <h1 className="text-3xl font-bold mb-2">Catálogo de Produtos</h1>
             <p className="text-muted-foreground">
               {filteredProducts.length} produto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
             </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <PWAInstallButton size="sm" variant="secondary">
+              Instalar App
+            </PWAInstallButton>
           </div>
         </div>
         

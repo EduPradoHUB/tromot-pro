@@ -27,12 +27,13 @@ export const InstallPrompt = () => {
       }
     }
 
-    // Mostrar o prompt após 5 segundos
+    // Mostrar o prompt após 3 segundos (mais rápido)
     const timer = setTimeout(() => {
       if (isInstallable && !isInstalled) {
+        console.log('[InstallPrompt] Showing install prompt');
         setShowPrompt(true);
       }
-    }, 5000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [isInstallable, isInstalled]);

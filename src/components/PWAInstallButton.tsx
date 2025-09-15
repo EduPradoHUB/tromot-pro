@@ -25,6 +25,9 @@ export function PWAInstallButton({
     return null;
   }
 
+  // Debug: sempre logar o estado para debug
+  console.log('[PWAInstallButton] State:', { isInstallable, isInstalled, hasPrompt });
+
   // Detectar se é iOS
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   
@@ -46,12 +49,8 @@ export function PWAInstallButton({
       }
     }
     
-    // Para iOS ou quando não tem prompt, mostrar instruções
-    if (isIOS) {
-      alert('Para instalar no iOS:\n1. Toque no ícone de compartilhar (⬆️)\n2. Selecione "Adicionar à Tela de Início"\n3. Confirme "Adicionar"');
-    } else {
-      alert('Para instalar o app:\n1. No Chrome: Menu (⋮) > "Instalar app"\n2. No Edge: Menu (...) > "Aplicativos" > "Instalar este site como um aplicativo"\n3. No Firefox: Não suportado, use Chrome ou Edge');
-    }
+    // Sempre chamar a função installApp do hook que já tem toda a lógica
+    await installApp();
   };
 
   return (
