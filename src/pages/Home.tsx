@@ -61,7 +61,7 @@ export default function Home() {
   });
 
   const [quickSearchContent, setQuickSearchContent] = useState({
-    title: 'Busca Geral',
+    title: 'Busca Rápida',
     description: 'Pesquise produtos, veículos e categorias em todo o app'
   });
 
@@ -159,7 +159,7 @@ export default function Home() {
     const content = getEditableContent('quick-search');
     if (content) {
       setQuickSearchContent({
-        title: content.title || 'Busca Geral',
+        title: content.title || 'Busca Rápida',
         description: content.description || 'Pesquise produtos, veículos e categorias em todo o app'
       });
     }
