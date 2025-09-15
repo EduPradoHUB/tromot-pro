@@ -78,27 +78,135 @@ export const checkPWAInstallability = async (): Promise<{
   }
 };
 
+// Utilitários profissionais para PWA - Versão Completa
+
 export const logPWAStatus = async () => {
-  console.log('[PWA] === PWA Status Check ===');
+  console.group('🔧 [PWA] Status Detalhado do Progressive Web App');
   
-  const result = await checkPWAInstallability();
-  
-  console.log('[PWA] Can Install:', result.canInstall);
-  console.log('[PWA] Checks:', result.checks);
-  
-  if (result.issues.length > 0) {
-    console.warn('[PWA] Issues found:', result.issues);
+  // Verificar Service Worker
+  if ('serviceWorker' in navigator) {
+    const registration = await navigator.serviceWorker.getRegistration();
+    console.log('✅ Service Worker:', registration ? 'Registrado' : 'Não encontrado');
+    if (registration) {
+      console.log('   📦 Escopo:', registration.scope);
+      console.log('   🔄 Estado:', registration.active?.state || 'Inativo');
+    }
   } else {
-    console.log('[PWA] All PWA requirements met!');
+    console.log('❌ Service Worker não suportado');
+  }
+
+  // Verificar Manifest
+  const manifestLink = document.querySelector('link[rel="manifest"]');
+  console.log('📋 Manifest:', manifestLink ? 'Encontrado' : 'Não encontrado');
+  if (manifestLink) {
+    console.log('   🔗 URL:', (manifestLink as HTMLLinkElement).href);
+  }
+
+  // Verificar HTTPS
+  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost';
+  console.log('🔒 HTTPS:', isSecure ? 'Seguro' : 'Inseguro');
+
+  // Verificar suporte a PWA
+  const supportsPWA = 'serviceWorker' in navigator && 'PushManager' in window;
+  console.log('🎯 Suporte PWA:', supportsPWA ? 'Completo' : 'Parcial');
+
+  // Verificar instalação
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                      (navigator as any).standalone === true;
+  console.log('📱 App Instalado:', isStandalone ? 'Sim' : 'Não');
+
+  // Verificar prompt disponível
+  const hasPrompt = !!(window as any).deferredPrompt;
+  console.log('⚡ Prompt Disponível:', hasPrompt ? 'Sim' : 'Não');
+
+  // Informações do navegador
+  console.log('🌐 Navegador:', {
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    cookieEnabled: navigator.cookieEnabled,
+    onLine: navigator.onLine
+  });
+
+  console.groupEnd();
+};
+
+export const getInstallInstructions = () => {
+  const userAgent = navigator.userAgent.toLowerCase();
+  
+  if (/ipad|iphone|ipod/.test(userAgent)) {
+    return {
+      platform: 'iOS',
+      icon: '📱',
+      steps: [
+        'Toque no ícone de compartilhar (□↑) na barra inferior',
+        'Role para baixo e toque em "Adicionar à Tela de Início"',
+        'Toque em "Adicionar" para confirmar',
+        'O TROMOT PRO aparecerá na sua tela inicial!'
+      ]
+    };
   }
   
-  // Verificar beforeinstallprompt
-  const hasPrompt = !!(window as any).deferredPrompt;
-  console.log('[PWA] beforeinstallprompt available:', hasPrompt);
+  if (userAgent.includes('chrome')) {
+    return {
+      platform: 'Chrome',
+      icon: '🔵',
+      steps: [
+        'Toque nos três pontos (⋮) no menu do Chrome',
+        'Selecione "Adicionar à tela inicial" ou "Instalar app"',
+        'Confirme tocando em "Adicionar" ou "Instalar"',
+        'O TROMOT PRO será instalado como app nativo!'
+      ]
+    };
+  }
+
+  if (userAgent.includes('edge')) {
+    return {
+      platform: 'Edge',
+      icon: '🔷',
+      steps: [
+        'Clique nos três pontos (...) no menu do Edge',
+        'Vá em "Apps" > "Instalar este site como um app"',
+        'Clique em "Instalar" na janela que aparecer',
+        'O TROMOT PRO será instalado no seu sistema!'
+      ]
+    };
+  }
+
+  return {
+    platform: 'Navegador',
+    icon: '🌐',
+    steps: [
+      'Procure pelo ícone de instalação na barra de endereços',
+      'Clique no ícone quando aparecer',
+      'Confirme a instalação na janela que abrir',
+      'Use o Chrome ou Edge para melhor experiência!'
+    ]
+  };
+};
+
+export const triggerInstallPrompt = async (): Promise<boolean> => {
+  const deferredPrompt = (window as any).deferredPrompt;
   
-  // User agent info
-  console.log('[PWA] User Agent:', navigator.userAgent);
-  console.log('[PWA] Is Mobile:', /Mobi|Android/i.test(navigator.userAgent));
-  
-  return result;
+  if (!deferredPrompt) {
+    console.warn('🚨 [PWA] Nenhum prompt de instalação disponível');
+    return false;
+  }
+
+  try {
+    console.log('🚀 [PWA] Disparando prompt de instalação nativo');
+    await deferredPrompt.prompt();
+    
+    const result = await deferredPrompt.userChoice;
+    console.log('📊 [PWA] Resultado da instalação:', result.outcome);
+    
+    if (result.outcome === 'accepted') {
+      delete (window as any).deferredPrompt;
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('❌ [PWA] Erro ao disparar prompt:', error);
+    return false;
+  }
 };

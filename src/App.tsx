@@ -7,6 +7,7 @@ import { AppProvider } from "@/contexts/AppContext";
 import { Layout } from "@/components/Layout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
+import { PWAStatusIndicator } from "@/components/PWAStatusIndicator";
 
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
@@ -31,6 +32,7 @@ const queryClient = new QueryClient();
 function AppContent() {
   return (
     <>
+      <PWAStatusIndicator />
       <InstallPrompt />
       <Routes>
         <Route path="/login" element={<Login />} />

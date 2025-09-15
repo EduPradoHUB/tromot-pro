@@ -27,21 +27,25 @@ export function PWAInstallButton({
     return null;
   }
 
-  // Debug: sempre logar o estado para debug
-      console.log('[PWAInstallButton] State:', { isInstallable, isInstalled, hasPrompt });
-      console.log('[PWA] User Agent:', navigator.userAgent);
-      console.log('[PWA] Standalone Mode:', window.matchMedia('(display-mode: standalone)').matches);
+  // Debug: sempre logar o estado para debug e facilitar troubleshooting
+  console.log('[PWAInstallButton] 🔍 Estado atual:', { isInstallable, isInstalled, hasPrompt });
+  console.log('[PWAInstallButton] 🌐 User Agent:', navigator.userAgent);
+  console.log('[PWAInstallButton] 📱 Standalone Mode:', window.matchMedia('(display-mode: standalone)').matches);
+  console.log('[PWAInstallButton] 🎯 beforeinstallprompt disponível:', !!(window as any).deferredPrompt);
   
   const handleClick = async () => {
-    console.log('[PWAInstallButton] Install button clicked');
+    console.log('[PWAInstallButton] 🎯 Botão de instalação clicado');
+    console.log('[PWAInstallButton] 🔍 Tentando instalação automática primeiro...');
     
     // Tentar instalação automática primeiro
     const success = await installApp();
     
     // Se não conseguiu instalar automaticamente, mostrar dialog com instruções
     if (!success) {
-      console.log('[PWAInstallButton] Automatic installation failed, showing instructions dialog');
+      console.log('[PWAInstallButton] ⚠️ Instalação automática falhou - exibindo instruções manuais');
       setShowDialog(true);
+    } else {
+      console.log('[PWAInstallButton] ✅ Instalação automática bem-sucedida!');
     }
   };
 

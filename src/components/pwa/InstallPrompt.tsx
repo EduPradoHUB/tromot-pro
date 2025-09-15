@@ -27,11 +27,19 @@ export const InstallPrompt = () => {
       }
     }
 
-    // Mostrar o prompt após 2 segundos conforme solicitado
+    // Mostrar o prompt após 2 segundos conforme solicitado - SEM CONDIÇÕES RESTRITIVAS
+    console.log('[InstallPrompt] Iniciando timer de 2 segundos para prompt de instalação');
     const timer = setTimeout(() => {
-      if (isInstallable && !isInstalled) {
-        console.log('[InstallPrompt] Showing install prompt after 2 seconds');
+      console.log('[InstallPrompt] ⏰ 2 segundos passaram - verificando condições de exibição');
+      console.log('[InstallPrompt] 📱 isInstalled:', isInstalled);
+      console.log('[InstallPrompt] ⚡ isInstallable:', isInstallable);
+      
+      // Remover condições restritivas - mostrar sempre que não estiver instalado
+      if (!isInstalled) {
+        console.log('[InstallPrompt] ✅ Exibindo prompt de instalação (sem condições restritivas)');
         setShowPrompt(true);
+      } else {
+        console.log('[InstallPrompt] ❌ App já instalado - não exibindo prompt');
       }
     }, 2000);
 

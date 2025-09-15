@@ -1,5 +1,5 @@
-// PWA Service Worker para TROMOT PRO
-const VERSION = 'v2.1.0';
+// PWA Service Worker para TROMOT PRO - Versão Profissional
+const VERSION = 'v3.0.0';
 const STATIC_CACHE = `tromot-pro-static-${VERSION}`;
 const RUNTIME_CACHE = `tromot-pro-runtime-${VERSION}`;
 const IMAGE_CACHE = `tromot-pro-images-${VERSION}`;
