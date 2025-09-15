@@ -65,7 +65,7 @@ export const usePWA = () => {
     }
 
     // Verificar condições PWA para trigger do beforeinstallprompt
-    const checkPWAEligibility = () => {
+    const checkPWAEligibility = async () => {
       const hasManifest = document.querySelector('link[rel="manifest"]');
       const hasServiceWorker = 'serviceWorker' in navigator;
       const isHTTPS = location.protocol === 'https:' || location.hostname === 'localhost';
@@ -76,9 +76,40 @@ export const usePWA = () => {
         isHTTPS,
         userAgent: navigator.userAgent
       });
+
+      // Importar e executar verificação detalhada
+      try {
+        const { logPWAStatus } = await import('@/utils/pwaUtils');
+        await logPWAStatus();
+      } catch (error) {
+        console.warn('[PWA] Could not load PWA utils:', error);
+      }
     };
     
-    checkPWAEligibility();
+    // Aguardar um pouco antes de verificar PWA eligibility
+    const checkTimer = setTimeout(() => {
+      checkPWAEligibility();
+      
+      // Forçar uma verificação adicional após service worker estar ativo
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(() => {
+          console.log('[PWA] Service Worker is ready, forcing prompt check');
+          // Pequeno delay para garantir que tudo foi processado
+          setTimeout(() => {
+            // Se ainda não temos prompt, algo pode estar errado
+            if (!hasPrompt && !(window as any).deferredPrompt) {
+              console.warn('[PWA] No beforeinstallprompt received yet. PWA may not meet criteria.');
+              console.log('[PWA] Current state:', {
+                isHTTPS: location.protocol === 'https:' || location.hostname === 'localhost',
+                hasManifest: !!document.querySelector('link[rel="manifest"]'),
+                hasServiceWorker: 'serviceWorker' in navigator,
+                userAgent: navigator.userAgent
+              });
+            }
+          }, 2000);
+        });
+      }
+    }, 1000);
 
     // Escutar evento de instalação (Android/Chrome)
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -127,6 +158,7 @@ export const usePWA = () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
       mediaQuery.removeEventListener('change', handleDisplayModeChange);
+      clearTimeout(checkTimer);
     };
   }, []);
 

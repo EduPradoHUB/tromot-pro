@@ -5,7 +5,7 @@
   "description": "App para instaladores e técnicos de produtos eletrônicos automotivos",
   "start_url": "/",
   "display": "standalone",
-  "display_override": ["standalone", "fullscreen"],
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#ffffff",
   "theme_color": "#C41E3A",
   "orientation": "portrait-primary",
@@ -22,7 +22,7 @@
       "icons": [
         {
           "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
-          "sizes": "96x96",
+          "sizes": "192x192",
           "type": "image/png"
         }
       ]
@@ -31,12 +31,43 @@
   "screenshots": [
     {
       "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
-      "sizes": "1080x1920",
+      "sizes": "720x1280",
       "type": "image/png",
-      "form_factor": "narrow"
+      "form_factor": "narrow",
+      "label": "Tela inicial do TROMOT PRO"
     }
   ],
   "icons": [
+    {
+      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
       "sizes": "192x192",
@@ -45,15 +76,21 @@
     },
     {
       "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
-      "sizes": "192x192", 
+      "sizes": "384x384",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any"
     },
     {
       "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
