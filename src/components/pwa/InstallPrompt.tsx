@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Download, Smartphone } from 'lucide-react';
+import { Download, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { usePWA } from '@/hooks/usePWA';
@@ -69,28 +69,18 @@ export const InstallPrompt = () => {
     <Dialog open={showPrompt} onOpenChange={setShowPrompt}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-full">
-                <Smartphone className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <DialogTitle className="text-lg font-semibold">
-                  Instalar TROMOT PRO
-                </DialogTitle>
-                <DialogDescription className="text-sm text-muted-foreground">
-                  Acesse rapidamente seus manuais
-                </DialogDescription>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-full">
+              <Smartphone className="w-6 h-6 text-primary" />
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleDismiss}
-              className="h-8 w-8 p-0"
-            >
-              <X className="w-4 h-4" />
-            </Button>
+            <div>
+              <DialogTitle className="text-lg font-semibold">
+                Instalar TROMOT PRO
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
+                Acesse rapidamente seus manuais
+              </DialogDescription>
+            </div>
           </div>
         </DialogHeader>
 
