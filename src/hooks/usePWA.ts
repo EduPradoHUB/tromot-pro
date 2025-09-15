@@ -50,33 +50,51 @@ export const usePWA = () => {
       if (isIOS()) {
         console.log('[PWA] iOS detected - installable via Add to Home Screen');
       } else {
-        console.log('[PWA] Browser detected - installable with manual instructions as fallback');
+        console.log('[PWA] Browser detected - checking for native prompt');
       }
     }
 
-    // Verificar se já existe o prompt capturado (pode acontecer antes do React carregar)
+    // Verificar se já existe o prompt capturado globalmente
     if ((window as any).deferredPrompt) {
-      console.log('[PWA] Found deferred prompt from before React initialization');
-      setInstallPrompt((window as any).deferredPrompt);
+      console.log('[PWA] Found existing deferred prompt');
+      const existingPrompt = (window as any).deferredPrompt;
+      setInstallPrompt(existingPrompt);
       setIsInstallable(true);
       setHasPrompt(true);
+      console.log('[PWA] Using existing prompt, platforms:', existingPrompt.platforms);
     }
+
+    // Verificar condições PWA para trigger do beforeinstallprompt
+    const checkPWAEligibility = () => {
+      const hasManifest = document.querySelector('link[rel="manifest"]');
+      const hasServiceWorker = 'serviceWorker' in navigator;
+      const isHTTPS = location.protocol === 'https:' || location.hostname === 'localhost';
+      
+      console.log('[PWA] Eligibility check:', {
+        hasManifest: !!hasManifest,
+        hasServiceWorker,
+        isHTTPS,
+        userAgent: navigator.userAgent
+      });
+    };
+    
+    checkPWAEligibility();
 
     // Escutar evento de instalação (Android/Chrome)
     const handleBeforeInstallPrompt = (e: Event) => {
-      console.log('[PWA] beforeinstallprompt event received');
+      console.log('[PWA] beforeinstallprompt event received - this enables native installation!');
       e.preventDefault();
       
       const event = e as BeforeInstallPromptEvent;
       
-      // Salvar no window também como backup
+      // Salvar no window globalmente
       (window as any).deferredPrompt = event;
       
       setInstallPrompt(event);
       setIsInstallable(true);
       setHasPrompt(true);
       
-      console.log('[PWA] Install prompt ready, platforms:', event.platforms);
+      console.log('[PWA] Native install prompt available, platforms:', event.platforms);
     };
 
     // Escutar app instalado
@@ -113,29 +131,51 @@ export const usePWA = () => {
   }, []);
 
   const installApp = async (): Promise<boolean> => {
-    console.log('[PWA] Install attempt - hasPrompt:', hasPrompt, 'installPrompt:', !!installPrompt, 'isIOS:', isIOS());
+    console.log('[PWA] Install attempt starting...', {
+      hasPrompt,
+      installPrompt: !!installPrompt,
+      isIOS: isIOS(),
+      deferredPromptExists: !!(window as any).deferredPrompt
+    });
+    
+    // Verificar se existe prompt em cache global
+    const globalPrompt = (window as any).deferredPrompt;
+    const promptToUse = installPrompt || globalPrompt;
     
     // Android/Chrome: Usar beforeinstallprompt se disponível
-    if (installPrompt && !isIOS()) {
+    if (promptToUse && !isIOS()) {
       try {
-        console.log('[PWA] Showing native install prompt');
-        await installPrompt.prompt();
+        console.log('[PWA] Using native install prompt - this should install automatically!');
         
-        const result = await installPrompt.userChoice;
-        console.log('[PWA] User choice:', result.outcome);
+        // Atualizar estado se usamos o prompt global
+        if (!installPrompt && globalPrompt) {
+          setInstallPrompt(globalPrompt);
+          setHasPrompt(true);
+        }
+        
+        await promptToUse.prompt();
+        
+        const result = await promptToUse.userChoice;
+        console.log('[PWA] User responded to native prompt:', result.outcome);
         
         if (result.outcome === 'accepted') {
+          console.log('[PWA] User accepted - app should be installing now!');
           setInstallPrompt(null);
-          setIsInstallable(false);
           setHasPrompt(false);
+          // Limpar o cache global
+          delete (window as any).deferredPrompt;
           return true;
+        } else {
+          console.log('[PWA] User dismissed the native install prompt');
         }
         
         return false;
       } catch (error) {
-        console.error('[PWA] Error during installation:', error);
-        // Fallback para instruções manuais
+        console.error('[PWA] Error during native installation:', error);
+        console.log('[PWA] Falling back to manual instructions');
       }
+    } else {
+      console.log('[PWA] No native prompt available, showing manual instructions');
     }
 
     // Fallback: Instruções manuais para todos os casos onde o prompt nativo não funciona
