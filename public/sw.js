@@ -1,17 +1,14 @@
 // PWA Service Worker para TROMOT PRO
-const VERSION = 'v3.0.0';
+const VERSION = 'v2.0.0';
 const STATIC_CACHE = `tromot-pro-static-${VERSION}`;
 const RUNTIME_CACHE = `tromot-pro-runtime-${VERSION}`;
 const IMAGE_CACHE = `tromot-pro-images-${VERSION}`;
 
-// Recursos essenciais para cache estático - EXPANDIDO PARA GARANTIR INSTALAÇÃO
+// Recursos essenciais para cache estático
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png',
-  '/src/main.tsx',
-  '/src/App.css',
-  '/index.html'
+  '/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png'
 ];
 
 // Instalar Service Worker
