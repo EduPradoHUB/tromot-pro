@@ -5,11 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { useApp } from '@/contexts/AppContext';
-import { brands } from '@/lib/data';
 import AdSlot from '@/components/AdSlot';
 import { PWAInstallButton } from '@/components/PWAInstallButton';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
@@ -26,7 +24,6 @@ export default function Home() {
   const {
     banners,
     legacyProducts: products,
-    vehicles,
     trackEvent,
     findProductByBarcode,
     getEditableContent,
@@ -34,9 +31,7 @@ export default function Home() {
   } = appContext;
   
   const navigate = useNavigate();
-  const [searchBrand, setSearchBrand] = useState('');
-  const [searchModel, setSearchModel] = useState('');
-  const [searchYear, setSearchYear] = useState('');
+  const [globalSearch, setGlobalSearch] = useState('');
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
   
   const [heroContent, setHeroContent] = useState({
@@ -62,12 +57,12 @@ export default function Home() {
 
   const [featureCard3, setFeatureCard3] = useState({
     title: 'Busca Inteligente',
-    description: 'Encontre produtos compatíveis com qualquer veículo de forma rápida e precisa.'
+    description: 'Encontre qualquer produto, veículo ou categoria de forma rápida e precisa em todo o app.'
   });
 
   const [quickSearchContent, setQuickSearchContent] = useState({
-    title: 'Busca Rápida por Veículo',
-    description: 'Encontre produtos compatíveis com seu veículo'
+    title: 'Busca Geral',
+    description: 'Pesquise produtos, veículos e categorias em todo o app'
   });
 
   // Plugin autoplay para carrossel
@@ -76,13 +71,10 @@ export default function Home() {
     stopOnInteraction: true
   }), []);
   
-  const availableModels = searchBrand ? vehicles.filter(v => v.brand === searchBrand).map(v => v.model) : [];
-  const availableYears = searchBrand && searchModel ? vehicles.find(v => v.brand === searchBrand && v.model === searchModel)?.years || [] : [];
-  
   const handleQuickSearch = () => {
-    if (searchBrand || searchModel || searchYear) {
-      // Navigate to catalog with filters
-      window.location.href = `/manuais?brand=${searchBrand}&model=${searchModel}&year=${searchYear}`;
+    if (globalSearch.trim()) {
+      // Navigate to catalog with search query
+      navigate(`/manuais?search=${encodeURIComponent(globalSearch.trim())}`);
     }
   };
   
@@ -157,7 +149,7 @@ export default function Home() {
     if (content3) {
       setFeatureCard3({
         title: content3.title || 'Busca Inteligente',
-        description: content3.description || 'Encontre produtos compatíveis com qualquer veículo de forma rápida e precisa.'
+        description: content3.description || 'Encontre qualquer produto, veículo ou categoria de forma rápida e precisa em todo o app.'
       });
     }
   }, [getEditableContent, editableContent]);
@@ -167,8 +159,8 @@ export default function Home() {
     const content = getEditableContent('quick-search');
     if (content) {
       setQuickSearchContent({
-        title: content.title || 'Busca Rápida por Veículo',
-        description: content.description || 'Encontre produtos compatíveis com seu veículo'
+        title: content.title || 'Busca Geral',
+        description: content.description || 'Pesquise produtos, veículos e categorias em todo o app'
       });
     }
   }, [getEditableContent, editableContent]);
@@ -274,47 +266,20 @@ export default function Home() {
               />
             </div>
             
-            <div className="grid md:grid-cols-4 gap-4">
-              <Select value={searchBrand} onValueChange={setSearchBrand}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Marca" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border shadow-lg">
-                  {brands.filter(b => b !== 'Todos').map(brand => (
-                    <SelectItem key={brand} value={brand}>
-                      {brand}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={searchModel} onValueChange={setSearchModel} disabled={!searchBrand}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Modelo" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border shadow-lg">
-                  {availableModels.map(model => (
-                    <SelectItem key={model} value={model}>
-                      {model}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={searchYear} onValueChange={setSearchYear} disabled={!searchModel}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Ano" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border shadow-lg">
-                  {availableYears.map(year => (
-                    <SelectItem key={year} value={year}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Button onClick={handleQuickSearch} className="w-full">
+            <div className="flex gap-4">
+              <Input
+                type="text"
+                placeholder="Digite sua pesquisa: produtos, veículos, categorias..."
+                value={globalSearch}
+                onChange={(e) => setGlobalSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleQuickSearch();
+                  }
+                }}
+                className="flex-1"
+              />
+              <Button onClick={handleQuickSearch} disabled={!globalSearch.trim()}>
                 <Search className="mr-2 h-4 w-4" />
                 Buscar
               </Button>
