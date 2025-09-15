@@ -642,12 +642,62 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      distributors_public: {
+        Row: {
+          active: boolean | null
+          city: string | null
+          cover_entire_state: boolean | null
+          created_at: string | null
+          has_contact: boolean | null
+          id: string | null
+          name: string | null
+          phone_display: string | null
+          state: string | null
+          whatsapp_display: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          city?: string | null
+          cover_entire_state?: boolean | null
+          created_at?: string | null
+          has_contact?: never
+          id?: string | null
+          name?: string | null
+          phone_display?: never
+          state?: string | null
+          whatsapp_display?: never
+        }
+        Update: {
+          active?: boolean | null
+          city?: string | null
+          cover_entire_state?: boolean | null
+          created_at?: string | null
+          has_contact?: never
+          id?: string | null
+          name?: string | null
+          phone_display?: never
+          state?: string | null
+          whatsapp_display?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_distributor_contact: {
+        Args: { distributor_id: string }
+        Returns: {
+          city: string
+          cover_entire_state: boolean
+          id: string
+          name: string
+          phone: string
+          state: string
+          whatsapp: string
+        }[]
       }
       get_installation_leaderboard: {
         Args: { limit_rows?: number }

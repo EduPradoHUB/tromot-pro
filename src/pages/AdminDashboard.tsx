@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
+import { useAdminDistributors } from '@/hooks/useAdminDistributors';
 import { Plus, Edit, Trash2, Upload, Eye, EyeOff, FileSpreadsheet, FileText, Image, Check, X, Search, Filter } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,7 +27,6 @@ export default function AdminDashboard() {
     advertisements, 
     vehicles,
     categories,
-    distributors,
     editableContent,
     updateSectionVisibility,
     createProduct, 
@@ -44,11 +44,16 @@ export default function AdminDashboard() {
     createCategory,
     updateCategory,
     deleteCategory,
-    createDistributor,
-    updateDistributor,
-    deleteDistributor,
     uploadFile
   } = useApp();
+  
+  // Use admin-specific hook for distributors to get complete data
+  const { 
+    distributors, 
+    createDistributor: createAdminDistributor,
+    updateDistributor: updateAdminDistributor,
+    deleteDistributor: deleteAdminDistributor 
+  } = useAdminDistributors();
   
   const { toast } = useToast();
   
@@ -284,7 +289,7 @@ export default function AdminDashboard() {
   // Distributor handlers  
   const handleCreateDistributor = async () => {
     try {
-      await createDistributor(distributorForm);
+      await createAdminDistributor(distributorForm);
       
       setDistributorForm({
         name: '',
@@ -315,7 +320,7 @@ export default function AdminDashboard() {
     if (!editingDistributor) return;
     
     try {
-      await updateDistributor(editingDistributor.id, distributorForm);
+      await updateAdminDistributor(editingDistributor.id, distributorForm);
       
       setDistributorForm({
         name: '',
@@ -345,7 +350,7 @@ export default function AdminDashboard() {
 
   const handleDeleteDistributor = async (id: string) => {
     try {
-      await deleteDistributor(id);
+      await deleteAdminDistributor(id);
       
       toast({
         title: "Sucesso",

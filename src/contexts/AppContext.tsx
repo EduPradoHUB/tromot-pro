@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
+import { DistributorPublic, fetchDistributorsPublic } from '@/lib/distributorUtils';
 
 // Database types
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -143,7 +144,7 @@ interface AppContextType {
   advertisements: Advertisement[];
   vehicles: Vehicle[];
   categories: Category[];
-  distributors: Distributor[];
+  distributors: DistributorPublic[];
   
   // Legacy data (for backward compatibility)
   posts: LegacyPost[];
@@ -241,7 +242,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [distributors, setDistributors] = useState<Distributor[]>([]);
+  const [distributors, setDistributors] = useState<DistributorPublic[]>([]);
   
   // Legacy state (mock data for backward compatibility)
   const [posts, setPosts] = useState<LegacyPost[]>([]);
@@ -645,17 +646,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCategories(prev => prev.filter(c => c.id !== id));
   };
 
-  // CRUD Functions for Distributors
+  // CRUD Functions for Distributors (Admin only)
   const createDistributor = async (data: DistributorInsert): Promise<Distributor> => {
     const { data: distributor, error } = await supabase
       .from('distributors')
       .insert(data)
       .select()
       .single();
-    
+
     if (error) throw error;
     
-    setDistributors(prev => [...prev, distributor]);
+    // Refresh distributors list after creating
+    await fetchData();
     return distributor;
   };
 
@@ -666,10 +668,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       .eq('id', id)
       .select()
       .single();
-    
+
     if (error) throw error;
     
-    setDistributors(prev => prev.map(d => d.id === id ? distributor : d));
+    // Refresh distributors list after updating
+    await fetchData();
     return distributor;
   };
 
@@ -678,10 +681,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       .from('distributors')
       .delete()
       .eq('id', id);
-    
+
     if (error) throw error;
     
-    setDistributors(prev => prev.filter(d => d.id !== id));
+    // Refresh distributors list after deleting
+    await fetchData();
   };
 
   // Function to moderate posts
@@ -872,14 +876,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         { data: advertisementsData },
         { data: vehiclesData },
         { data: categoriesData },
-        { data: distributorsData }
+        distributorsPublicData
       ] = await Promise.all([
         supabase.from('products').select('*'),
         supabase.from('banners').select('*'),
         supabase.from('advertisements').select('*'),
         supabase.from('vehicles').select('*'),
         supabase.from('categories').select('*'),
-        supabase.from('distributors').select('*')
+        fetchDistributorsPublic()
       ]);
 
       if (productsData) setProducts(productsData);
@@ -887,7 +891,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (advertisementsData) setAdvertisements(advertisementsData);
       if (vehiclesData) setVehicles(vehiclesData);
       if (categoriesData) setCategories(categoriesData);
-      if (distributorsData) setDistributors(distributorsData);
+      if (distributorsPublicData) setDistributors(distributorsPublicData);
       
       // Also fetch editable content
       await fetchEditableContent();

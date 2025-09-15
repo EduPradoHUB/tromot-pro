@@ -8,6 +8,13 @@ import { Input } from '@/components/ui/input';
 import { useApp } from '@/contexts/AppContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { 
+  DistributorPublic, 
+  DistributorContact, 
+  fetchDistributorsPublic, 
+  getDistributorContact,
+  logDistributorAccess 
+} from '@/lib/distributorUtils';
 
 interface Distributor {
   id: string;
@@ -24,11 +31,13 @@ export default function WhereToBuy() {
   const navigate = useNavigate();
   const { legacyProducts, profile, trackEvent } = useApp();
   const [product, setProduct] = useState<any>(null);
-  const [distributors, setDistributors] = useState<Distributor[]>([]);
+  const [distributors, setDistributors] = useState<DistributorPublic[]>([]);
+  const [distributorContacts, setDistributorContacts] = useState<Map<string, DistributorContact>>(new Map());
   const [loading, setLoading] = useState(true);
   const [userState, setUserState] = useState(profile?.state || '');
   const [userCity, setUserCity] = useState(profile?.city || '');
   const [showLocationForm, setShowLocationForm] = useState(false);
+  const [contactingDistributor, setContactingDistributor] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -61,25 +70,15 @@ export default function WhereToBuy() {
     try {
       setLoading(true);
       
-      let query = supabase
-        .from('distributors')
-        .select('*')
-        .eq('active', true)
-        .eq('state', userState);
-
-      // Se temos cidade, buscar distribuidores da cidade ou que cobrem todo o estado
-      if (userCity) {
-        query = supabase
-          .from('distributors')
-          .select('*')
-          .eq('active', true)
-          .eq('state', userState)
-          .or(`city.eq.${userCity},cover_entire_state.eq.true`);
+      let data: DistributorPublic[] = [];
+      
+      if (userState && userCity) {
+        data = await fetchDistributorsPublic(userState, userCity);
+      } else if (userState) {
+        data = await fetchDistributorsPublic(userState);
+      } else {
+        data = await fetchDistributorsPublic();
       }
-
-      const { data, error } = await query.order('name');
-
-      if (error) throw error;
 
       setDistributors(data || []);
     } catch (error) {
@@ -258,28 +257,35 @@ export default function WhereToBuy() {
                           )}
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        {distributor.phone && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleContactClick(distributor, 'phone')}
-                          >
-                            <Phone className="h-4 w-4 mr-2" />
-                            Ligar
-                          </Button>
-                        )}
-                        {distributor.whatsapp && (
-                          <Button
-                            size="sm"
-                            onClick={() => handleContactClick(distributor, 'whatsapp')}
-                            className="bg-green-600 hover:bg-green-700"
-                          >
-                            <MessageCircle className="h-4 w-4 mr-2" />
-                            WhatsApp
-                          </Button>
-                        )}
-                      </div>
+                       <div className="flex gap-2">
+                         {distributor.has_contact && (
+                           <>
+                             <Button
+                               variant="outline"
+                               size="sm"
+                               onClick={() => handleContactClick(distributor, 'phone')}
+                               disabled={contactingDistributor === distributor.id}
+                             >
+                               <Phone className="h-4 w-4 mr-2" />
+                               {contactingDistributor === distributor.id ? 'Carregando...' : 'Ligar'}
+                             </Button>
+                             <Button
+                               size="sm"
+                               onClick={() => handleContactClick(distributor, 'whatsapp')}
+                               disabled={contactingDistributor === distributor.id}
+                               className="bg-green-600 hover:bg-green-700"
+                             >
+                               <MessageCircle className="h-4 w-4 mr-2" />
+                               {contactingDistributor === distributor.id ? 'Carregando...' : 'WhatsApp'}
+                             </Button>
+                           </>
+                         )}
+                         {!distributor.has_contact && (
+                           <span className="text-sm text-muted-foreground">
+                             Contato: {distributor.phone_display || distributor.whatsapp_display || 'Não informado'}
+                           </span>
+                         )}
+                       </div>
                     </div>
                   </CardContent>
                 </Card>
