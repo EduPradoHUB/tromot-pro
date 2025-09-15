@@ -27,21 +27,15 @@ export type DistributorContact = {
 
 /**
  * Busca distribuidores com dados mascarados (seguro para exibição geral)
+ * Agora usando função sem SECURITY DEFINER para maior segurança
  */
 export const fetchDistributorsPublic = async (state?: string, city?: string): Promise<DistributorPublic[]> => {
   try {
-    let query = supabase
-      .from('distributors_public')
-      .select('*')
-      .eq('active', true);
-
-    if (state && city) {
-      query = query.or(`and(state.eq.${state},city.eq.${city}),and(state.eq.${state},cover_entire_state.eq.true)`);
-    } else if (state) {
-      query = query.eq('state', state);
-    }
-
-    const { data, error } = await query;
+    const { data, error } = await supabase
+      .rpc('search_distributors_masked', {
+        p_state: state || null,
+        p_city: city || null
+      });
 
     if (error) {
       console.error('Erro ao buscar distribuidores públicos:', error);
@@ -56,13 +50,13 @@ export const fetchDistributorsPublic = async (state?: string, city?: string): Pr
 };
 
 /**
- * Obtém dados completos de contato de um distribuidor específico
- * Registra o acesso para auditoria de segurança
+ * Obtém dados completos de contato de um distributor específico
+ * Agora usando função sem SECURITY DEFINER que usa RLS policies
  */
 export const getDistributorContact = async (distributorId: string): Promise<DistributorContact | null> => {
   try {
     const { data, error } = await supabase
-      .rpc('get_distributor_contact', {
+      .rpc('get_distributor_full_contact', {
         distributor_id: distributorId
       });
 

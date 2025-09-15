@@ -642,52 +642,14 @@ export type Database = {
       }
     }
     Views: {
-      distributors_public: {
-        Row: {
-          active: boolean | null
-          city: string | null
-          cover_entire_state: boolean | null
-          created_at: string | null
-          has_contact: boolean | null
-          id: string | null
-          name: string | null
-          phone_display: string | null
-          state: string | null
-          whatsapp_display: string | null
-        }
-        Insert: {
-          active?: boolean | null
-          city?: string | null
-          cover_entire_state?: boolean | null
-          created_at?: string | null
-          has_contact?: never
-          id?: string | null
-          name?: string | null
-          phone_display?: never
-          state?: string | null
-          whatsapp_display?: never
-        }
-        Update: {
-          active?: boolean | null
-          city?: string | null
-          cover_entire_state?: boolean | null
-          created_at?: string | null
-          has_contact?: never
-          id?: string | null
-          name?: string | null
-          phone_display?: never
-          state?: string | null
-          whatsapp_display?: never
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
       }
-      get_distributor_contact: {
+      get_distributor_full_contact: {
         Args: { distributor_id: string }
         Returns: {
           city: string
@@ -738,6 +700,21 @@ export type Database = {
       mask_sensitive_data: {
         Args: { phone_input: string; whatsapp_input: string }
         Returns: Json
+      }
+      search_distributors_masked: {
+        Args: { p_city?: string; p_state?: string }
+        Returns: {
+          active: boolean
+          city: string
+          cover_entire_state: boolean
+          created_at: string
+          has_contact: boolean
+          id: string
+          name: string
+          phone_display: string
+          state: string
+          whatsapp_display: string
+        }[]
       }
     }
     Enums: {
