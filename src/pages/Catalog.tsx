@@ -13,7 +13,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
+} from '@/components/ui/custom-sheet';
 import { useApp } from '@/contexts/AppContext';
 import { categories, brands } from '@/lib/data';
 import { PWAInstallButtonSimple } from '@/components/PWAInstallButtonSimple';

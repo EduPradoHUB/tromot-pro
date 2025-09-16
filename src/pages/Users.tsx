@@ -2,8 +2,7 @@ import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/custom-alert-dialog';
 import { Trash2 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { toast } from '@/hooks/use-toast';
@@ -181,21 +180,17 @@ export default function Users() {
                       {profile.role}
                     </Badge>
                     
-                    <Select
-                      value={profile.role}
-                      onValueChange={(value: 'ADM' | 'Técnico Tromot' | 'Cliente') => 
-                        handleRoleChange(profile.user_id, value)
-                      }
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Cliente">Cliente</SelectItem>
-                        <SelectItem value="Técnico Tromot">Técnico Tromot</SelectItem>
-                        <SelectItem value="ADM">ADM</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="relative">
+                      <select
+                        value={profile.role}
+                        onChange={(e) => handleRoleChange(profile.user_id, e.target.value as 'ADM' | 'Técnico Tromot' | 'Cliente')}
+                        className="w-[180px] h-10 px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      >
+                        <option value="Cliente">Cliente</option>
+                        <option value="Técnico Tromot">Técnico Tromot</option>
+                        <option value="ADM">ADM</option>
+                      </select>
+                    </div>
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>

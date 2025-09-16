@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// Removed Select imports to avoid React hooks conflicts
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
 import { Plus, Edit, Trash2 } from 'lucide-react';
@@ -333,16 +333,16 @@ export default function TechnicianDashboard() {
                   
                   <div className="space-y-2">
                     <Label htmlFor="category">Categoria*</Label>
-                    <Select value={productForm.category} onValueChange={(value) => setProductForm(prev => ({ ...prev, category: value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma categoria" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <select 
+                      value={productForm.category} 
+                      onChange={(e) => setProductForm(prev => ({ ...prev, category: e.target.value }))}
+                      className="w-full h-10 px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    >
+                      <option value="">Selecione uma categoria</option>
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.name}>{cat.name}</option>
+                      ))}
+                    </select>
                   </div>
                   
                   <div className="col-span-2 space-y-2">
@@ -377,15 +377,14 @@ export default function TechnicianDashboard() {
                   
                   <div className="space-y-2">
                     <Label htmlFor="manual_type">Tipo do Manual</Label>
-                    <Select value={productForm.manual_type} onValueChange={(value: 'pdf' | 'image') => setProductForm(prev => ({ ...prev, manual_type: value }))}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pdf">PDF</SelectItem>
-                        <SelectItem value="image">Imagem</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <select 
+                      value={productForm.manual_type} 
+                      onChange={(e) => setProductForm(prev => ({ ...prev, manual_type: e.target.value as 'pdf' | 'image' }))}
+                      className="w-full h-10 px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    >
+                      <option value="pdf">PDF</option>
+                      <option value="image">Imagem</option>
+                    </select>
                   </div>
                   
                   <div className="space-y-2">

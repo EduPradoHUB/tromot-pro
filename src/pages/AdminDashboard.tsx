@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// Removed Select imports to avoid React hooks conflicts
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
 import { useAdminDistributors } from '@/hooks/useAdminDistributors';
@@ -849,16 +849,16 @@ export default function AdminDashboard() {
                   
                   <div>
                     <Label htmlFor="category">Categoria</Label>
-                    <Select value={productForm.category} onValueChange={(value) => setProductForm({...productForm, category: value})}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione a categoria" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.filter(cat => cat.active).map((cat) => (
-                          <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <select 
+                      value={productForm.category} 
+                      onChange={(e) => setProductForm({...productForm, category: e.target.value})}
+                      className="w-full h-10 px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    >
+                      <option value="">Selecione a categoria</option>
+                      {categories.filter(cat => cat.active).map((cat) => (
+                        <option key={cat.id} value={cat.name}>{cat.name}</option>
+                      ))}
+                    </select>
                   </div>
                   
                   <div>
@@ -941,15 +941,14 @@ export default function AdminDashboard() {
                   
                   <div>
                     <Label htmlFor="manual_type">Tipo do Manual</Label>
-                    <Select value={productForm.manual_type} onValueChange={(value: 'pdf' | 'image') => setProductForm({...productForm, manual_type: value})}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pdf">PDF</SelectItem>
-                        <SelectItem value="image">Imagem</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <select 
+                      value={productForm.manual_type} 
+                      onChange={(e) => setProductForm({...productForm, manual_type: e.target.value as 'pdf' | 'image'})}
+                      className="w-full h-10 px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    >
+                      <option value="pdf">PDF</option>
+                      <option value="image">Imagem</option>
+                    </select>
                   </div>
                   
                   <div>
@@ -993,19 +992,18 @@ export default function AdminDashboard() {
                 </div>
               </div>
               
-              <Select value={filters.category} onValueChange={(value) => setFilters(prev => ({...prev, category: value}))}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Filtrar por categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as categorias</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.name}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <select 
+                value={filters.category} 
+                onChange={(e) => setFilters(prev => ({...prev, category: e.target.value}))}
+                className="w-[200px] h-10 px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <option value="all">Todas as categorias</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.name}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
             </div>
             
             <div className="flex gap-2 flex-wrap">
@@ -1586,16 +1584,15 @@ export default function AdminDashboard() {
                   
                   <div>
                     <Label htmlFor="slot">Posição</Label>
-                    <Select value={adForm.slot} onValueChange={(value: any) => setAdForm({...adForm, slot: value})}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="home_hero">Banner Home</SelectItem>
-                        <SelectItem value="product_banner">Banner Produto</SelectItem>
-                        <SelectItem value="feed_sponsored">Feed Patrocinado</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <select 
+                      value={adForm.slot} 
+                      onChange={(e) => setAdForm({...adForm, slot: e.target.value as 'home_hero' | 'product_banner' | 'feed_sponsored'})}
+                      className="w-full h-10 px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    >
+                      <option value="home_hero">Banner Home</option>
+                      <option value="product_banner">Banner Produto</option>
+                      <option value="feed_sponsored">Feed Patrocinado</option>
+                    </select>
                   </div>
                   
                   <div>
@@ -1632,15 +1629,14 @@ export default function AdminDashboard() {
                   
                   <div>
                     <Label htmlFor="aspect_ratio">Proporção</Label>
-                    <Select value={adForm.creative_aspect_ratio} onValueChange={(value: any) => setAdForm({...adForm, creative_aspect_ratio: value})}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="4:5">4:5</SelectItem>
-                        <SelectItem value="16:9">16:9</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <select 
+                      value={adForm.creative_aspect_ratio} 
+                      onChange={(e) => setAdForm({...adForm, creative_aspect_ratio: e.target.value as '4:5' | '16:9'})}
+                      className="w-full h-10 px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    >
+                      <option value="4:5">4:5</option>
+                      <option value="16:9">16:9</option>
+                    </select>
                   </div>
                   
                   <div>
@@ -1689,31 +1685,30 @@ export default function AdminDashboard() {
                     
                     <div>
                       <Label htmlFor="target_type">Onde exibir</Label>
-                      <Select value={adForm.target_type} onValueChange={(value: any) => setAdForm({...adForm, target_type: value, target_category: '', target_products: []})}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Em todos os produtos</SelectItem>
-                          <SelectItem value="category">Apenas em uma categoria específica</SelectItem>
-                          <SelectItem value="products">Apenas em produtos específicos</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <select 
+                        value={adForm.target_type} 
+                        onChange={(e) => setAdForm({...adForm, target_type: e.target.value as 'all' | 'category' | 'products', target_category: '', target_products: []})}
+                        className="w-full h-10 px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      >
+                        <option value="all">Em todos os produtos</option>
+                        <option value="category">Apenas em uma categoria específica</option>
+                        <option value="products">Apenas em produtos específicos</option>
+                      </select>
                     </div>
                     
                     {adForm.target_type === 'category' && (
                       <div>
                         <Label htmlFor="target_category">Categoria</Label>
-                        <Select value={adForm.target_category} onValueChange={(value) => setAdForm({...adForm, target_category: value})}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione a categoria" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categories.filter(cat => cat.active).map((cat) => (
-                              <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <select 
+                          value={adForm.target_category} 
+                          onChange={(e) => setAdForm({...adForm, target_category: e.target.value})}
+                          className="w-full h-10 px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        >
+                          <option value="">Selecione a categoria</option>
+                          {categories.filter(cat => cat.active).map((cat) => (
+                            <option key={cat.id} value={cat.name}>{cat.name}</option>
+                          ))}
+                        </select>
                       </div>
                     )}
                     
