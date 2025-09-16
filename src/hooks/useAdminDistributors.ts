@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from '@/integrations/supabase/types';
 
@@ -10,8 +10,8 @@ type DistributorInsert = Database['public']['Tables']['distributors']['Insert'];
  * Usado apenas em contextos administrativos
  */
 export const useAdminDistributors = () => {
-  const [distributors, setDistributors] = React.useState<Distributor[]>([]);
-  const [loading, setLoading] = React.useState(false);
+  const [distributors, setDistributors] = useState<Distributor[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchDistributors = async () => {
     setLoading(true);
@@ -68,7 +68,7 @@ export const useAdminDistributors = () => {
     await fetchDistributors(); // Refresh list
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchDistributors();
   }, []);
 
