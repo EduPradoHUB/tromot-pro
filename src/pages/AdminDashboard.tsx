@@ -206,20 +206,11 @@ export default function AdminDashboard() {
       // Deletar o produto
       await deleteProduct(productId);
 
-      // Mostrar toast com opção de desfazer
+      // Mostrar toast de confirmação
       toast({
         title: "Produto deletado",
         description: `${productToDelete.name} foi removido.`,
-        action: (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleUndoDelete}
-          >
-            Desfazer
-          </Button>
-        ),
-      });
+      })
 
       // Limpar o produto salvo após 10 segundos se não foi restaurado
       setTimeout(() => {
