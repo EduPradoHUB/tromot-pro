@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 interface Banner {
@@ -17,10 +17,10 @@ export function BannerCarousel({
   autoPlay = true,
   autoPlayInterval = 4000
 }: BannerCarouselProps) {
-  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   // Auto-play functionality
-  React.useEffect(() => {
+  useEffect(() => {
     if (!autoPlay || banners.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentIndex(prevIndex => prevIndex === banners.length - 1 ? 0 : prevIndex + 1);

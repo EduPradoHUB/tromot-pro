@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, ChevronRight, Star, Eye, Download, Smartphone, ScanLine, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -31,36 +31,36 @@ export default function Home() {
   } = appContext;
   
   const navigate = useNavigate();
-  const [globalSearch, setGlobalSearch] = React.useState('');
-  const [showBarcodeScanner, setShowBarcodeScanner] = React.useState(false);
+  const [globalSearch, setGlobalSearch] = useState('');
+  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
   
-  const [heroContent, setHeroContent] = React.useState({
+  const [heroContent, setHeroContent] = useState({
     title: 'Soluções Eletrônicas',
     subtitle: 'para Instaladores',
     description: 'Acesse manuais, compartilhe instalações e encontre suporte técnico especializado.'
   });
 
-  const [featuresContent, setFeaturesContent] = React.useState({
+  const [featuresContent, setFeaturesContent] = useState({
     title: 'Por que usar o TROMOT Pro?',
     description: 'Desenvolvido especialmente para instaladores e técnicos, oferecendo tudo que você precisa em um só lugar.'
   });
 
-  const [featureCard1, setFeatureCard1] = React.useState({
+  const [featureCard1, setFeatureCard1] = useState({
     title: 'Manuais Sempre Disponíveis',
     description: 'Acesse manuais de instalação em PDF ou imagem, sempre atualizados e organizados por produto.'
   });
 
-  const [featureCard2, setFeatureCard2] = React.useState({
+  const [featureCard2, setFeatureCard2] = useState({
     title: 'Rede Colaborativa', 
     description: 'Compartilhe suas instalações, veja o trabalho de outros técnicos e aprenda com a comunidade.'
   });
 
-  const [featureCard3, setFeatureCard3] = React.useState({
+  const [featureCard3, setFeatureCard3] = useState({
     title: 'Busca Inteligente',
     description: 'Encontre qualquer produto, veículo ou categoria de forma rápida e precisa em todo o app.'
   });
 
-  const [quickSearchContent, setQuickSearchContent] = React.useState({
+  const [quickSearchContent, setQuickSearchContent] = useState({
     title: 'Busca Geral',
     description: 'Pesquise produtos, veículos e categorias em todo o app'
   });
@@ -101,7 +101,7 @@ export default function Home() {
   const latestProducts = products.slice(0, 6);
 
   // Update hero content when editable content changes
-  React.useEffect(() => {
+  useEffect(() => {
     const content = getEditableContent('hero');
     if (content) {
       setHeroContent({
@@ -113,7 +113,7 @@ export default function Home() {
   }, [getEditableContent, editableContent]);
 
   // Update features content when editable content changes
-  React.useEffect(() => {
+  useEffect(() => {
     const content = getEditableContent('features');
     if (content) {
       setFeaturesContent({
@@ -124,7 +124,7 @@ export default function Home() {
   }, [getEditableContent, editableContent]);
 
   // Update feature cards content when editable content changes
-  React.useEffect(() => {
+  useEffect(() => {
     const content1 = getEditableContent('feature-card-1');
     if (content1) {
       setFeatureCard1({
@@ -151,7 +151,7 @@ export default function Home() {
   }, [getEditableContent, editableContent]);
 
   // Update quick search content when editable content changes
-  React.useEffect(() => {
+  useEffect(() => {
     const content = getEditableContent('quick-search');
     if (content) {
       setQuickSearchContent({

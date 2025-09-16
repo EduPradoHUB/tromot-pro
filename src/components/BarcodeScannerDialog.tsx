@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Camera, Type, X, ScanLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,17 +16,17 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
   onOpenChange,
   onBarcodeDetected,
 }) => {
-  const [mode, setMode] = React.useState<'camera' | 'manual'>('camera');
-  const [isScanning, setIsScanning] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [manualInput, setManualInput] = React.useState('');
+  const [mode, setMode] = useState<'camera' | 'manual'>('camera');
+  const [isScanning, setIsScanning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [manualInput, setManualInput] = useState('');
   
-  const videoRef = React.useRef<HTMLVideoElement>(null);
-  const codeReaderRef = React.useRef<BrowserMultiFormatReader | null>(null);
-  const streamRef = React.useRef<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   // Inicializar scanner quando o modal abrir
-  React.useEffect(() => {
+  useEffect(() => {
     if (open && mode === 'camera') {
       startScanning();
     } else {
