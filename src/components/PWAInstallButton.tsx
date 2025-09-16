@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Smartphone, Download } from 'lucide-react';
 import { usePWA } from '@/hooks/usePWA';
@@ -20,7 +20,7 @@ export function PWAInstallButton({
   showIcon = true 
 }: PWAInstallButtonProps) {
   const { isInstallable, isInstalled, hasPrompt, installApp } = usePWA();
-  const [showDialog, setShowDialog] = useState(false);
+  const [showDialog, setShowDialog] = React.useState(false);
 
   // Não mostrar botão se já está instalado
   if (isInstalled) {

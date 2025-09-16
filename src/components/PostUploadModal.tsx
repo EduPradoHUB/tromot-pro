@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import * as React from 'react';
 import { Camera, X, Upload, Image } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -18,13 +18,13 @@ interface PostUploadModalProps {
 export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalProps) {
   const { uploadFile, currentUser } = useApp();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
-  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = React.useState(false);
+  const [imageFile, setImageFile] = React.useState<File | null>(null);
+  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
+  const cameraInputRef = React.useRef<HTMLInputElement>(null);
+  const galleryInputRef = React.useRef<HTMLInputElement>(null);
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = React.useState({
     caption: '',
     vehicleBrand: '',
     vehicleModel: '',

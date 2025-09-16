@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import * as React from 'react';
 import { Camera, Type, AlertCircle } from 'lucide-react';
 import { BrowserMultiFormatReader, Result } from '@zxing/library';
 import {
@@ -24,15 +24,15 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
   onOpenChange,
   onBarcodeDetected,
 }) => {
-  const [isScanning, setIsScanning] = useState(false);
-  const [manualInput, setManualInput] = useState('');
-  const [showManualInput, setShowManualInput] = useState(false);
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const codeReader = useRef<BrowserMultiFormatReader | null>(null);
+  const [isScanning, setIsScanning] = React.useState(false);
+  const [manualInput, setManualInput] = React.useState('');
+  const [showManualInput, setShowManualInput] = React.useState(false);
+  const [stream, setStream] = React.useState<MediaStream | null>(null);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const codeReader = React.useRef<BrowserMultiFormatReader | null>(null);
 
   // Inicializa o leitor de código de barras
-  useEffect(() => {
+  React.useEffect(() => {
     try {
       codeReader.current = new BrowserMultiFormatReader();
     } catch (error) {
@@ -146,7 +146,7 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (open && !showManualInput) {
       startCamera();
     } else if (!open) {

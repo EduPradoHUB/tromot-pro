@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Star } from 'lucide-react';
@@ -11,9 +11,9 @@ interface RatingFormProps {
 
 export function RatingForm({ productId }: RatingFormProps) {
   const { currentUser, submitRating } = useApp();
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
-  const [hoveredRating, setHoveredRating] = useState(0);
+  const [rating, setRating] = React.useState(0);
+  const [comment, setComment] = React.useState('');
+  const [hoveredRating, setHoveredRating] = React.useState(0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

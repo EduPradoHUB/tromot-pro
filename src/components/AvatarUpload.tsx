@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import * as React from 'react';
 import ReactCrop, { centerCrop, makeAspectCrop, type Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Button } from '@/components/ui/button';
@@ -37,17 +37,17 @@ function centerAspectCrop(
 export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: AvatarUploadProps) {
   const { uploadFile } = useApp();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
-  const [imgSrc, setImgSrc] = useState('');
-  const [crop, setCrop] = useState<Crop>();
-  const [completedCrop, setCompletedCrop] = useState<Crop>();
-  const [aspect] = useState<number | undefined>(1); // 1:1 aspect ratio for avatar
-  const [uploading, setUploading] = useState(false);
+  const [open, setOpen] = React.useState(false);
+  const [imgSrc, setImgSrc] = React.useState('');
+  const [crop, setCrop] = React.useState<Crop>();
+  const [completedCrop, setCompletedCrop] = React.useState<Crop>();
+  const [aspect] = React.useState<number | undefined>(1); // 1:1 aspect ratio for avatar
+  const [uploading, setUploading] = React.useState(false);
   
-  const imgRef = useRef<HTMLImageElement>(null);
-  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-  const hiddenAnchorRef = useRef<HTMLAnchorElement>(null);
-  const blobUrlRef = useRef('');
+  const imgRef = React.useRef<HTMLImageElement>(null);
+  const previewCanvasRef = React.useRef<HTMLCanvasElement>(null);
+  const hiddenAnchorRef = React.useRef<HTMLAnchorElement>(null);
+  const blobUrlRef = React.useRef('');
 
   const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -61,7 +61,7 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
     }
   };
 
-  const onImageLoad = useCallback(
+  const onImageLoad = React.useCallback(
     (e: React.SyntheticEvent<HTMLImageElement>) => {
       if (aspect) {
         const { width, height } = e.currentTarget;

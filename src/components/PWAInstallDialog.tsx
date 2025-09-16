@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { X, Download, Smartphone, Chrome, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -10,7 +10,7 @@ interface PWAInstallDialogProps {
 }
 
 export const PWAInstallDialog = ({ open, onOpenChange, onInstall }: PWAInstallDialogProps) => {
-  const [isInstalling, setIsInstalling] = useState(false);
+  const [isInstalling, setIsInstalling] = React.useState(false);
 
   const handleInstall = async () => {
     setIsInstalling(true);

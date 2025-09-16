@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { Edit2, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,11 +30,11 @@ export const EditableContent: React.FC<EditableContentProps> = ({
   onContentUpdate
 }) => {
   const { profile, updateEditableContent } = useApp();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState(title || '');
-  const [editSubtitle, setEditSubtitle] = useState(subtitle || '');
-  const [editDescription, setEditDescription] = useState(description || '');
-  const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editTitle, setEditTitle] = React.useState(title || '');
+  const [editSubtitle, setEditSubtitle] = React.useState(subtitle || '');
+  const [editDescription, setEditDescription] = React.useState(description || '');
+  const [loading, setLoading] = React.useState(false);
 
   const isAdmin = profile?.role === 'ADM';
 

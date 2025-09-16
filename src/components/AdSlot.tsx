@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
@@ -15,19 +15,19 @@ interface AdSlotProps {
 
 export default function AdSlot({ slot, className = '', productId }: AdSlotProps) {
   const { getActiveAd, trackEvent, currentUser, products } = useApp();
-  const [ad, setAd] = useState<Advertisement | null>(null);
-  const [impressionTracked, setImpressionTracked] = useState(false);
+  const [ad, setAd] = React.useState<Advertisement | null>(null);
+  const [impressionTracked, setImpressionTracked] = React.useState(false);
 
   // Get product category if productId is provided
   const productCategory = productId ? products.find(p => p.id === productId)?.category : undefined;
 
-  useEffect(() => {
+  React.useEffect(() => {
     const activeAd = getActiveAd(slot, productId, productCategory);
     setAd(activeAd);
     setImpressionTracked(false);
   }, [slot, productId, productCategory, getActiveAd]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (ad && !impressionTracked) {
       // Track impression
       trackEvent({ 

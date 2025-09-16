@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,15 +40,15 @@ export const BulkProductUpload: React.FC = () => {
   const { createProduct, updateProduct, products, categories, createCategory } = useApp();
   const { toast } = useToast();
   
-  const [file, setFile] = useState<File | null>(null);
-  const [parsedData, setParsedData] = useState<ParsedProduct[]>([]);
-  const [showPreview, setShowPreview] = useState(false);
-  const [importing, setImporting] = useState(false);
-  const [importProgress, setImportProgress] = useState(0);
-  const [importMode, setImportMode] = useState<'create' | 'update_code' | 'update_ean'>('create');
-  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [file, setFile] = React.useState<File | null>(null);
+  const [parsedData, setParsedData] = React.useState<ParsedProduct[]>([]);
+  const [showPreview, setShowPreview] = React.useState(false);
+  const [importing, setImporting] = React.useState(false);
+  const [importProgress, setImportProgress] = React.useState(0);
+  const [importMode, setImportMode] = React.useState<'create' | 'update_code' | 'update_ean'>('create');
+  const [importResult, setImportResult] = React.useState<ImportResult | null>(null);
   
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
