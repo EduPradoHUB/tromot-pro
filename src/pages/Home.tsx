@@ -9,7 +9,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Autoplay from 'embla-carousel-autoplay';
 import { useApp } from '@/contexts/AppContext';
 import AdSlot from '@/components/AdSlot';
-import { PWAInstallButton } from '@/components/PWAInstallButton';
+import { PWAInstallButtonSimple } from '@/components/PWAInstallButtonSimple';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
 import { EditableContent } from '@/components/EditableContent';
 import { toast } from '@/hooks/use-toast';
@@ -192,11 +192,11 @@ export default function Home() {
                   <ScanLine className="mr-2 h-5 w-5" />
                   Escanear Código de Barras
                 </Button>
-                <PWAInstallButton 
+                <PWAInstallButtonSimple 
                   className="border-white hover:bg-white text-primary hover:text-primary"
                 >
                   Instalar App
-                </PWAInstallButton>
+                </PWAInstallButtonSimple>
               </div>
             </div>
 

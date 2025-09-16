@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/sheet';
 import { useApp } from '@/contexts/AppContext';
 import { categories, brands } from '@/lib/data';
-import { PWAInstallButton } from '@/components/PWAInstallButton';
+import { PWAInstallButtonSimple } from '@/components/PWAInstallButtonSimple';
 
 export default function Catalog() {
   const { legacyProducts: products, vehicles, trackEvent } = useApp();
@@ -216,9 +216,9 @@ export default function Catalog() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <PWAInstallButton size="sm" variant="secondary">
+            <PWAInstallButtonSimple size="sm" variant="secondary">
               Instalar App
-            </PWAInstallButton>
+            </PWAInstallButtonSimple>
           </div>
         </div>
         
