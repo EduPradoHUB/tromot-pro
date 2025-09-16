@@ -5,11 +5,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
+
+// Component imports
 import { Layout } from "@/components/Layout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { PWAStatusIndicator } from "@/components/PWAStatusIndicator";
 
+// Page imports
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import Product from "./pages/Product";
@@ -24,7 +27,6 @@ import Login from "./pages/Login";
 import PasswordReset from "./pages/PasswordReset";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
-
 import InstallApp from "./pages/InstallApp";
 import NotFound from "./pages/NotFound";
 
@@ -32,7 +34,7 @@ const queryClient = new QueryClient();
 
 function AppContent() {
   return (
-    <>
+    <React.Fragment>
       <PWAStatusIndicator />
       <InstallPrompt />
       <Routes>
@@ -99,25 +101,36 @@ function AppContent() {
           </ProtectedRoute>
         } />
         <Route path="/instalar" element={<InstallApp />} />
-        
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </>
+    </React.Fragment>
   );
 }
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AppProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </TooltipProvider>
-    </AppProvider>
-  </QueryClientProvider>
-);
+function App() {
+  console.log('🚀 App iniciando - React disponível:', !!React);
+  console.log('🚀 React.useState disponível:', !!React.useState);
+  console.log('🚀 React.useRef disponível:', !!React.useRef);
+  
+  return React.createElement(
+    QueryClientProvider,
+    { client: queryClient },
+    React.createElement(
+      AppProvider,
+      null,
+      React.createElement(
+        TooltipProvider,
+        null,
+        React.createElement(Toaster),
+        React.createElement(Sonner),
+        React.createElement(
+          BrowserRouter,
+          null,
+          React.createElement(AppContent)
+        )
+      )
+    )
+  );
+}
 
 export default App;

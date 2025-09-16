@@ -19,4 +19,11 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  define: {
+    // Garantir que React seja globalmente disponível
+    global: 'globalThis',
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom']
+  }
 }));
