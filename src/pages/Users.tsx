@@ -149,8 +149,8 @@ export default function Users() {
                         {profile.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-1">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-lg font-semibold">{profile.name}</h3>
                         {profile.customer_type && (
                           <Badge variant="secondary" className="text-xs">
@@ -161,24 +161,22 @@ export default function Users() {
                         )}
                       </div>
                       <p className="text-muted-foreground">{profile.email}</p>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {profile.phone && (
-                          <span className="text-sm text-muted-foreground">📞 {profile.phone}</span>
-                        )}
-                        {profile.whatsapp && (
-                          <a 
-                            href={`https://wa.me/${profile.whatsapp.replace(/\D/g, '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-green-600 hover:underline"
-                          >
-                            💬 {profile.whatsapp}
-                          </a>
-                        )}
-                        {profile.city && profile.state && (
-                          <span className="text-sm text-muted-foreground">📍 {profile.city}, {profile.state}</span>
-                        )}
-                      </div>
+                      {profile.phone && (
+                        <p className="text-sm text-muted-foreground">📞 {profile.phone}</p>
+                      )}
+                      {profile.whatsapp && (
+                        <a 
+                          href={`https://wa.me/${profile.whatsapp.replace(/\D/g, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-green-600 hover:underline"
+                        >
+                          💬 {profile.whatsapp}
+                        </a>
+                      )}
+                      {profile.city && profile.state && (
+                        <p className="text-sm text-muted-foreground">📍 {profile.city}, {profile.state}</p>
+                      )}
                     </div>
                   </div>
                   
