@@ -13,7 +13,7 @@
   "lang": "pt-BR",
   "categories": ["productivity", "utilities"],
   "prefer_related_applications": false,
-  "shortcuts": [
+      "shortcuts": [
     {
       "name": "Catálogo",
       "short_name": "Catálogo", 
@@ -21,7 +21,7 @@
       "url": "/manuais",
       "icons": [
         {
-          "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+          "src": "/favicon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -30,7 +30,7 @@
   ],
   "screenshots": [
     {
-      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "src": "/favicon-512.png",
       "sizes": "720x1280",
       "type": "image/png",
       "form_factor": "narrow",
@@ -39,61 +39,61 @@
   ],
   "icons": [
     {
-      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "src": "/favicon-192.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "src": "/favicon-192.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "src": "/favicon-192.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "src": "/favicon-192.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "src": "/favicon-192.png",
       "sizes": "152x152",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "src": "/favicon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "src": "/favicon-512.png",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "src": "/favicon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "src": "/favicon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png",
+      "src": "/favicon-512.png",
       "sizes": "512x512",
       "type": "image/png", 
       "purpose": "maskable"
