@@ -15,7 +15,6 @@ export const Layout: React.FC<LayoutProps> = ({
   children
 }) => {
   console.log('🏗️ Renderizando Layout...');
-  
   const {
     profile,
     logout,
@@ -38,17 +37,14 @@ export const Layout: React.FC<LayoutProps> = ({
     if (descContent?.description) {
       setFooterDescription(descContent.description);
     }
-
     const supportContent = getEditableContent('footer-support-title');
     if (supportContent?.title) {
       setSupportTitle(supportContent.title);
     }
-
     const legalContent = getEditableContent('footer-legal-title');
     if (legalContent?.title) {
       setLegalTitle(legalContent.title);
     }
-
     const copyrightContent = getEditableContent('footer-copyright');
     if (copyrightContent?.description) {
       setCopyright(copyrightContent.description);
@@ -63,19 +59,39 @@ export const Layout: React.FC<LayoutProps> = ({
     }
   };
   const isActive = (path: string) => location.pathname === path;
-const navigationItems = [
-    { name: 'Home', path: '/', icon: Home },
-    { name: 'Manuais', path: '/manuais', icon: Search },
-    ...(profile?.role === 'ADM' ? [
-      { name: 'Dashboard', path: '/dashboard', icon: BarChart3 },
-      { name: 'Admin', path: '/admin', icon: Package },
-      { name: 'Mídia', path: '/midia', icon: Smartphone },
-      { name: 'Usuários', path: '/usuarios', icon: User }
-    ] : profile?.role === 'Técnico Tromot' ? [
-      { name: 'Dashboard', path: '/dashboard', icon: BarChart3 },
-      { name: 'Técnico', path: '/tecnico', icon: Package }
-    ] : [])
-  ];
+  const navigationItems = [{
+    name: 'Home',
+    path: '/',
+    icon: Home
+  }, {
+    name: 'Manuais',
+    path: '/manuais',
+    icon: Search
+  }, ...(profile?.role === 'ADM' ? [{
+    name: 'Dashboard',
+    path: '/dashboard',
+    icon: BarChart3
+  }, {
+    name: 'Admin',
+    path: '/admin',
+    icon: Package
+  }, {
+    name: 'Mídia',
+    path: '/midia',
+    icon: Smartphone
+  }, {
+    name: 'Usuários',
+    path: '/usuarios',
+    icon: User
+  }] : profile?.role === 'Técnico Tromot' ? [{
+    name: 'Dashboard',
+    path: '/dashboard',
+    icon: BarChart3
+  }, {
+    name: 'Técnico',
+    path: '/tecnico',
+    icon: Package
+  }] : [])];
   return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -96,8 +112,7 @@ const navigationItems = [
 
           {/* User Menu */}
           <div className="flex items-center space-x-4">
-            {profile ? (
-              <div className="flex items-center space-x-2">
+            {profile ? <div className="flex items-center space-x-2">
                 {/* User Avatar */}
                 <div className="flex items-center space-x-2">
                   {/* Simple Avatar Replacement */}
@@ -109,49 +124,32 @@ const navigationItems = [
                 
                 {/* Quick Actions */}
                 <div className="hidden md:flex items-center space-x-1">
-                  {profile?.role === 'ADM' && (
-                    <>
+                  {profile?.role === 'ADM' && <>
                       <Button variant="ghost" size="sm" asChild>
-                        <Link to="/midia">
-                          <Smartphone className="h-4 w-4 mr-1" />
-                          Mídia
-                        </Link>
+                        
                       </Button>
-                    </>
-                  )}
-                  {profile?.role === 'Técnico Tromot' && (
-                    <Button variant="ghost" size="sm" asChild>
+                    </>}
+                  {profile?.role === 'Técnico Tromot' && <Button variant="ghost" size="sm" asChild>
                       <Link to="/tecnico">
                         <Package className="h-4 w-4 mr-1" />
                         Técnico
                       </Link>
-                    </Button>
-                  )}
+                    </Button>}
                   <Button variant="ghost" size="sm" asChild>
-                    <Link to="/perfil">
-                      <User className="h-4 w-4 mr-1" />
-                      Perfil
-                    </Link>
+                    
                   </Button>
                   <Button variant="ghost" size="sm" onClick={handleLogout}>
                     <LogOut className="h-4 w-4 mr-1" />
                     Sair
                   </Button>
                 </div>
-              </div>
-            ) : (
-              <Button asChild>
+              </div> : <Button asChild>
                 <Link to="/login">Entrar</Link>
-              </Button>
-            )}
+              </Button>}
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              >
+              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
                 <Menu className="h-5 w-5" />
               </Button>
             </div>
@@ -159,60 +157,35 @@ const navigationItems = [
         </div>
 
         {/* Mobile Menu Overlay */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden">
-            <div 
-              className="fixed inset-0 z-40 bg-black/50" 
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
+        {isMobileMenuOpen && <div className="md:hidden">
+            <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setIsMobileMenuOpen(false)} />
             <div className="fixed top-16 left-0 right-0 z-50 bg-background border-b shadow-lg">
               <div className="container py-4">
                 <nav className="space-y-2">
-                  {navigationItems.map(item => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                        isActive(item.path) 
-                          ? 'bg-primary text-primary-foreground' 
-                          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                      }`}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
+                  {navigationItems.map(item => <Link key={item.path} to={item.path} className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${isActive(item.path) ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`} onClick={() => setIsMobileMenuOpen(false)}>
                       <item.icon className="h-5 w-5" />
                       <span className="font-medium">{item.name}</span>
-                    </Link>
-                  ))}
+                    </Link>)}
                   
-                  {profile && (
-                    <>
+                  {profile && <>
                       <div className="border-t pt-2 mt-2">
-                        <Link
-                          to="/perfil"
-                          className="flex items-center space-x-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
+                        <Link to="/perfil" className="flex items-center space-x-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
                           <User className="h-5 w-5" />
                           <span className="font-medium">Perfil</span>
                         </Link>
-                        <button
-                          onClick={() => {
-                            setIsMobileMenuOpen(false);
-                            handleLogout();
-                          }}
-                          className="flex items-center space-x-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors w-full text-left"
-                        >
+                        <button onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout();
+                  }} className="flex items-center space-x-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors w-full text-left">
                           <LogOut className="h-5 w-5" />
                           <span className="font-medium">Sair</span>
                         </button>
                       </div>
-                    </>
-                  )}
+                    </>}
                 </nav>
               </div>
             </div>
-          </div>
-        )}
+          </div>}
       </header>
 
       {/* Main Content */}
@@ -231,20 +204,10 @@ const navigationItems = [
                   <span className="text-2xl font-bold text-primary">PRO</span>
                 </div>
               </div>
-              <EditableContent
-                section="footer-description"
-                description={footerDescription}
-                descriptionClassName="text-sm text-muted-foreground"
-                onContentUpdate={(content) => setFooterDescription(content.description || footerDescription)}
-              />
+              <EditableContent section="footer-description" description={footerDescription} descriptionClassName="text-sm text-muted-foreground" onContentUpdate={content => setFooterDescription(content.description || footerDescription)} />
             </div>
             <div>
-              <EditableContent
-                section="footer-support-title"
-                title={supportTitle}
-                titleClassName="font-semibold mb-4"
-                onContentUpdate={(content) => setSupportTitle(content.title || supportTitle)}
-              />
+              <EditableContent section="footer-support-title" title={supportTitle} titleClassName="font-semibold mb-4" onContentUpdate={content => setSupportTitle(content.title || supportTitle)} />
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
                   <a href="tel:+5516993032002" className="hover:text-foreground">
@@ -259,12 +222,7 @@ const navigationItems = [
               </ul>
             </div>
             <div>
-              <EditableContent
-                section="footer-legal-title"
-                title={legalTitle}
-                titleClassName="font-semibold mb-4"
-                onContentUpdate={(content) => setLegalTitle(content.title || legalTitle)}
-              />
+              <EditableContent section="footer-legal-title" title={legalTitle} titleClassName="font-semibold mb-4" onContentUpdate={content => setLegalTitle(content.title || legalTitle)} />
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
                   <a href="/termos" className="hover:text-foreground">
@@ -279,12 +237,7 @@ const navigationItems = [
               </ul>
             </div>
           </div>
-          <EditableContent
-            section="footer-copyright"
-            description={copyright}
-            descriptionClassName="mt-8 pt-8 border-t text-center text-sm text-muted-foreground"
-            onContentUpdate={(content) => setCopyright(content.description || copyright)}
-          />
+          <EditableContent section="footer-copyright" description={copyright} descriptionClassName="mt-8 pt-8 border-t text-center text-sm text-muted-foreground" onContentUpdate={content => setCopyright(content.description || copyright)} />
         </div>
       </footer>
     </div>;
