@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import Autoplay from 'embla-carousel-autoplay';
+// Removed problematic carousel imports to fix React hooks conflicts
 import { useApp } from '@/contexts/AppContext';
 import AdSlot from '@/components/AdSlot';
 import { PWAInstallButtonSimple } from '@/components/PWAInstallButtonSimple';
@@ -65,11 +64,7 @@ export default function Home() {
     description: 'Pesquise produtos, veículos e categorias em todo o app'
   });
 
-  // Plugin autoplay para carrossel
-  const autoplayPlugin = React.useCallback(() => Autoplay({
-    delay: 2000,
-    stopOnInteraction: true
-  }), []);
+  // Removed autoplay plugin to fix React hooks conflicts
   
   const handleQuickSearch = () => {
     if (globalSearch.trim()) {
@@ -225,24 +220,20 @@ export default function Home() {
               </div>
             </div>
           ) : (
-            <Carousel className="w-full max-w-4xl mx-auto" plugins={[autoplayPlugin()]}>
-              <CarouselContent className="-ml-1 sm:-ml-2 md:-ml-4">
+            <div className="w-full max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {banners.map(banner => (
-                  <CarouselItem key={banner.id} className="pl-1 sm:pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
-                    <div className="aspect-[4/5] overflow-hidden shadow-card">
-                      <img 
-                        src={banner.image_url} 
-                        alt={banner.title} 
-                        className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
-                        onClick={() => banner.link_url && window.open(banner.link_url, '_blank')} 
-                      />
-                    </div>
-                  </CarouselItem>
+                  <div key={banner.id} className="aspect-[4/5] overflow-hidden shadow-card">
+                    <img 
+                      src={banner.image_url} 
+                      alt={banner.title} 
+                      className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
+                      onClick={() => banner.link_url && window.open(banner.link_url, '_blank')} 
+                    />
+                  </div>
                 ))}
-              </CarouselContent>
-              <CarouselPrevious className="hidden sm:flex" />
-              <CarouselNext className="hidden sm:flex" />
-            </Carousel>
+              </div>
+            </div>
           )}
         </section>
       )}
@@ -303,66 +294,60 @@ export default function Home() {
           </Button>
         </div>
 
-        <Carousel className="w-full">
-          <CarouselContent className="-ml-2 md:-ml-4">
-            {latestProducts.map(product => (
-              <CarouselItem key={product.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                <Card className="shadow-card hover:shadow-lg transition-shadow">
-                  <CardContent className="p-0">
-                    <div className="aspect-[4/3] relative overflow-hidden rounded-t-2xl">
-                      <img 
-                        src={product.image_url || '/src/assets/photo-unavailable.png'} 
-                        alt={product.name} 
-                        className="w-full h-full object-contain bg-muted/30" 
-                      />
-                      <div className="absolute top-3 right-3">
-                        <Badge variant="secondary" className="bg-background/90">
-                          {product.category}
-                        </Badge>
-                      </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {latestProducts.map(product => (
+            <Card key={product.id} className="shadow-card hover:shadow-lg transition-shadow">
+              <CardContent className="p-0">
+                <div className="aspect-[4/3] relative overflow-hidden rounded-t-2xl">
+                  <img 
+                    src={product.image_url || '/src/assets/photo-unavailable.png'} 
+                    alt={product.name} 
+                    className="w-full h-full object-contain bg-muted/30" 
+                  />
+                  <div className="absolute top-3 right-3">
+                    <Badge variant="secondary" className="bg-background/90">
+                      {product.category}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="font-semibold line-clamp-2 mb-1">
+                        {product.name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        Código: {product.code}
+                      </p>
                     </div>
-                    <div className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="font-semibold line-clamp-2 mb-1">
-                            {product.name}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            Código: {product.code}
-                          </p>
-                        </div>
-                      </div>
+                  </div>
 
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
-                          <span className="text-sm font-medium">
-                            {product.rating_average}
-                          </span>
-                          <span className="text-sm text-muted-foreground ml-1">
-                            ({product.rating_count})
-                          </span>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Eye className="h-4 w-4 mr-1" />
-                          {product.compatibility.length}
-                        </div>
-                      </div>
-
-                      <Button className="w-full" asChild onClick={() => handleProductView(product.id)}>
-                        <Link to={`/produto/${product.id}`}>
-                          Ver Produto
-                        </Link>
-                      </Button>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center">
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
+                      <span className="text-sm font-medium">
+                        {product.rating_average}
+                      </span>
+                      <span className="text-sm text-muted-foreground ml-1">
+                        ({product.rating_count})
+                      </span>
                     </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="hidden sm:flex" />
-          <CarouselNext className="hidden sm:flex" />
-        </Carousel>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Eye className="h-4 w-4 mr-1" />
+                      {product.compatibility.length}
+                    </div>
+                  </div>
+
+                  <Button className="w-full" asChild onClick={() => handleProductView(product.id)}>
+                    <Link to={`/produto/${product.id}`}>
+                      Ver Produto
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </section>
 
       {/* Features */}
