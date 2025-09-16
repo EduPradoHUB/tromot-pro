@@ -2,8 +2,7 @@ import * as React from 'react';
 import ReactCrop, { centerCrop, makeAspectCrop, type Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Camera, Upload } from 'lucide-react';
+import { Camera, Upload, X } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
 interface AvatarUploadProps {
@@ -177,62 +176,81 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
         </div>
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Editar Foto de Perfil</DialogTitle>
-          </DialogHeader>
+      {/* Custom Modal Implementation */}
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50" 
+            onClick={() => setOpen(false)}
+          />
           
-          <div className="space-y-4">
-            {imgSrc && (
-              <div>
-                <ReactCrop
-                  crop={crop}
-                  onChange={(_, percentCrop) => setCrop(percentCrop)}
-                  onComplete={(c) => setCompletedCrop(c)}
-                  aspect={aspect}
-                  minWidth={100}
-                  minHeight={100}
-                  circularCrop
-                >
-                  <img
-                    ref={imgRef}
-                    alt="Crop me"
-                    src={imgSrc}
-                    style={{ transform: `scale(1) rotate(0deg)` }}
-                    onLoad={onImageLoad}
-                    className="max-w-full max-h-96"
-                  />
-                </ReactCrop>
-              </div>
-            )}
+          {/* Modal Content */}
+          <div className="relative bg-background border rounded-2xl shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b">
+              <h2 className="text-lg font-semibold">Editar Foto de Perfil</h2>
+              <button
+                onClick={() => setOpen(false)}
+                className="p-2 hover:bg-muted rounded-full transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
             
-            {completedCrop && (
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-2">Preview:</p>
-                <canvas
-                  ref={previewCanvasRef}
-                  className="border rounded-full mx-auto"
-                  style={{
-                    objectFit: 'contain',
-                    width: 150,
-                    height: 150,
-                  }}
-                />
-              </div>
-            )}
-          </div>
+            {/* Content */}
+            <div className="p-6 space-y-4">
+              {imgSrc && (
+                <div>
+                  <ReactCrop
+                    crop={crop}
+                    onChange={(_, percentCrop) => setCrop(percentCrop)}
+                    onComplete={(c) => setCompletedCrop(c)}
+                    aspect={aspect}
+                    minWidth={100}
+                    minHeight={100}
+                    circularCrop
+                  >
+                    <img
+                      ref={imgRef}
+                      alt="Crop me"
+                      src={imgSrc}
+                      style={{ transform: `scale(1) rotate(0deg)` }}
+                      onLoad={onImageLoad}
+                      className="max-w-full max-h-96"
+                    />
+                  </ReactCrop>
+                </div>
+              )}
+              
+              {completedCrop && (
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground mb-2">Preview:</p>
+                  <canvas
+                    ref={previewCanvasRef}
+                    className="border rounded-full mx-auto"
+                    style={{
+                      objectFit: 'contain',
+                      width: 150,
+                      height: 150,
+                    }}
+                  />
+                </div>
+              )}
+            </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={uploadCroppedImage} disabled={uploading || !completedCrop}>
-              {uploading ? 'Enviando...' : 'Salvar Foto'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            {/* Footer */}
+            <div className="flex justify-end gap-2 p-6 border-t">
+              <Button variant="outline" onClick={() => setOpen(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={uploadCroppedImage} disabled={uploading || !completedCrop}>
+                {uploading ? 'Enviando...' : 'Salvar Foto'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
