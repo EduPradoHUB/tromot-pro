@@ -219,7 +219,6 @@ interface AppContextType {
   // Barcode scanning
   findProductByBarcode: (barcode: string) => Promise<LegacyProduct | null>;
   
-  
   // Editable content
   editableContent: any[];
   fetchEditableContent: () => Promise<void>;
@@ -253,6 +252,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   console.log('🚀 AppProvider iniciando - React disponível:', !!React);
   console.log('🚀 React.useState disponível:', !!React.useState);
   
+  // State declarations
   const [user, setUser] = React.useState<User | null>(null);
   const [session, setSession] = React.useState<Session | null>(null);
   const [profile, setProfile] = React.useState<Profile | null>(null);
@@ -276,749 +276,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [selectedCategory, setSelectedCategory] = React.useState('Todos');
   const [selectedBrand, setSelectedBrand] = React.useState('Todos');
   const [searchQuery, setSearchQuery] = React.useState('');
-  
-  // Helper function to convert Json to array
-  const parseCompatibility = (compatibility: any): LegacyVehicle[] => {
-    if (!compatibility) return [];
-    if (typeof compatibility === 'string') {
-      try {
-        return JSON.parse(compatibility) || [];
-      } catch {
-        return [];
-      }
-    }
-    if (Array.isArray(compatibility)) return compatibility;
-    return [];
-  };
-  
-  // Convert Supabase products to legacy format
-  const legacyProducts: LegacyProduct[] = products.map(product => ({
-    id: product.id,
-    name: product.name,
-    code: product.code,
-    category: product.category,
-    compatibility: parseCompatibility(product.compatibility),
-    manual_url: product.manual_url || undefined,
-    manual_type: (product.manual_type as 'pdf' | 'image') || undefined,
-    video_url: product.video_url || undefined,
-    rating_average: product.rating_average || 0,
-    rating_count: product.rating_count || 0,
-    image_url: product.image_url || '',
-    description: product.description || '',
-    status: product.status === 'active' ? 'active' : 'inactive',
-    out_of_production: product.out_of_production || false,
-    no_manual_available: product.no_manual_available || false
-  }));
 
-  // Fetch user profile
-  const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-    
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching profile:', error);
-      return null;
-    }
-    
-    return data;
-  };
-
-  // Auth functions
-  const login = async (email: string, password: string): Promise<{ error: Error | null }> => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      return { error };
-    } catch (error) {
-      return { error: error as Error };
-    }
-  };
-
-  const signUp = async (email: string, password: string, name: string, customerType?: 'lojista_instalador' | 'distribuidor_representante' | 'usuario_final', whatsapp?: string, city?: string, state?: string): Promise<{ error: Error | null }> => {
-    try {
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            name: name
-          }
-        }
-      });
-
-      // Create profile manually if user is created
-      if (data.user && !error) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            user_id: data.user.id,
-            name: name,
-            email: email,
-            role: 'Cliente',
-            customer_type: customerType || 'usuario_final',
-            whatsapp: whatsapp || null,
-            city: city || null,
-            state: state || null
-          });
-        
-        if (profileError) {
-          console.error('Error creating profile:', profileError);
-        }
-      }
-
-      return { error };
-    } catch (error) {
-      return { error: error as Error };
-    }
-  };
-
-  const resetPassword = async (email: string): Promise<{ error: Error | null }> => {
-    try {
-      const redirectUrl = `${window.location.origin}/reset-password`;
-      
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl
-      });
-      
-      return { error };
-    } catch (error) {
-      return { error: error as Error };
-    }
-  };
-
-  const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-  };
-
-  // User management (admin only)
-  const fetchAllProfiles = async (): Promise<Profile[]> => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data || [];
-  };
-
-  const updateUserRole = async (userId: string, role: 'ADM' | 'Técnico Tromot' | 'Cliente'): Promise<void> => {
-    const { error } = await supabase
-      .from('profiles')
-      .update({ role })
-      .eq('user_id', userId);
-    
-    if (error) throw error;
-  };
-
-  // Profile management
-  const updateProfile = async (data: Partial<Profile>): Promise<void> => {
-    if (!user) throw new Error('User not authenticated');
-    
-    const { error } = await supabase
-      .from('profiles')
-      .update(data)
-      .eq('user_id', user.id);
-    
-    if (error) throw error;
-    
-    // Refresh profile data
-    fetchData();
-  };
-
-  // File upload function
-  const uploadFile = async (bucket: string, path: string, file: File): Promise<string> => {
-    console.log('🔄 Iniciando upload:', { bucket, path, fileSize: file.size, fileType: file.type });
-    
-    if (!user) {
-      console.error('❌ Usuário não autenticado para upload');
-      throw new Error('Usuário não autenticado');
-    }
-
-    // Validação de tamanho de arquivo (10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSize) {
-      console.error('❌ Arquivo muito grande:', file.size, 'bytes');
-      throw new Error('Arquivo muito grande. Máximo permitido: 10MB');
-    }
-    
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .upload(path, file, {
-        cacheControl: '3600',
-        upsert: true,
-        contentType: file.type
-      });
-    
-    if (error) {
-      console.error('❌ Erro no upload para storage:', error);
-      throw new Error(`Falha no upload: ${error.message}`);
-    }
-    
-    const { data: { publicUrl } } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(data.path);
-    
-    console.log('✅ Upload concluído com sucesso:', publicUrl);
-    return publicUrl;
-  };
-
-  // CRUD Functions for Products
-  const createProduct = async (data: ProductInsert): Promise<Product> => {
-    const { data: product, error } = await supabase
-      .from('products')
-      .insert(data)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    setProducts(prev => [...prev, product]);
-    return product;
-  };
-
-  const updateProduct = async (id: string, data: Partial<ProductInsert>): Promise<Product> => {
-    const { data: product, error } = await supabase
-      .from('products')
-      .update(data)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    setProducts(prev => prev.map(p => p.id === id ? product : p));
-    return product;
-  };
-
-  const deleteProduct = async (id: string): Promise<void> => {
-    const { error } = await supabase
-      .from('products')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-    
-    setProducts(prev => prev.filter(p => p.id !== id));
-  };
-
-  // CRUD Functions for Banners
-  const createBanner = async (data: BannerInsert): Promise<Banner> => {
-    const { data: banner, error } = await supabase
-      .from('banners')
-      .insert(data)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    setBanners(prev => [...prev, banner]);
-    return banner;
-  };
-
-  const updateBanner = async (id: string, data: Partial<BannerInsert>): Promise<Banner> => {
-    const { data: banner, error } = await supabase
-      .from('banners')
-      .update(data)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    setBanners(prev => prev.map(b => b.id === id ? banner : b));
-    return banner;
-  };
-
-  const deleteBanner = async (id: string): Promise<void> => {
-    const { error } = await supabase
-      .from('banners')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-    
-    setBanners(prev => prev.filter(b => b.id !== id));
-  };
-
-  // CRUD Functions for Advertisements
-  const createAdvertisement = async (data: AdvertisementInsert): Promise<Advertisement> => {
-    const { data: ad, error } = await supabase
-      .from('advertisements')
-      .insert(data)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    setAdvertisements(prev => [...prev, ad]);
-    return ad;
-  };
-
-  const updateAdvertisement = async (id: string, data: Partial<AdvertisementInsert>): Promise<Advertisement> => {
-    const { data: ad, error } = await supabase
-      .from('advertisements')
-      .update(data)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    setAdvertisements(prev => prev.map(a => a.id === id ? ad : a));
-    return ad;
-  };
-
-  const deleteAdvertisement = async (id: string): Promise<void> => {
-    const { error } = await supabase
-      .from('advertisements')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-    
-    setAdvertisements(prev => prev.filter(a => a.id !== id));
-  };
-
-  // CRUD Functions for Vehicles
-  const createVehicle = async (data: VehicleInsert): Promise<Vehicle> => {
-    const { data: vehicle, error } = await supabase
-      .from('vehicles')
-      .insert(data)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    setVehicles(prev => [...prev, vehicle]);
-    return vehicle;
-  };
-
-  const updateVehicle = async (id: string, data: Partial<VehicleInsert>): Promise<Vehicle> => {
-    const { data: vehicle, error } = await supabase
-      .from('vehicles')
-      .update(data)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    setVehicles(prev => prev.map(v => v.id === id ? vehicle : v));
-    return vehicle;
-  };
-
-  const deleteVehicle = async (id: string): Promise<void> => {
-    const { error } = await supabase
-      .from('vehicles')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-    
-    setVehicles(prev => prev.filter(v => v.id !== id));
-  };
-
-  // CRUD Functions for Categories
-  const createCategory = async (data: CategoryInsert): Promise<Category> => {
-    const { data: category, error } = await supabase
-      .from('categories')
-      .insert(data)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    setCategories(prev => [...prev, category]);
-    return category;
-  };
-
-  const updateCategory = async (id: string, data: Partial<CategoryInsert>): Promise<Category> => {
-    const { data: category, error } = await supabase
-      .from('categories')
-      .update(data)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    setCategories(prev => prev.map(c => c.id === id ? category : c));
-    return category;
-  };
-
-  const deleteCategory = async (id: string): Promise<void> => {
-    const { error } = await supabase
-      .from('categories')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-    
-    setCategories(prev => prev.filter(c => c.id !== id));
-  };
-
-  // CRUD Functions for Distributors (Admin only)
-  const createDistributor = async (data: DistributorInsert): Promise<Distributor> => {
-    const { data: distributor, error } = await supabase
-      .from('distributors')
-      .insert(data)
-      .select()
-      .single();
-
-    if (error) throw error;
-    
-    // Refresh distributors list after creating
-    await fetchData();
-    return distributor;
-  };
-
-  const updateDistributor = async (id: string, data: Partial<DistributorInsert>): Promise<Distributor> => {
-    const { data: distributor, error } = await supabase
-      .from('distributors')
-      .update(data)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    
-    // Refresh distributors list after updating
-    await fetchData();
-    return distributor;
-  };
-
-  const deleteDistributor = async (id: string): Promise<void> => {
-    const { error } = await supabase
-      .from('distributors')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-    
-    // Refresh distributors list after deleting
-    await fetchData();
-  };
-
-  // Function to moderate posts
-  const moderatePost = async (id: string, status: 'approved' | 'rejected'): Promise<void> => {
-    const { error } = await supabase
-      .from('posts')
-      .update({ status })
-      .eq('id', id);
-    
-    if (error) throw error;
-    
-    // Update local state for legacy posts
-    setPosts(prev => prev.map(post => 
-      post.id === id ? { ...post, status } : post
-    ));
-  };
-
-  // Function to find product by barcode
-  const findProductByBarcode = async (barcode: string): Promise<LegacyProduct | null> => {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('barcode_ean', barcode)
-        .eq('status', 'active')
-        .single();
-
-      if (error || !data) {
-        return null;
-      }
-
-      return {
-        id: data.id,
-        name: data.name,
-        code: data.code,
-        category: data.category,
-        compatibility: parseCompatibility(data.compatibility),
-        manual_url: data.manual_url || undefined,
-        manual_type: (data.manual_type as 'pdf' | 'image') || undefined,
-        video_url: data.video_url || undefined,
-        rating_average: data.rating_average || 0,
-        rating_count: data.rating_count || 0,
-        image_url: data.image_url || '',
-        description: data.description || '',
-        status: data.status === 'active' ? 'active' : 'inactive',
-        out_of_production: data.out_of_production || false,
-        no_manual_available: data.no_manual_available || false
-      };
-    } catch (error) {
-      console.error('Error finding product by barcode:', error);
-      return null;
-    }
-  };
-  
-
-  // Editable content functions
-  const fetchEditableContent = React.useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('editable_content')
-        .select('*');
-      
-      if (error) {
-        console.error('Error fetching editable content:', error);
-        return;
-      }
-      
-      setEditableContent(data || []);
-    } catch (error) {
-      console.error('Error fetching editable content:', error);
-    }
-  }, []);
-
-  const updateEditableContent = React.useCallback(async (
-    section: string, 
-    content: { title?: string; subtitle?: string; description?: string }
-  ): Promise<boolean> => {
-    if (!user || profile?.role !== 'ADM') return false;
-    
-    try {
-      const { data, error } = await supabase
-        .from('editable_content')
-        .upsert({
-          section,
-          title: content.title,
-          subtitle: content.subtitle,
-          description: content.description
-        }, {
-          onConflict: 'section'
-        })
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error updating editable content:', error);
-        return false;
-      }
-      
-      // Update local state
-      setEditableContent(prev => {
-        const index = prev.findIndex(item => item.section === section);
-        if (index >= 0) {
-          const updated = [...prev];
-          updated[index] = data;
-          return updated;
-        } else {
-          return [...prev, data];
-        }
-      });
-      
-      return true;
-    } catch (error) {
-      console.error('Error updating editable content:', error);
-      return false;
-    }
-  }, [user, profile]);
-
-  const updateSectionVisibility = React.useCallback(async (
-    section: string, 
-    visible: boolean
-  ): Promise<boolean> => {
-    if (!user || profile?.role !== 'ADM') return false;
-    
-    try {
-      // Usar upsert para inserir se não existe ou atualizar se existe
-      const { data, error } = await supabase
-        .from('editable_content')
-        .upsert(
-          { 
-            section, 
-            visible,
-            title: section,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          },
-          { 
-            onConflict: 'section',
-            ignoreDuplicates: false 
-          }
-        )
-        .select();
-      
-      if (error) {
-        console.error('Error updating section visibility:', error);
-        return false;
-      }
-      
-      // Update local state
-      setEditableContent(prev => {
-        const existingIndex = prev.findIndex(item => item.section === section);
-        if (existingIndex >= 0) {
-          // Atualizar item existente
-          return prev.map(item => 
-            item.section === section 
-              ? { ...item, visible }
-              : item
-          );
-        } else {
-          // Adicionar novo item
-          return [...prev, { 
-            section, 
-            visible, 
-            title: section,
-            id: data?.[0]?.id,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }];
-        }
-      });
-      
-      return true;
-    } catch (error) {
-      console.error('Error updating section visibility:', error);
-      return false;
-    }
-  }, [user, profile]);
-
-  const getEditableContent = React.useCallback((section: string) => {
-    return editableContent.find(item => item.section === section);
-  }, [editableContent]);
-
-  // Fetch all data
-  const fetchData = async () => {
-    try {
-      const [
-        { data: productsData },
-        { data: bannersData },
-        { data: advertisementsData },
-        { data: vehiclesData },
-        { data: categoriesData },
-        distributorsPublicData
-      ] = await Promise.all([
-        supabase.from('products').select('*'),
-        supabase.from('banners').select('*'),
-        supabase.from('advertisements').select('*'),
-        supabase.from('vehicles').select('*'),
-        supabase.from('categories').select('*'),
-        fetchDistributorsPublic()
-      ]);
-
-      if (productsData) setProducts(productsData);
-      if (bannersData) setBanners(bannersData);
-      if (advertisementsData) setAdvertisements(advertisementsData);
-      if (vehiclesData) setVehicles(vehiclesData);
-      if (categoriesData) setCategories(categoriesData);
-      if (distributorsPublicData) setDistributors(distributorsPublicData);
-      
-      // Also fetch editable content
-      await fetchEditableContent();
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-
-  // Legacy functions for backward compatibility
-  const likePost = (postId: string) => {
-    setPosts(prevPosts => 
-      prevPosts.map(post => 
-        post.id === postId 
-          ? { ...post, likes_count: post.likes_count + 1, liked_by_user: true }
-          : post
-      )
-    );
-  };
-
-  const reportPost = (postId: string) => {
-    setPosts(prevPosts => 
-      prevPosts.map(post => 
-        post.id === postId 
-          ? { ...post, reports_count: (post.reports_count || 0) + 1 }
-          : post
-      )
-    );
-  };
-
-  const submitRating = (productId: string, rating: number, comment: string) => {
-    if (!profile) return;
-    
-    const newRating: LegacyRating = {
-      id: Math.random().toString(36).substr(2, 9),
-      product_id: productId,
-      author_id: profile.id,
-      author_name: profile.name,
-      rating,
-      comment,
-      created_at: new Date().toISOString(),
-    };
-    
-    setRatings(prev => [newRating, ...prev]);
-  };
-
-  const submitQuestion = (productId: string, question: string) => {
-    if (!profile) return;
-    
-    const newQuestion: LegacyQuestion = {
-      id: Math.random().toString(36).substr(2, 9),
-      product_id: productId,
-      author_id: profile.id,
-      author_name: profile.name,
-      question,
-      created_at: new Date().toISOString(),
-    };
-    
-    setQuestions(prev => [newQuestion, ...prev]);
-  };
-
-  const answerQuestion = (questionId: string, answer: string) => {
-    if (!profile) return;
-    
-    setQuestions(prevQuestions => 
-      prevQuestions.map(question => 
-        question.id === questionId 
-          ? { ...question, answer, answer_by: profile.name, answered_at: new Date().toISOString() }
-          : question
-      )
-    );
-  };
-
-  const getActiveAd = (slot: 'home_hero' | 'product_banner' | 'feed_sponsored', productId?: string, productCategory?: string): Advertisement | null => {
-    const now = new Date();
-    const activeAds = advertisements.filter(ad => {
-      const startDate = new Date(ad.start_date);
-      const endDate = new Date(ad.end_date);
-      const isTimeValid = ad.status === 'active' && 
-                         ad.slot === slot &&
-                         now >= startDate && 
-                         now <= endDate;
-      
-      if (!isTimeValid) return false;
-      
-      // Filtrar por tipo de segmentação
-      if (ad.target_type === 'all') {
-        return true;
-      } else if (ad.target_type === 'category' && productCategory && ad.target_category) {
-        return productCategory === ad.target_category;
-      } else if (ad.target_type === 'products' && productId && ad.target_products) {
-        const targetProducts = Array.isArray(ad.target_products) ? ad.target_products : [];
-        return targetProducts.includes(productId);
-      }
-      
-      return false;
-    });
-    
-    return activeAds[0] || null;
-  };
-
-  const getAdStats = (adId?: string): AdStats[] => {
-    // Mock data for now
-    return [];
-  };
-
-  // Analytics and dashboard functions
-  const getDashboardStatsReal = async (): Promise<DashboardStats> => {
+  // Analytics and dashboard functions - DEFINED FIRST
+  const getDashboardStatsReal = React.useCallback(async (): Promise<DashboardStats> => {
     try {
       const today = new Date();
       const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -1087,10 +347,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         avg_rating: 0
       };
     }
-  };
+  }, []);
 
   // Get analytics data for charts
-  const getAnalyticsChartData = async (days: number = 7) => {
+  const getAnalyticsChartData = React.useCallback(async (days: number = 7) => {
     try {
       const endDate = new Date();
       const startDate = new Date();
@@ -1141,21 +401,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error fetching analytics chart data:', error);
       return [];
     }
-  };
-
-  const getDashboardStats = (): DashboardStats => {
-    return {
-      dau: 147,
-      mau: 2834,
-      manual_views_today: 89,
-      posts_today: 0,
-      likes_today: 0,
-      avg_rating: 4.2,
-    };
-  };
+  }, []);
 
   // Get category distribution
-  const getCategoryDistribution = async () => {
+  const getCategoryDistribution = React.useCallback(async () => {
     try {
       const { data } = await supabase
         .from('products')
@@ -1177,9 +426,22 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error fetching category distribution:', error);
       return [];
     }
-  };
+  }, []);
 
-  const trackEvent = async (event: Omit<LegacyAnalyticsEvent, 'id' | 'timestamp'>) => {
+  // Legacy getDashboardStats for compatibility
+  const getDashboardStats = React.useCallback((): DashboardStats => {
+    return {
+      dau: 147,
+      mau: 2834,
+      manual_views_today: 89,
+      posts_today: 0,
+      likes_today: 0,
+      avg_rating: 4.2,
+    };
+  }, []);
+
+  // Track event function
+  const trackEvent = React.useCallback(async (event: Omit<LegacyAnalyticsEvent, 'id' | 'timestamp'>) => {
     try {
       const { error } = await supabase
         .from('analytics_events')
@@ -1197,10 +459,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Error tracking event:', error);
     }
-  };
+  }, [user]);
 
   // Ad impression tracking
-  const trackAdImpression = async (adId: string) => {
+  const trackAdImpression = React.useCallback(async (adId: string) => {
     try {
       // Get current count and increment
       const { data: ad } = await supabase
@@ -1230,10 +492,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Error tracking ad impression:', error);
     }
-  };
+  }, [trackEvent]);
 
   // Ad click tracking
-  const trackAdClick = async (adId: string) => {
+  const trackAdClick = React.useCallback(async (adId: string) => {
     try {
       // Get current count and increment
       const { data: ad } = await supabase
@@ -1263,97 +525,702 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Error tracking ad click:', error);
     }
-  };
+  }, [trackEvent]);
 
-  // Legacy currentUser for backward compatibility - FIXED to use auth user ID
-  const currentUser: LegacyUser | null = profile && user ? {
-    id: user.id, // CRITICAL FIX: Use auth user ID instead of profile.id for RLS compatibility
-    name: profile.name,
-    email: profile.email,
-    phone: profile.phone || undefined,
-    role: profile.role,
-    avatar: profile.avatar_url || undefined
-  } : null;
+  // Auth functions
+  const login = React.useCallback(async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-  // Auth state management
-  React.useEffect(() => {
-    console.log('🚀 Inicializando AppContext...');
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('🔐 Auth state change:', event, session?.user?.email);
-        
-        // Only synchronous state updates here to avoid deadlock
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          console.log('👤 Usuário logado, buscando perfil...');
-          // Defer Supabase calls with setTimeout to avoid deadlock
-          setTimeout(async () => {
-            try {
-              // Fetch user profile
-              let { data: profileData } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('user_id', session.user.id)
-                .single();
-              
-              // If profile doesn't exist, create one
-              if (!profileData) {
-                const { data: newProfile, error: createError } = await supabase
-                  .from('profiles')
-                  .insert({
-                    user_id: session.user.id,
-                    name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Usuário',
-                    email: session.user.email || '',
-                    role: session.user.email === 'eduardo@tromot.com.br' ? 'ADM' : 'Cliente'
-                  })
-                  .select()
-                  .single();
-                
-                if (createError) {
-                  console.error('Error creating profile:', createError);
-                } else {
-                  profileData = newProfile;
-                }
-              }
-              
-              setProfile(profileData);
-              console.log('✅ Perfil carregado:', profileData?.name);
-              
-              // Fetch app data after profile is loaded
-              console.log('📊 Buscando dados da aplicação...');
-              await fetchData();
-              console.log('✅ Dados carregados, app pronto!');
-              setLoading(false);
-            } catch (error) {
-              console.error('❌ Erro ao carregar perfil/dados:', error);
-              setLoading(false);
-            }
-          }, 0);
-        } else {
-          console.log('🚪 Usuário não logado');
-          setProfile(null);
-          setProducts([]);
-          setBanners([]);
-          setAdvertisements([]);
-          setVehicles([]);
-          setCategories([]);
-          setDistributors([]);
-          setLoading(false);
-        }
+      if (error) {
+        return { error };
       }
+
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  }, []);
+
+  const signUp = React.useCallback(async (
+    email: string, 
+    password: string, 
+    name: string, 
+    customerType?: 'lojista_instalador' | 'distribuidor_representante' | 'usuario_final',
+    whatsapp?: string,
+    city?: string,
+    state?: string
+  ) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            customer_type: customerType,
+            whatsapp,
+            city,
+            state
+          }
+        }
+      });
+
+      if (error) {
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  }, []);
+
+  const resetPassword = React.useCallback(async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      
+      if (error) {
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  }, []);
+
+  const logout = React.useCallback(async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  }, []);
+
+  // Profile management
+  const fetchAllProfiles = React.useCallback(async (): Promise<Profile[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching profiles:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching profiles:', error);
+      return [];
+    }
+  }, []);
+
+  const updateUserRole = React.useCallback(async (userId: string, role: 'ADM' | 'Técnico Tromot' | 'Cliente') => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Error updating user role:', error);
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      throw error;
+    }
+  }, []);
+
+  const updateProfile = React.useCallback(async (data: Partial<Profile>) => {
+    try {
+      if (!user) throw new Error('No user logged in');
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(data)
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error updating profile:', error);
+        throw error;
+      }
+
+      // Refresh profile data
+      const { data: updatedProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (updatedProfile) {
+        setProfile(updatedProfile);
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      throw error;
+    }
+  }, [user]);
+
+  // CRUD Functions
+  const createProduct = React.useCallback(async (data: ProductInsert): Promise<Product> => {
+    const { data: product, error } = await supabase
+      .from('products')
+      .insert(data)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    setProducts(prev => [...prev, product]);
+    return product;
+  }, []);
+
+  const updateProduct = React.useCallback(async (id: string, data: Partial<ProductInsert>): Promise<Product> => {
+    const { data: product, error } = await supabase
+      .from('products')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    setProducts(prev => prev.map(p => p.id === id ? product : p));
+    return product;
+  }, []);
+
+  const deleteProduct = React.useCallback(async (id: string): Promise<void> => {
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    
+    setProducts(prev => prev.filter(p => p.id !== id));
+  }, []);
+
+  const createBanner = React.useCallback(async (data: BannerInsert): Promise<Banner> => {
+    const { data: banner, error } = await supabase
+      .from('banners')
+      .insert(data)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    setBanners(prev => [...prev, banner]);
+    return banner;
+  }, []);
+
+  const updateBanner = React.useCallback(async (id: string, data: Partial<BannerInsert>): Promise<Banner> => {
+    const { data: banner, error } = await supabase
+      .from('banners')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    setBanners(prev => prev.map(b => b.id === id ? banner : b));
+    return banner;
+  }, []);
+
+  const deleteBanner = React.useCallback(async (id: string): Promise<void> => {
+    const { error } = await supabase
+      .from('banners')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    
+    setBanners(prev => prev.filter(b => b.id !== id));
+  }, []);
+
+  const createAdvertisement = React.useCallback(async (data: AdvertisementInsert): Promise<Advertisement> => {
+    const { data: advertisement, error } = await supabase
+      .from('advertisements')
+      .insert(data)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    setAdvertisements(prev => [...prev, advertisement]);
+    return advertisement;
+  }, []);
+
+  const updateAdvertisement = React.useCallback(async (id: string, data: Partial<AdvertisementInsert>): Promise<Advertisement> => {
+    const { data: advertisement, error } = await supabase
+      .from('advertisements')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    setAdvertisements(prev => prev.map(a => a.id === id ? advertisement : a));
+    return advertisement;
+  }, []);
+
+  const deleteAdvertisement = React.useCallback(async (id: string): Promise<void> => {
+    const { error } = await supabase
+      .from('advertisements')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    
+    setAdvertisements(prev => prev.filter(a => a.id !== id));
+  }, []);
+
+  const createVehicle = React.useCallback(async (data: VehicleInsert): Promise<Vehicle> => {
+    const { data: vehicle, error } = await supabase
+      .from('vehicles')
+      .insert(data)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    setVehicles(prev => [...prev, vehicle]);
+    return vehicle;
+  }, []);
+
+  const updateVehicle = React.useCallback(async (id: string, data: Partial<VehicleInsert>): Promise<Vehicle> => {
+    const { data: vehicle, error } = await supabase
+      .from('vehicles')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    setVehicles(prev => prev.map(v => v.id === id ? vehicle : v));
+    return vehicle;
+  }, []);
+
+  const deleteVehicle = React.useCallback(async (id: string): Promise<void> => {
+    const { error } = await supabase
+      .from('vehicles')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    
+    setVehicles(prev => prev.filter(v => v.id !== id));
+  }, []);
+
+  const createCategory = React.useCallback(async (data: CategoryInsert): Promise<Category> => {
+    const { data: category, error } = await supabase
+      .from('categories')
+      .insert(data)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    setCategories(prev => [...prev, category]);
+    return category;
+  }, []);
+
+  const updateCategory = React.useCallback(async (id: string, data: Partial<CategoryInsert>): Promise<Category> => {
+    const { data: category, error } = await supabase
+      .from('categories')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    setCategories(prev => prev.map(c => c.id === id ? category : c));
+    return category;
+  }, []);
+
+  const deleteCategory = React.useCallback(async (id: string): Promise<void> => {
+    const { error } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    
+    setCategories(prev => prev.filter(c => c.id !== id));
+  }, []);
+
+  const createDistributor = React.useCallback(async (data: DistributorInsert): Promise<Distributor> => {
+    const { data: distributor, error } = await supabase
+      .from('distributors')
+      .insert(data)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    return distributor;
+  }, []);
+
+  const updateDistributor = React.useCallback(async (id: string, data: Partial<DistributorInsert>): Promise<Distributor> => {
+    const { data: distributor, error } = await supabase
+      .from('distributors')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    return distributor;
+  }, []);
+
+  const deleteDistributor = React.useCallback(async (id: string): Promise<void> => {
+    const { error } = await supabase
+      .from('distributors')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }, []);
+
+  // Post moderation
+  const moderatePost = React.useCallback(async (id: string, status: 'approved' | 'rejected') => {
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .update({ status })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error moderating post:', error);
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error moderating post:', error);
+      throw error;
+    }
+  }, []);
+
+  // File upload
+  const uploadFile = React.useCallback(async (bucket: string, path: string, file: File): Promise<string> => {
+    try {
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .upload(path, file);
+
+      if (error) {
+        console.error('Error uploading file:', error);
+        throw error;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(path);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      throw error;
+    }
+  }, []);
+
+  // Legacy functions for backward compatibility
+  const likePost = React.useCallback((postId: string) => {
+    console.log('Legacy likePost called for:', postId);
+  }, []);
+
+  const reportPost = React.useCallback((postId: string) => {
+    console.log('Legacy reportPost called for:', postId);
+  }, []);
+
+  const submitRating = React.useCallback((productId: string, rating: number, comment: string) => {
+    console.log('Legacy submitRating called for:', productId, rating, comment);
+  }, []);
+
+  const submitQuestion = React.useCallback((productId: string, question: string) => {
+    console.log('Legacy submitQuestion called for:', productId, question);
+  }, []);
+
+  const answerQuestion = React.useCallback((questionId: string, answer: string) => {
+    console.log('Legacy answerQuestion called for:', questionId, answer);
+  }, []);
+
+  const getActiveAd = React.useCallback((slot: 'home_hero' | 'product_banner' | 'feed_sponsored', productId?: string, productCategory?: string): Advertisement | null => {
+    const activeAds = advertisements.filter(ad => 
+      ad.status === 'active' && 
+      ad.slot === slot &&
+      (!ad.start_date || new Date(ad.start_date) <= new Date()) &&
+      (!ad.end_date || new Date(ad.end_date) >= new Date())
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    if (activeAds.length === 0) return null;
+
+    // Simple random selection for now
+    return activeAds[Math.floor(Math.random() * activeAds.length)];
+  }, [advertisements]);
+
+  const getAdStats = React.useCallback((adId?: string): AdStats[] => {
+    // Mock data for backward compatibility
+    return [];
+  }, []);
+
+  const findProductByBarcode = React.useCallback(async (barcode: string): Promise<LegacyProduct | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('barcode', barcode)
+        .single();
+
+      if (error || !data) return null;
+
+      // Convert to legacy format
+      return {
+        id: data.id,
+        name: data.name,
+        code: data.code || '',
+        category: data.category,
+        compatibility: [], // Would need to fetch from relationships
+        manual_url: data.manual_url,
+        manual_type: data.manual_type as 'pdf' | 'image',
+        video_url: data.video_url,
+        rating_average: data.rating_average || 0,
+        rating_count: data.rating_count || 0,
+        image_url: data.image_url || '',
+        description: data.description || '',
+        status: data.status as 'active' | 'inactive',
+        out_of_production: data.out_of_production,
+        no_manual_available: data.no_manual_available
+      };
+    } catch (error) {
+      console.error('Error finding product by barcode:', error);
+      return null;
+    }
+  }, []);
+
+  // Editable content functions
+  const fetchEditableContent = React.useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('editable_content')
+        .select('*');
+
+      if (error) {
+        console.error('Error fetching editable content:', error);
+        return;
+      }
+
+      setEditableContent(data || []);
+    } catch (error) {
+      console.error('Error fetching editable content:', error);
+    }
+  }, []);
+
+  const updateEditableContent = React.useCallback(async (section: string, content: { title?: string; subtitle?: string; description?: string }): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('editable_content')
+        .upsert({
+          section,
+          content
+        });
+
+      if (error) {
+        console.error('Error updating editable content:', error);
+        return false;
+      }
+
+      await fetchEditableContent();
+      return true;
+    } catch (error) {
+      console.error('Error updating editable content:', error);
+      return false;
+    }
+  }, [fetchEditableContent]);
+
+  const updateSectionVisibility = React.useCallback(async (section: string, visible: boolean): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('editable_content')
+        .upsert({
+          section,
+          visible
+        });
+
+      if (error) {
+        console.error('Error updating section visibility:', error);
+        return false;
+      }
+
+      await fetchEditableContent();
+      return true;
+    } catch (error) {
+      console.error('Error updating section visibility:', error);
+      return false;
+    }
+  }, [fetchEditableContent]);
+
+  const getEditableContent = React.useCallback((section: string) => {
+    return editableContent.find(content => content.section === section);
+  }, [editableContent]);
+
+  // Fetch all data
+  const fetchData = React.useCallback(async () => {
+    try {
+      setLoading(true);
+
+      // Fetch all data in parallel
+      const [
+        productsResult,
+        bannersResult,
+        advertisementsResult,
+        vehiclesResult,
+        categoriesResult,
+        distributorsResult
+      ] = await Promise.allSettled([
+        supabase.from('products').select('*').eq('status', 'active'),
+        supabase.from('banners').select('*').eq('status', 'active'),
+        supabase.from('advertisements').select('*').eq('status', 'active'),
+        supabase.from('vehicles').select('*'),
+        supabase.from('categories').select('*'),
+        fetchDistributorsPublic()
+      ]);
+
+      if (productsResult.status === 'fulfilled' && productsResult.value.data) {
+        setProducts(productsResult.value.data);
+      }
+
+      if (bannersResult.status === 'fulfilled' && bannersResult.value.data) {
+        setBanners(bannersResult.value.data);
+      }
+
+      if (advertisementsResult.status === 'fulfilled' && advertisementsResult.value.data) {
+        setAdvertisements(advertisementsResult.value.data);
+      }
+
+      if (vehiclesResult.status === 'fulfilled' && vehiclesResult.value.data) {
+        setVehicles(vehiclesResult.value.data);
+      }
+
+      if (categoriesResult.status === 'fulfilled' && categoriesResult.value.data) {
+        setCategories(categoriesResult.value.data);
+      }
+
+      if (distributorsResult.status === 'fulfilled') {
+        setDistributors(distributorsResult.value);
+      }
+
+      await fetchEditableContent();
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchEditableContent]);
+
+  // Initialize auth state
+  React.useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          setSession(session);
+          setUser(session.user);
+          
+          // Fetch user profile
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          
+          if (profile) {
+            setProfile(profile);
+          }
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        // Fetch user profile
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (profile) {
+          setProfile(profile);
+        }
+      } else {
+        setProfile(null);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Fetch data on mount
+  React.useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Legacy computed properties
+  const currentUser: LegacyUser | null = React.useMemo(() => {
+    if (!user || !profile) return null;
+    
+    return {
+      id: user.id,
+      name: profile.name || user.email || '',
+      email: user.email || '',
+      phone: profile.whatsapp,
+      role: profile.role as 'ADM' | 'Técnico Tromot' | 'Cliente' | 'Suporte Tromot',
+      avatar: profile.avatar_url
+    };
+  }, [user, profile]);
+
+  const legacyProducts: LegacyProduct[] = React.useMemo(() => {
+    return products.map(product => ({
+      id: product.id,
+      name: product.name,
+      code: product.code || '',
+      category: product.category,
+      compatibility: [], // Would need to fetch from relationships
+      manual_url: product.manual_url,
+      manual_type: product.manual_type as 'pdf' | 'image',
+      video_url: product.video_url,
+      rating_average: product.rating_average || 0,
+      rating_count: product.rating_count || 0,
+      image_url: product.image_url || '',
+      description: product.description || '',
+      status: product.status as 'active' | 'inactive',
+      out_of_production: product.out_of_production,
+      no_manual_available: product.no_manual_available
+    }));
+  }, [products]);
 
   const value: AppContextType = {
     // New Supabase
@@ -1361,12 +1228,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     session,
     profile,
     loading,
+    login,
     signUp,
     resetPassword,
+    logout,
     fetchAllProfiles,
     updateUserRole,
-    login,
-    logout,
     products,
     banners,
     advertisements,
@@ -1426,17 +1293,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     updateSectionVisibility,
     getEditableContent,
     
+    // Filters
     selectedCategory,
     setSelectedCategory,
     selectedBrand,
     setSelectedBrand,
     searchQuery,
-    setSearchQuery
+    setSearchQuery,
   };
 
-  return (
-    <AppContext.Provider value={value}>
-      {children}
-    </AppContext.Provider>
-  );
+  return React.createElement(AppContext.Provider, { value }, children);
 };
+
+export default AppProvider;
