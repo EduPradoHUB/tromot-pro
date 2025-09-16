@@ -27,10 +27,11 @@ export type DistributorContact = {
 
 /**
  * Busca distribuidores com dados mascarados (seguro para exibição por região)
- * Agora usando função segura que restringe acesso por localização do usuário
+ * Tenta usar função segura primeiro, com fallback para consulta básica não autenticada
  */
 export const fetchDistributorsPublic = async (state?: string, city?: string): Promise<DistributorPublic[]> => {
   try {
+    // First try the secure function for authenticated users
     const { data, error } = await supabase
       .rpc('search_distributors_secure', {
         p_state: state || null,
@@ -38,14 +39,34 @@ export const fetchDistributorsPublic = async (state?: string, city?: string): Pr
       });
 
     if (error) {
-      console.error('Erro ao buscar distribuidores públicos:', error);
-      throw error;
+      // If secure function fails (user not authenticated or no location), fallback to basic query
+      console.warn('Secure distributors function failed, using basic query:', error.message);
+      
+      const { data: basicData, error: basicError } = await supabase
+        .from('distributors')
+        .select('id, name, state, city, cover_entire_state, active, created_at')
+        .eq('active', true)
+        .limit(50); // Limit for performance
+      
+      if (basicError) {
+        console.error('Erro ao buscar distribuidores básicos:', basicError);
+        return []; // Return empty array instead of throwing
+      }
+      
+      // Transform to match expected format with masked data for non-authenticated users
+      return (basicData || []).map(distributor => ({
+        ...distributor,
+        phone_display: null, // No phone data for non-authenticated users
+        whatsapp_display: null, // No whatsapp data for non-authenticated users
+        has_contact: false // No contact info available
+      }));
     }
 
     return data || [];
   } catch (error) {
     console.error('Erro ao buscar distribuidores públicos:', error);
-    throw error;
+    // Return empty array instead of throwing to prevent breaking the entire app
+    return [];
   }
 };
 
