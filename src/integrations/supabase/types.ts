@@ -642,30 +642,7 @@ export type Database = {
       }
     }
     Views: {
-      security_audit_summary: {
-        Row: {
-          created_at: string | null
-          event_type: string | null
-          id: string | null
-          ip_masked: string | null
-          metadata_safe: Json | null
-        }
-        Insert: {
-          created_at?: string | null
-          event_type?: string | null
-          id?: string | null
-          ip_masked?: never
-          metadata_safe?: never
-        }
-        Update: {
-          created_at?: string | null
-          event_type?: string | null
-          id?: string | null
-          ip_masked?: never
-          metadata_safe?: never
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       get_current_user_role: {
