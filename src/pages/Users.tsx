@@ -149,29 +149,36 @@ export default function Users() {
                         {profile.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold">{profile.name}</h3>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-1">
+                        <h3 className="text-lg font-semibold">{profile.name}</h3>
+                        {profile.customer_type && (
+                          <Badge variant="secondary" className="text-xs">
+                            {profile.customer_type === 'lojista_instalador' && 'Lojista/Instalador'}
+                            {profile.customer_type === 'distribuidor_representante' && 'Distribuidor/Representante'}
+                            {profile.customer_type === 'usuario_final' && 'Usuário Final'}
+                          </Badge>
+                        )}
+                      </div>
                       <p className="text-muted-foreground">{profile.email}</p>
-                      {profile.phone && (
-                        <p className="text-sm text-muted-foreground">{profile.phone}</p>
-                      )}
-                      {profile.whatsapp && (
-                        <a 
-                          href={`https://wa.me/${profile.whatsapp.replace(/\D/g, '')}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-green-600 hover:underline"
-                        >
-                          WhatsApp: {profile.whatsapp}
-                        </a>
-                      )}
-                      {profile.customer_type && (
-                        <Badge variant="outline" className="text-xs mt-1">
-                          {profile.customer_type === 'lojista_instalador' && 'Lojista/Instalador'}
-                          {profile.customer_type === 'distribuidor_representante' && 'Distribuidor/Representante'}
-                          {profile.customer_type === 'usuario_final' && 'Usuário Final'}
-                        </Badge>
-                      )}
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {profile.phone && (
+                          <span className="text-sm text-muted-foreground">📞 {profile.phone}</span>
+                        )}
+                        {profile.whatsapp && (
+                          <a 
+                            href={`https://wa.me/${profile.whatsapp.replace(/\D/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-green-600 hover:underline"
+                          >
+                            💬 {profile.whatsapp}
+                          </a>
+                        )}
+                        {profile.city && profile.state && (
+                          <span className="text-sm text-muted-foreground">📍 {profile.city}, {profile.state}</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   
