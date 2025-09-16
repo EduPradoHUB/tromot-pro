@@ -1098,13 +1098,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         } else {
           console.log('🚪 Usuário não logado');
           setProfile(null);
-          setProducts([]);
-          setBanners([]);
-          setAdvertisements([]);
-          setVehicles([]);
-          setCategories([]);
-          setDistributors([]);
-          setLoading(false);
+          
+          // Even for non-authenticated users, load public data (products, vehicles, etc.)
+          console.log('📊 Buscando dados públicos...');
+          fetchData().then(() => {
+            console.log('✅ Dados públicos carregados!');
+          }).catch((error) => {
+            console.error('❌ Erro ao carregar dados públicos:', error);
+          }).finally(() => {
+            setLoading(false);
+          });
         }
       }
     );
