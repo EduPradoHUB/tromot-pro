@@ -1,17 +1,14 @@
-import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
-
-// Component imports
 import { Layout } from "@/components/Layout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { PWAStatusIndicator } from "@/components/PWAStatusIndicator";
 
-// Page imports
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import Product from "./pages/Product";
@@ -26,6 +23,7 @@ import Login from "./pages/Login";
 import PasswordReset from "./pages/PasswordReset";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+
 import InstallApp from "./pages/InstallApp";
 import NotFound from "./pages/NotFound";
 
@@ -41,107 +39,84 @@ function AppContent() {
         <Route path="/reset-password" element={<PasswordReset />} />
         <Route path="/" element={
           <ProtectedRoute>
-            <Layout>
-              <Home />
-            </Layout>
+            <Layout><Home /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/manuais" element={
           <ProtectedRoute>
-            <Layout>
-              <Catalog />
-            </Layout>
+            <Layout><Catalog /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/produto/:id" element={
           <ProtectedRoute>
-            <Layout>
-              <Product />
-            </Layout>
+            <Layout><Product /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/comprar/:id" element={
           <ProtectedRoute>
-            <Layout>
-              <WhereToBuy />
-            </Layout>
+            <Layout><WhereToBuy /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/perfil" element={
           <ProtectedRoute>
-            <Layout>
-              <Profile />
-            </Layout>
+            <Layout><Profile /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/dashboard" element={
           <ProtectedRoute>
-            <Layout>
-              <Dashboard />
-            </Layout>
+            <Layout><Dashboard /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/admin" element={
-          <ProtectedRoute requireAdmin={true}>
-            <Layout>
-              <AdminDashboard />
-            </Layout>
+          <ProtectedRoute requireAdmin>
+            <Layout><AdminDashboard /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/tecnico" element={
           <ProtectedRoute>
-            <Layout>
-              <TechnicianDashboard />
-            </Layout>
+            <Layout><TechnicianDashboard /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/midia" element={
-          <ProtectedRoute requireAdmin={true}>
-            <Layout>
-              <MediaDashboard />
-            </Layout>
+          <ProtectedRoute requireAdmin>
+            <Layout><MediaDashboard /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/usuarios" element={
-          <ProtectedRoute requireAdmin={true}>
-            <Layout>
-              <Users />
-            </Layout>
+          <ProtectedRoute requireAdmin>
+            <Layout><Users /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/termos" element={
           <ProtectedRoute>
-            <Layout>
-              <Terms />
-            </Layout>
+            <Layout><Terms /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/privacidade" element={
           <ProtectedRoute>
-            <Layout>
-              <Privacy />
-            </Layout>
+            <Layout><Privacy /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/instalar" element={<InstallApp />} />
+        
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
 }
 
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AppProvider>
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AppProvider>
+      <TooltipProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
           <AppContent />
         </BrowserRouter>
-      </AppProvider>
-    </QueryClientProvider>
-  );
-}
+      </TooltipProvider>
+    </AppProvider>
+  </QueryClientProvider>
+);
 
 export default App;

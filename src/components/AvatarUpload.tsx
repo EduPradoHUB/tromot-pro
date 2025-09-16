@@ -102,7 +102,7 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
       console.log('📷 Avatar processado:', { name: file.name, size: file.size, type: file.type });
       
       const fileName = `${Date.now()}-${file.name}`;
-      const avatarUrl = await uploadFile(file, 'avatars', fileName);
+      const avatarUrl = await uploadFile('avatars', fileName, file);
       
       console.log('✅ Upload de avatar concluído:', avatarUrl);
       

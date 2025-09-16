@@ -268,7 +268,7 @@ export default function AdminDashboard() {
     setUploadingFile(true);
     try {
       const fileName = `${Date.now()}-${file.name}`;
-      const url = await uploadFile(file, bucket, fileName);
+      const url = await uploadFile(bucket, fileName, file);
       toast({
         title: "Upload realizado",
         description: "Arquivo enviado com sucesso!"

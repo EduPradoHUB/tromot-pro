@@ -1,13 +1,6 @@
-import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-
-// Garantir que React está globalmente disponível
-console.log('🚀 Main iniciando - React disponível:', !!React);
-
-// Disponibilizar React globalmente para bibliotecas que possam precisar
-(window as any).React = React;
 
 // Capturar o evento beforeinstallprompt antes do React carregar
 let deferredPrompt: any = null;
