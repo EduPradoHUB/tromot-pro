@@ -128,7 +128,7 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
 
       // Upload da imagem
       const fileName = `${Date.now()}_${imageFile.name}`;
-      const imageUrl = await uploadFile('posts', fileName, imageFile);
+      const imageUrl = await uploadFile(imageFile, 'posts', fileName);
 
       console.log('✅ Upload de imagem concluído:', imageUrl);
 
