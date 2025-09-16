@@ -3,10 +3,8 @@ import ReactCrop, { centerCrop, makeAspectCrop, type Crop } from 'react-image-cr
 import 'react-image-crop/dist/ReactCrop.css';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera, Upload } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
-import { useToast } from '@/hooks/use-toast';
 
 interface AvatarUploadProps {
   currentAvatar?: string;
@@ -36,7 +34,6 @@ function centerAspectCrop(
 
 export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: AvatarUploadProps) {
   const { uploadFile } = useApp();
-  const { toast } = useToast();
   const [open, setOpen] = React.useState(false);
   const [imgSrc, setImgSrc] = React.useState('');
   const [crop, setCrop] = React.useState<Crop>();
@@ -83,11 +80,7 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
 
   const uploadCroppedImage = async () => {
     if (!completedCrop || !previewCanvasRef.current || !imgRef.current) {
-      toast({
-        title: "Erro",
-        description: "Por favor, selecione uma área da imagem.",
-        variant: "destructive"
-      });
+      alert("Por favor, selecione uma área da imagem.");
       return;
     }
 
@@ -110,10 +103,7 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
       setOpen(false);
       setImgSrc('');
       
-      toast({
-        title: "Sucesso",
-        description: "Foto de perfil atualizada com sucesso!"
-      });
+      alert("Foto de perfil atualizada com sucesso!");
     } catch (error: any) {
       console.error('❌ Erro no upload de avatar:', error);
       
@@ -127,11 +117,7 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
         errorMessage = "Falha no upload. Verifique sua conexão e tente novamente.";
       }
 
-      toast({
-        title: "Erro",
-        description: errorMessage,
-        variant: "destructive"
-      });
+      alert(`Erro: ${errorMessage}`);
     } finally {
       setUploading(false);
     }
@@ -155,12 +141,18 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
   return (
     <>
       <div className="flex flex-col items-center space-y-4">
-        <Avatar className="h-24 w-24 cursor-pointer" onClick={() => setOpen(true)}>
-          <AvatarImage src={currentAvatar} />
-          <AvatarFallback className="text-2xl">
-            {userName.charAt(0)}
-          </AvatarFallback>
-        </Avatar>
+        <div 
+          className="h-24 w-24 rounded-full bg-muted flex items-center justify-center cursor-pointer overflow-hidden border-2 border-border"
+          onClick={() => setOpen(true)}
+        >
+          {currentAvatar ? (
+            <img src={currentAvatar} alt={userName} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-2xl font-semibold text-muted-foreground">
+              {userName.charAt(0)}
+            </span>
+          )}
+        </div>
         
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
