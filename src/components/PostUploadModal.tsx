@@ -1,12 +1,10 @@
 import * as React from 'react';
 import { Camera, X, Upload, Image } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useApp } from '@/contexts/AppContext';
-import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 interface PostUploadModalProps {
@@ -17,7 +15,6 @@ interface PostUploadModalProps {
 
 export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalProps) {
   const { uploadFile, currentUser } = useApp();
-  const { toast } = useToast();
   const [loading, setLoading] = React.useState(false);
   const [imageFile, setImageFile] = React.useState<File | null>(null);
   const [imagePreview, setImagePreview] = React.useState<string | null>(null);
@@ -36,32 +33,20 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
     if (file) {
       // Validação de tipo de arquivo
       if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Tipo de arquivo inválido",
-          description: "Por favor, selecione apenas arquivos de imagem.",
-          variant: "destructive",
-        });
+        alert("Tipo de arquivo inválido. Por favor, selecione apenas arquivos de imagem.");
         return;
       }
 
       // Validação de tamanho
       const maxSize = 10 * 1024 * 1024; // 10MB
       if (file.size > maxSize) {
-        toast({
-          title: "Arquivo muito grande",
-          description: "A imagem deve ter no máximo 10MB.",
-          variant: "destructive",
-        });
+        alert("Arquivo muito grande. A imagem deve ter no máximo 10MB.");
         return;
       }
 
       // Aviso para formatos problemáticos
       if (file.type === 'image/heic' || file.type === 'image/heif') {
-        toast({
-          title: "Formato de imagem",
-          description: "Imagens HEIC podem ter problemas. Considere converter para JPG.",
-          variant: "default",
-        });
+        alert("Imagens HEIC podem ter problemas. Considere converter para JPG.");
       }
 
       console.log('📷 Imagem selecionada:', { name: file.name, size: file.size, type: file.type });
@@ -88,31 +73,19 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
     
     if (!imageFile || !formData.caption.trim() || !formData.vehicleBrand.trim() || 
         !formData.vehicleModel.trim() || !formData.vehicleYear.trim()) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Por favor, preencha todos os campos e selecione uma foto.",
-        variant: "destructive",
-      });
+      alert("Campos obrigatórios. Por favor, preencha todos os campos e selecione uma foto.");
       return;
     }
 
     if (!currentUser) {
-      toast({
-        title: "Erro",
-        description: "Você precisa estar logado para compartilhar uma instalação.",
-        variant: "destructive",
-      });
+      alert("Erro. Você precisa estar logado para compartilhar uma instalação.");
       return;
     }
 
     // Validação adicional de tamanho de arquivo
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (imageFile.size > maxSize) {
-      toast({
-        title: "Arquivo muito grande",
-        description: "A imagem deve ter no máximo 10MB.",
-        variant: "destructive",
-      });
+      alert("Arquivo muito grande. A imagem deve ter no máximo 10MB.");
       return;
     }
 
@@ -156,10 +129,7 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
 
       console.log('✅ Post criado com sucesso:', data);
 
-      toast({
-        title: "Sucesso!",
-        description: "Sua instalação foi enviada para análise. Aguarde a aprovação do administrador.",
-      });
+      alert("Sucesso! Sua instalação foi enviada para análise. Aguarde a aprovação do administrador.");
       
       // Atualizar dados após criação bem-sucedida
       window.location.reload();
@@ -179,11 +149,7 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
         errorMessage = "Falha no upload da imagem. Verifique sua conexão e tente novamente.";
       }
 
-      toast({
-        title: "Erro",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      alert("Erro: " + errorMessage);
     } finally {
       setLoading(false);
     }
@@ -206,149 +172,157 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Camera className="h-5 w-5" />
-            Compartilhar Instalação
-          </DialogTitle>
-          <DialogDescription>
-            Compartilhe sua experiência de instalação com a comunidade
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div 
+            className="fixed inset-0 bg-black/50" 
+            onClick={handleClose}
+          />
+          <div className="relative bg-background rounded-2xl shadow-lg border max-w-md mx-4 w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Camera className="h-5 w-5" />
+                <h2 className="text-lg font-semibold">Compartilhar Instalação</h2>
+              </div>
+              <p className="text-muted-foreground mb-6 text-sm">
+                Compartilhe sua experiência de instalação com a comunidade
+              </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Upload de Foto */}
-          <div className="space-y-2">
-            <Label>Foto da Instalação *</Label>
-            {!imagePreview ? (
-              <div className="space-y-3">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Upload de Foto */}
+                <div className="space-y-2">
+                  <Label>Foto da Instalação *</Label>
+                  {!imagePreview ? (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-24 flex flex-col gap-2"
+                          onClick={openCamera}
+                        >
+                          <Camera className="h-6 w-6" />
+                          <span className="text-sm">Usar Câmera</span>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-24 flex flex-col gap-2"
+                          onClick={openGallery}
+                        >
+                          <Image className="h-6 w-6" />
+                          <span className="text-sm">Da Galeria</span>
+                        </Button>
+                      </div>
+                      
+                      {/* Hidden inputs */}
+                      <input
+                        ref={cameraInputRef}
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={handleImageChange}
+                      />
+                      <input
+                        ref={galleryInputRef}
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2"
+                        onClick={() => {
+                          setImageFile(null);
+                          setImagePreview(null);
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Descrição */}
+                <div className="space-y-2">
+                  <Label htmlFor="caption">Descrição da Instalação *</Label>
+                  <Textarea
+                    id="caption"
+                    placeholder="Descreva como foi a instalação, dificuldades encontradas, dicas importantes..."
+                    value={formData.caption}
+                    onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
+                    className="min-h-[80px]"
+                  />
+                </div>
+
+                {/* Dados do Veículo */}
                 <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="vehicleBrand">Marca *</Label>
+                    <Input
+                      id="vehicleBrand"
+                      placeholder="Ex: Honda"
+                      value={formData.vehicleBrand}
+                      onChange={(e) => setFormData({ ...formData, vehicleBrand: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="vehicleModel">Modelo *</Label>
+                    <Input
+                      id="vehicleModel"
+                      placeholder="Ex: Civic"
+                      value={formData.vehicleModel}
+                      onChange={(e) => setFormData({ ...formData, vehicleModel: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="vehicleYear">Ano *</Label>
+                  <Input
+                    id="vehicleYear"
+                    placeholder="Ex: 2023"
+                    value={formData.vehicleYear}
+                    onChange={(e) => setFormData({ ...formData, vehicleYear: e.target.value })}
+                  />
+                </div>
+
+                <div className="flex gap-2 pt-2">
                   <Button
                     type="button"
                     variant="outline"
-                    className="h-24 flex flex-col gap-2"
-                    onClick={openCamera}
+                    className="flex-1"
+                    onClick={handleClose}
+                    disabled={loading}
                   >
-                    <Camera className="h-6 w-6" />
-                    <span className="text-sm">Usar Câmera</span>
+                    Cancelar
                   </Button>
                   <Button
-                    type="button"
-                    variant="outline"
-                    className="h-24 flex flex-col gap-2"
-                    onClick={openGallery}
+                    type="submit"
+                    className="flex-1"
+                    disabled={loading}
                   >
-                    <Image className="h-6 w-6" />
-                    <span className="text-sm">Da Galeria</span>
+                    {loading ? 'Enviando...' : 'Compartilhar'}
                   </Button>
                 </div>
-                
-                {/* Hidden inputs */}
-                <input
-                  ref={cameraInputRef}
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={handleImageChange}
-                />
-                <input
-                  ref={galleryInputRef}
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-              </div>
-            ) : (
-              <div className="relative">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full h-48 object-cover rounded-lg"
-                />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  className="absolute top-2 right-2"
-                  onClick={() => {
-                    setImageFile(null);
-                    setImagePreview(null);
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {/* Descrição */}
-          <div className="space-y-2">
-            <Label htmlFor="caption">Descrição da Instalação *</Label>
-            <Textarea
-              id="caption"
-              placeholder="Descreva como foi a instalação, dificuldades encontradas, dicas importantes..."
-              value={formData.caption}
-              onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
-              className="min-h-[80px]"
-            />
-          </div>
-
-          {/* Dados do Veículo */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="vehicleBrand">Marca *</Label>
-              <Input
-                id="vehicleBrand"
-                placeholder="Ex: Honda"
-                value={formData.vehicleBrand}
-                onChange={(e) => setFormData({ ...formData, vehicleBrand: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="vehicleModel">Modelo *</Label>
-              <Input
-                id="vehicleModel"
-                placeholder="Ex: Civic"
-                value={formData.vehicleModel}
-                onChange={(e) => setFormData({ ...formData, vehicleModel: e.target.value })}
-              />
+              </form>
             </div>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="vehicleYear">Ano *</Label>
-            <Input
-              id="vehicleYear"
-              placeholder="Ex: 2023"
-              value={formData.vehicleYear}
-              onChange={(e) => setFormData({ ...formData, vehicleYear: e.target.value })}
-            />
-          </div>
-
-          <div className="flex gap-2 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="flex-1"
-              onClick={handleClose}
-              disabled={loading}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              className="flex-1"
-              disabled={loading}
-            >
-              {loading ? 'Enviando...' : 'Compartilhar'}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+      )}
+    </>
   );
 }

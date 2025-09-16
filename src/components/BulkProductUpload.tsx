@@ -3,13 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useApp } from '@/contexts/AppContext';
-import { useToast } from '@/hooks/use-toast';
+// Removed useToast to avoid React hooks conflicts
 import { Upload, Download, CheckCircle, XCircle, AlertCircle, FileText } from 'lucide-react';
 import { parseFile, validateProductData, generateCSVTemplate, generateExcelTemplate } from '@/lib/csvUtils';
 
@@ -38,7 +36,7 @@ interface ImportResult {
 
 export const BulkProductUpload: React.FC = () => {
   const { createProduct, updateProduct, products, categories, createCategory } = useApp();
-  const { toast } = useToast();
+  // Removed toast to avoid React hooks conflicts
   
   const [file, setFile] = React.useState<File | null>(null);
   const [parsedData, setParsedData] = React.useState<ParsedProduct[]>([]);
@@ -60,11 +58,7 @@ export const BulkProductUpload: React.FC = () => {
         setFile(selectedFile);
         parseFileData(selectedFile);
       } else {
-        toast({
-          title: "Arquivo inválido",
-          description: "Por favor, selecione um arquivo CSV ou Excel (.xlsx/.xls).",
-          variant: "destructive"
-        });
+        alert("Arquivo inválido. Por favor, selecione um arquivo CSV ou Excel (.xlsx/.xls).");
       }
     }
   };
@@ -76,11 +70,7 @@ export const BulkProductUpload: React.FC = () => {
       setParsedData(validated);
       setShowPreview(true);
     } catch (error) {
-      toast({
-        title: "Erro ao processar arquivo",
-        description: "Não foi possível processar o arquivo.",
-        variant: "destructive"
-      });
+      alert("Erro ao processar arquivo. Não foi possível processar o arquivo.");
     }
   };
 
@@ -104,11 +94,7 @@ export const BulkProductUpload: React.FC = () => {
   const handleImport = async () => {
     const validProducts = parsedData.filter(p => p.isValid);
     if (validProducts.length === 0) {
-      toast({
-        title: "Nenhum produto válido",
-        description: "Corrija os erros antes de importar.",
-        variant: "destructive"
-      });
+      alert("Nenhum produto válido. Corrija os erros antes de importar.");
       return;
     }
 
@@ -195,11 +181,7 @@ export const BulkProductUpload: React.FC = () => {
     setImporting(false);
     setShowPreview(false);
     
-    toast({
-      title: "Importação concluída",
-      description: `${result.success} produtos processados com sucesso, ${result.errors} erros.`,
-      variant: result.errors === 0 ? "default" : "destructive"
-    });
+    alert(`Importação concluída: ${result.success} produtos processados com sucesso, ${result.errors} erros.`);
   };
 
   const getValidationIcon = (isValid: boolean, errors: string[]) => {
@@ -272,16 +254,15 @@ export const BulkProductUpload: React.FC = () => {
                 <div className="flex items-center gap-4">
                   <div>
                     <Label htmlFor="importMode">Modo de Importação</Label>
-                    <Select value={importMode} onValueChange={(value: any) => setImportMode(value)}>
-                      <SelectTrigger className="w-48">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="create">Apenas Criar Novos</SelectItem>
-                        <SelectItem value="update_code">Atualizar por Código</SelectItem>
-                        <SelectItem value="update_ean">Atualizar por EAN</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <select 
+                      value={importMode} 
+                      onChange={(e) => setImportMode(e.target.value as any)}
+                      className="flex h-10 w-48 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    >
+                      <option value="create">Apenas Criar Novos</option>
+                      <option value="update_code">Atualizar por Código</option>
+                      <option value="update_ean">Atualizar por EAN</option>
+                    </select>
                   </div>
 
                   <Button
@@ -348,61 +329,67 @@ export const BulkProductUpload: React.FC = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Preview dos Dados</DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Código</TableHead>
-                    <TableHead>EAN</TableHead>
-                    <TableHead>Categoria</TableHead>
-                    <TableHead>Erros</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {parsedData.map((product, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        {getValidationIcon(product.isValid, product.errors)}
-                      </TableCell>
-                      <TableCell className="font-medium">{product.name}</TableCell>
-                      <TableCell>{product.code}</TableCell>
-                      <TableCell>{product.barcode_ean || '-'}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{product.category}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        {product.errors.length > 0 && (
-                          <div className="text-sm text-red-600">
-                            {product.errors.join(', ')}
-                          </div>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+      {showPreview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div 
+            className="fixed inset-0 bg-black/50" 
+            onClick={() => setShowPreview(false)}
+          />
+          <div className="relative bg-background rounded-2xl shadow-lg border max-w-6xl max-h-[80vh] overflow-y-auto mx-4 w-full">
+            <div className="p-6">
+              <h2 className="text-lg font-semibold mb-4">Preview dos Dados</h2>
+              
+              <div className="space-y-4">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Nome</TableHead>
+                        <TableHead>Código</TableHead>
+                        <TableHead>EAN</TableHead>
+                        <TableHead>Categoria</TableHead>
+                        <TableHead>Erros</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {parsedData.map((product, index) => (
+                        <TableRow key={index}>
+                          <TableCell>
+                            {getValidationIcon(product.isValid, product.errors)}
+                          </TableCell>
+                          <TableCell className="font-medium">{product.name}</TableCell>
+                          <TableCell>{product.code}</TableCell>
+                          <TableCell>{product.barcode_ean || '-'}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{product.category}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            {product.errors.length > 0 && (
+                              <div className="text-sm text-red-600">
+                                {product.errors.join(', ')}
+                              </div>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+              
+              <div className="flex gap-2 pt-4">
+                <Button variant="outline" onClick={() => setShowPreview(false)}>
+                  Fechar
+                </Button>
+                <Button onClick={() => setShowPreview(false)}>
+                  Prosseguir com Importação
+                </Button>
+              </div>
             </div>
           </div>
-          
-          <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={() => setShowPreview(false)}>
-              Fechar
-            </Button>
-            <Button onClick={() => setShowPreview(false)}>
-              Prosseguir com Importação
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { X, Download, Smartphone, Chrome, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface PWAInstallDialogProps {
   open: boolean;
@@ -83,94 +82,102 @@ export const PWAInstallDialog = ({ open, onOpenChange, onInstall }: PWAInstallDi
   const instructions = getInstructions();
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-3 bg-gradient-to-br from-tromot-red to-tromot-red/80 rounded-2xl">
-              <Smartphone className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <DialogTitle className="text-xl font-bold text-primary">
-                Instalar TROMOT PRO
-              </DialogTitle>
-              <DialogDescription className="text-muted-foreground">
-                Transforme seu navegador em um app nativo
-              </DialogDescription>
-            </div>
-          </div>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          {/* Benefícios */}
-          <div className="bg-gradient-card rounded-2xl p-4 border border-border/50">
-            <h4 className="font-semibold mb-3 text-primary">Por que instalar?</h4>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-tromot-red rounded-full"></div>
-                <span>Acesso offline</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-tromot-red rounded-full"></div>
-                <span>Mais velocidade</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-tromot-red rounded-full"></div>
-                <span>Notificações push</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-tromot-red rounded-full"></div>
-                <span>Ícone na tela inicial</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Instruções */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              {instructions.icon}
-              <h3 className="font-semibold text-lg">{instructions.title}</h3>
-            </div>
-            
-            <div className="bg-muted/30 rounded-2xl p-4 space-y-3">
-              {instructions.steps.map((step, index) => (
-                <div key={index} className="flex gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-tromot-red text-white rounded-full flex items-center justify-center text-xs font-bold">
-                    {index + 1}
-                  </div>
-                  <p className="text-sm leading-relaxed">{step}</p>
+    <>
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div 
+            className="fixed inset-0 bg-black/50" 
+            onClick={() => onOpenChange(false)}
+          />
+          <div className="relative bg-background rounded-2xl shadow-lg border max-w-lg max-h-[90vh] overflow-y-auto mx-4 w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-3 bg-gradient-to-br from-tromot-red to-tromot-red/80 rounded-2xl">
+                  <Smartphone className="w-6 h-6 text-white" />
                 </div>
-              ))}
+                <div>
+                  <h2 className="text-xl font-bold text-primary">
+                    Instalar TROMOT PRO
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Transforme seu navegador em um app nativo
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {/* Benefícios */}
+                <div className="bg-gradient-card rounded-2xl p-4 border border-border/50">
+                  <h4 className="font-semibold mb-3 text-primary">Por que instalar?</h4>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-tromot-red rounded-full"></div>
+                      <span>Acesso offline</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-tromot-red rounded-full"></div>
+                      <span>Mais velocidade</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-tromot-red rounded-full"></div>
+                      <span>Notificações push</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-tromot-red rounded-full"></div>
+                      <span>Ícone na tela inicial</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Instruções */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    {instructions.icon}
+                    <h3 className="font-semibold text-lg">{instructions.title}</h3>
+                  </div>
+                  
+                  <div className="bg-muted/30 rounded-2xl p-4 space-y-3">
+                    {instructions.steps.map((step, index) => (
+                      <div key={index} className="flex gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 bg-tromot-red text-white rounded-full flex items-center justify-center text-xs font-bold">
+                          {index + 1}
+                        </div>
+                        <p className="text-sm leading-relaxed">{step}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Botões */}
+                <div className="flex gap-3 pt-2">
+                  <Button 
+                    onClick={handleInstall} 
+                    className="flex-1 bg-tromot-red hover:bg-tromot-red/90" 
+                    size="lg"
+                    disabled={isInstalling}
+                  >
+                    {isInstalling ? (
+                      <>Instalando...</>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        Tentar Instalação Automática
+                      </>
+                    )}
+                  </Button>
+                  <Button variant="outline" onClick={() => onOpenChange(false)} size="lg">
+                    Fechar
+                  </Button>
+                </div>
+
+                <p className="text-xs text-muted-foreground text-center leading-relaxed">
+                  Se a instalação automática não funcionar, siga as instruções acima para instalar manualmente
+                </p>
+              </div>
             </div>
           </div>
-
-          {/* Botões */}
-          <div className="flex gap-3 pt-2">
-            <Button 
-              onClick={handleInstall} 
-              className="flex-1 bg-tromot-red hover:bg-tromot-red/90" 
-              size="lg"
-              disabled={isInstalling}
-            >
-              {isInstalling ? (
-                <>Instalando...</>
-              ) : (
-                <>
-                  <Download className="w-4 h-4 mr-2" />
-                  Tentar Instalação Automática
-                </>
-              )}
-            </Button>
-            <Button variant="outline" onClick={() => onOpenChange(false)} size="lg">
-              Fechar
-            </Button>
-          </div>
-
-          <p className="text-xs text-muted-foreground text-center leading-relaxed">
-            Se a instalação automática não funcionar, siga as instruções acima para instalar manualmente
-          </p>
         </div>
-      </DialogContent>
-    </Dialog>
+      )}
+    </>
   );
 };
