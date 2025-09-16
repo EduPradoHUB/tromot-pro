@@ -112,12 +112,6 @@ const navigationItems = [
                   {profile?.role === 'ADM' && (
                     <>
                       <Button variant="ghost" size="sm" asChild>
-                        <Link to="/dashboard">
-                          <BarChart3 className="h-4 w-4 mr-1" />
-                          Dashboard
-                        </Link>
-                      </Button>
-                      <Button variant="ghost" size="sm" asChild>
                         <Link to="/midia">
                           <Smartphone className="h-4 w-4 mr-1" />
                           Mídia
