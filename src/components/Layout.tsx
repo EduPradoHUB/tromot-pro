@@ -3,7 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Search, Package, User, LogOut, Menu, BarChart3, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+// Temporarily disable DropdownMenu to fix React hooks conflicts
+// import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApp } from '@/contexts/AppContext';
 import { EditableContent } from '@/components/EditableContent';
 interface LayoutProps {
@@ -93,80 +94,69 @@ const navigationItems = [
 
           {/* User Menu */}
           <div className="flex items-center space-x-4">
-            {profile ? <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={profile.avatar_url} alt={profile.name} />
-                      <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-background border shadow-lg" align="end" forceMount>
-                  <div className="flex items-center justify-start gap-2 p-2">
-                    <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{profile.name}</p>
-                      <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        {profile.email}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {profile.role}
-                      </p>
-                    </div>
-                  </div>
-                  {profile?.role === 'ADM' && <>
-                      <DropdownMenuItem asChild>
-                        <Link to="/dashboard" className="cursor-pointer">
-                          <BarChart3 className="mr-2 h-4 w-4" />
-                          <span>Dashboard</span>
+            {profile ? (
+              <div className="flex items-center space-x-2">
+                {/* User Avatar */}
+                <div className="flex items-center space-x-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={profile.avatar_url} alt={profile.name} />
+                    <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <span className="hidden md:block text-sm font-medium">{profile.name}</span>
+                </div>
+                
+                {/* Quick Actions */}
+                <div className="hidden md:flex items-center space-x-1">
+                  {profile?.role === 'ADM' && (
+                    <>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link to="/dashboard">
+                          <BarChart3 className="h-4 w-4 mr-1" />
+                          Dashboard
                         </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                         <Link to="/midia" className="cursor-pointer">
-                          <Smartphone className="mr-2 h-4 w-4" />
-                          <span>Dashboard de Mídia</span>
+                      </Button>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link to="/midia">
+                          <Smartphone className="h-4 w-4 mr-1" />
+                          Mídia
                         </Link>
-                      </DropdownMenuItem>
-                    </>}
-                  {profile?.role === 'Técnico Tromot' && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/tecnico" className="cursor-pointer">
-                        <Package className="mr-2 h-4 w-4" />
-                        <span>Painel Técnico</span>
-                      </Link>
-                    </DropdownMenuItem>
+                      </Button>
+                    </>
                   )}
-                  <DropdownMenuItem asChild>
-                    <Link to="/perfil" className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Perfil</span>
+                  {profile?.role === 'Técnico Tromot' && (
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link to="/tecnico">
+                        <Package className="h-4 w-4 mr-1" />
+                        Técnico
+                      </Link>
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/perfil">
+                      <User className="h-4 w-4 mr-1" />
+                      Perfil
                     </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sair</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu> : <Button asChild>
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={handleLogout}>
+                    <LogOut className="h-4 w-4 mr-1" />
+                    Sair
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button asChild>
                 <Link to="/login">Entrar</Link>
-              </Button>}
+              </Button>
+            )}
 
-            {/* Mobile Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
+            {/* Mobile Menu Button - Simple Navigation */}
+            <div className="md:hidden">
+              <Button variant="ghost" size="icon" asChild>
+                <Link to="/perfil">
                   <Menu className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-background border shadow-lg" align="end">
-                {navigationItems.map(item => <DropdownMenuItem key={item.path} asChild>
-                    <Link to={item.path} className="cursor-pointer">
-                      <item.icon className="mr-2 h-4 w-4" />
-                      <span>{item.name}</span>
-                    </Link>
-                  </DropdownMenuItem>)}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
