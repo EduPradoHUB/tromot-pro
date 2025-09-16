@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext } from 'react';
+import type { ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
@@ -232,30 +233,33 @@ export const useApp = () => {
   return context;
 };
 
-export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [banners, setBanners] = useState<Banner[]>([]);
-  const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [distributors, setDistributors] = useState<DistributorPublic[]>([]);
+export const AppProvider = ({ children }: { children: ReactNode }) => {
+  console.log('🚀 AppProvider iniciando - React disponível:', !!React);
+  console.log('🚀 React.useState disponível:', !!React.useState);
+  
+  const [user, setUser] = React.useState<User | null>(null);
+  const [session, setSession] = React.useState<Session | null>(null);
+  const [profile, setProfile] = React.useState<Profile | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [products, setProducts] = React.useState<Product[]>([]);
+  const [banners, setBanners] = React.useState<Banner[]>([]);
+  const [advertisements, setAdvertisements] = React.useState<Advertisement[]>([]);
+  const [vehicles, setVehicles] = React.useState<Vehicle[]>([]);
+  const [categories, setCategories] = React.useState<Category[]>([]);
+  const [distributors, setDistributors] = React.useState<DistributorPublic[]>([]);
   
   // Legacy state (mock data for backward compatibility)
-  const [posts, setPosts] = useState<LegacyPost[]>([]);
-  const [ratings, setRatings] = useState<LegacyRating[]>([]);
-  const [questions, setQuestions] = useState<LegacyQuestion[]>([]);
+  const [posts, setPosts] = React.useState<LegacyPost[]>([]);
+  const [ratings, setRatings] = React.useState<LegacyRating[]>([]);
+  const [questions, setQuestions] = React.useState<LegacyQuestion[]>([]);
   
   // Editable content state
-  const [editableContent, setEditableContent] = useState<any[]>([]);
+  const [editableContent, setEditableContent] = React.useState<any[]>([]);
   
   // Filters
-  const [selectedCategory, setSelectedCategory] = useState('Todos');
-  const [selectedBrand, setSelectedBrand] = useState('Todos');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = React.useState('Todos');
+  const [selectedBrand, setSelectedBrand] = React.useState('Todos');
+  const [searchQuery, setSearchQuery] = React.useState('');
   
   // Helper function to convert Json to array
   const parseCompatibility = (compatibility: any): LegacyVehicle[] => {
@@ -742,7 +746,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   
 
   // Editable content functions
-  const fetchEditableContent = useCallback(async () => {
+  const fetchEditableContent = React.useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('editable_content')
@@ -759,7 +763,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, []);
 
-  const updateEditableContent = useCallback(async (
+  const updateEditableContent = React.useCallback(async (
     section: string, 
     content: { title?: string; subtitle?: string; description?: string }
   ): Promise<boolean> => {
@@ -803,7 +807,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, [user, profile]);
 
-  const updateSectionVisibility = useCallback(async (
+  const updateSectionVisibility = React.useCallback(async (
     section: string, 
     visible: boolean
   ): Promise<boolean> => {
@@ -863,7 +867,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, [user, profile]);
 
-  const getEditableContent = useCallback((section: string) => {
+  const getEditableContent = React.useCallback((section: string) => {
     return editableContent.find(item => item.section === section);
   }, [editableContent]);
 
@@ -1039,7 +1043,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   } : null;
 
   // Auth state management
-  useEffect(() => {
+  React.useEffect(() => {
     console.log('🚀 Inicializando AppContext...');
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
