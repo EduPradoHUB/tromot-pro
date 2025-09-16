@@ -2,59 +2,52 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-// Capturar o evento beforeinstallprompt antes do React carregar
-let deferredPrompt: any = null;
+// Captura do beforeinstallprompt o mais cedo possível
+let deferredPrompt: any = null
+window.addEventListener('beforeinstallprompt', (e: Event) => {
+  e.preventDefault()
+  deferredPrompt = e
+  ;(window as any).deferredPrompt = e
+  console.log('[PWA] beforeinstallprompt capturado')
+})
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  console.log('[PWA] Early beforeinstallprompt captured');
-  e.preventDefault();
-  deferredPrompt = e;
-  (window as any).deferredPrompt = e;
-});
-
-// Register service worker for PWA
+// Registro do Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      const registration = await navigator.serviceWorker.register('/sw.js');
-      console.log('[PWA] Service Worker registered successfully:', registration);
-      
-      // Escutar atualizações do SW
+      const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      console.log('[PWA] SW registrado:', registration)
+
+      // Detecta nova versão do SW
       registration.addEventListener('updatefound', () => {
-        const newWorker = registration.installing;
-        if (newWorker) {
-          console.log('[PWA] New service worker found, installing...');
-          
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('[PWA] New service worker installed, prompting for update');
-              
-              // Notificar usuário sobre atualização disponível
-              if (confirm('Uma nova versão do app está disponível. Atualizar agora?')) {
-                newWorker.postMessage({ type: 'SKIP_WAITING' });
-                window.location.reload();
-              }
+        const newWorker = registration.installing
+        if (!newWorker) return
+
+        console.log('[PWA] Novo SW encontrado...')
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            console.log('[PWA] Nova versão instalada')
+            if (confirm('Uma nova versão do app está disponível. Atualizar agora?')) {
+              newWorker.postMessage({ type: 'SKIP_WAITING' })
             }
-          });
-        }
-      });
+          }
+        })
+      })
 
-      // Verificar atualizações periodicamente (a cada 30 minutos)
-      setInterval(() => {
-        registration.update();
-      }, 1800000);
-      
-    } catch (error) {
-      console.error('[PWA] Service Worker registration failed:', error);
+      // Verifica atualizações a cada 30 min
+      setInterval(() => registration.update(), 30 * 60 * 1000)
+    } catch (err) {
+      console.error('[PWA] Falha ao registrar SW:', err)
     }
-  });
+  })
 
-  // Escutar quando o novo SW assume controle
+  // Recarrega uma vez quando o novo SW assume o controle
+  let refreshing = false
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    console.log('[PWA] New service worker activated');
-    window.location.reload();
-  });
+    if (refreshing) return
+    refreshing = true
+    window.location.reload()
+  })
 }
 
-
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById('root')!).render(<App />)
