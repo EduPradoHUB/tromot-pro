@@ -14,7 +14,7 @@ interface AdSlotProps {
 }
 
 export default function AdSlot({ slot, className = '', productId }: AdSlotProps) {
-  const { getActiveAd, trackEvent, currentUser, products } = useApp();
+  const { getActiveAd, trackAdImpression, trackAdClick, products } = useApp();
   const [ad, setAd] = useState<Advertisement | null>(null);
   const [impressionTracked, setImpressionTracked] = useState(false);
 
@@ -29,23 +29,16 @@ export default function AdSlot({ slot, className = '', productId }: AdSlotProps)
 
   useEffect(() => {
     if (ad && !impressionTracked) {
-      // Track impression
-      trackEvent({ 
-        type: 'ad_impression', 
-        ad_id: ad.id,
-        product_id: productId 
-      });
+      // Track impression using the new function
+      trackAdImpression(ad.id);
       setImpressionTracked(true);
     }
-  }, [ad, impressionTracked, trackEvent, productId]);
+  }, [ad, impressionTracked, trackAdImpression]);
 
   const handleAdClick = () => {
     if (ad) {
-      trackEvent({ 
-        type: 'ad_click', 
-        ad_id: ad.id,
-        product_id: productId 
-      });
+      // Track click using the new function
+      trackAdClick(ad.id);
       
       if (ad.target_url) {
         window.open(ad.target_url, '_blank');

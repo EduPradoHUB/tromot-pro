@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
@@ -6,7 +6,52 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, P
 import { Calendar, Users, FileText, Heart, Star, TrendingUp } from 'lucide-react';
 
 export default function Dashboard() {
-  const { currentUser, getDashboardStats, products, ratings, posts } = useApp();
+  const { currentUser, getDashboardStatsReal, getAnalyticsChartData, getCategoryDistribution, products } = useApp();
+  const [stats, setStats] = useState({
+    dau: 0,
+    mau: 0,
+    manual_views_today: 0,
+    posts_today: 0,
+    likes_today: 0,
+    avg_rating: 0
+  });
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [categoryData, setCategoryData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (currentUser && currentUser.role === 'ADM') {
+      loadDashboardData();
+    }
+  }, [currentUser]);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      const [statsData, analyticsData, categoriesData] = await Promise.all([
+        getDashboardStatsReal(),
+        getAnalyticsChartData(7),
+        getCategoryDistribution()
+      ]);
+
+      setStats(statsData);
+      setChartData(analyticsData);
+      setCategoryData(categoriesData.map((cat, index) => ({
+        ...cat,
+        color: [
+          'hsl(var(--primary))',
+          'hsl(var(--secondary))',
+          'hsl(var(--accent))',
+          'hsl(var(--muted))',
+          'hsl(var(--border))'
+        ][index % 5]
+      })));
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!currentUser || currentUser.role !== 'ADM') {
     return (
@@ -16,44 +61,20 @@ export default function Dashboard() {
     );
   }
 
-  const stats = getDashboardStats();
-  
-  // Mock data for charts
-  const manualAccessData = [
-    { day: 'Seg', views: 45 },
-    { day: 'Ter', views: 62 },
-    { day: 'Qua', views: 38 },
-    { day: 'Qui', views: 71 },
-    { day: 'Sex', views: 89 },
-    { day: 'Sáb', views: 34 },
-    { day: 'Dom', views: 28 },
-  ];
-
-  const engagementData = [
-    { day: 'Seg', posts: 3, likes: 15 },
-    { day: 'Ter', posts: 5, likes: 28 },
-    { day: 'Qua', posts: 2, likes: 12 },
-    { day: 'Qui', posts: 7, likes: 35 },
-    { day: 'Sex', posts: 4, likes: 22 },
-    { day: 'Sáb', posts: 6, likes: 31 },
-    { day: 'Dom', posts: 3, likes: 18 },
-  ];
-
-  const categoryData = [
-    { name: 'Alarmes', value: 35, color: 'hsl(var(--primary))' },
-    { name: 'Vidros Elétricos', value: 25, color: 'hsl(var(--secondary))' },
-    { name: 'Travas', value: 20, color: 'hsl(var(--accent))' },
-    { name: 'Sensores', value: 15, color: 'hsl(var(--muted))' },
-    { name: 'Outros', value: 5, color: 'hsl(var(--border))' },
-  ];
+  if (loading) {
+    return (
+      <div className="container py-8">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-4">Dashboard Administrativo</h1>
+          <p className="text-muted-foreground">Carregando métricas...</p>
+        </div>
+      </div>
+    );
+  }
 
   const topProducts = products
     .sort((a, b) => (b.rating_count || 0) - (a.rating_count || 0))
     .slice(0, 10);
-
-  const recentRatings = ratings
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 5);
 
   return (
     <div className="container py-8 space-y-8">
@@ -120,14 +141,14 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={manualAccessData}>
+              <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="day" />
                 <YAxis />
                 <Tooltip />
                 <Line 
                   type="monotone" 
-                  dataKey="views" 
+                  dataKey="manual_views" 
                   stroke="hsl(var(--primary))" 
                   strokeWidth={2}
                   dot={{ fill: 'hsl(var(--primary))' }}
@@ -146,7 +167,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={engagementData}>
+              <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="day" />
                 <YAxis />
@@ -159,30 +180,36 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Category Distribution */}
         <Card className="shadow-card">
           <CardHeader>
             <CardTitle>Produtos por Categoria</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={40}
-                  outerRadius={80}
-                  dataKey="value"
-                >
-                  {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            {categoryData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={categoryData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={40}
+                    outerRadius={80}
+                    dataKey="value"
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="text-center text-muted-foreground py-8">
+                Nenhum produto encontrado
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -192,43 +219,26 @@ export default function Dashboard() {
             <CardTitle>Top 10 Produtos</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {topProducts.slice(0, 5).map((product, index) => (
-              <div key={product.id} className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="font-medium text-sm">{product.name}</p>
-                  <p className="text-xs text-muted-foreground">{product.code}</p>
-                </div>
-                <div className="text-right">
-                  <Badge variant="secondary">#{index + 1}</Badge>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {product.rating_count} avaliações
-                  </p>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Recent Ratings */}
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle>Avaliações Recentes</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {recentRatings.map((rating) => (
-              <div key={rating.id} className="border-b border-border/50 pb-3 last:border-0">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="font-medium text-sm">{rating.author_name}</p>
-                  <div className="flex items-center gap-1">
-                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm">{rating.rating}</span>
+            {topProducts.length > 0 ? (
+              topProducts.slice(0, 5).map((product, index) => (
+                <div key={product.id} className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">{product.name}</p>
+                    <p className="text-xs text-muted-foreground">{product.code}</p>
+                  </div>
+                  <div className="text-right">
+                    <Badge variant="secondary">#{index + 1}</Badge>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {product.rating_count} avaliações
+                    </p>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground line-clamp-2">
-                  {rating.comment}
-                </p>
+              ))
+            ) : (
+              <div className="text-center text-muted-foreground py-4">
+                Nenhum produto encontrado
               </div>
-            ))}
+            )}
           </CardContent>
         </Card>
       </div>

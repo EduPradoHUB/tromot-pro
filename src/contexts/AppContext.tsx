@@ -189,6 +189,22 @@ interface AppContextType {
   // File upload
   uploadFile: (bucket: string, path: string, file: File) => Promise<string>;
   
+  // Real analytics functions
+  getDashboardStatsReal: () => Promise<DashboardStats>;
+  getAnalyticsChartData: (days?: number) => Promise<Array<{
+    date: string;
+    day: string;
+    manual_views: number;
+    posts: number;
+    likes: number;
+  }>>;
+  getCategoryDistribution: () => Promise<Array<{
+    name: string;
+    value: number;
+  }>>;
+  trackAdImpression: (adId: string) => Promise<void>;
+  trackAdClick: (adId: string) => Promise<void>;
+  
   // Legacy functions (for backward compatibility)
   likePost: (postId: string) => void;
   reportPost: (postId: string) => void;
@@ -1001,6 +1017,132 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return [];
   };
 
+  // Analytics and dashboard functions
+  const getDashboardStatsReal = async (): Promise<DashboardStats> => {
+    try {
+      const today = new Date();
+      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+      // Get DAU (users active today)
+      const { count: dauCount } = await supabase
+        .from('analytics_events')
+        .select('user_id', { count: 'exact', head: true })
+        .gte('created_at', startOfToday.toISOString())
+        .not('user_id', 'is', null);
+
+      // Get MAU (users active this month)
+      const { count: mauCount } = await supabase
+        .from('analytics_events')
+        .select('user_id', { count: 'exact', head: true })
+        .gte('created_at', startOfMonth.toISOString())
+        .not('user_id', 'is', null);
+
+      // Get manual views today
+      const { count: manualViewsToday } = await supabase
+        .from('analytics_events')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_type', 'view_manual')
+        .gte('created_at', startOfToday.toISOString());
+
+      // Get posts created today
+      const { count: postsToday } = await supabase
+        .from('posts')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', startOfToday.toISOString());
+
+      // Get likes today
+      const { count: likesToday } = await supabase
+        .from('post_likes')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', startOfToday.toISOString());
+
+      // Get average rating
+      const { data: avgRatingData } = await supabase
+        .from('ratings')
+        .select('rating');
+
+      let avgRating = 0;
+      if (avgRatingData && avgRatingData.length > 0) {
+        const sum = avgRatingData.reduce((acc, rating) => acc + rating.rating, 0);
+        avgRating = sum / avgRatingData.length;
+      }
+
+      return {
+        dau: dauCount || 0,
+        mau: mauCount || 0,
+        manual_views_today: manualViewsToday || 0,
+        posts_today: postsToday || 0,
+        likes_today: likesToday || 0,
+        avg_rating: avgRating
+      };
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+      return {
+        dau: 0,
+        mau: 0,
+        manual_views_today: 0,
+        posts_today: 0,
+        likes_today: 0,
+        avg_rating: 0
+      };
+    }
+  };
+
+  // Get analytics data for charts
+  const getAnalyticsChartData = async (days: number = 7) => {
+    try {
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+
+      const { data } = await supabase
+        .from('analytics_events')
+        .select('event_type, created_at')
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString());
+
+      if (!data) return [];
+
+      // Group by day
+      const groupedData: Record<string, { manual_views: number; posts: number; likes: number }> = {};
+
+      for (let i = 0; i < days; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateKey = date.toISOString().split('T')[0];
+        groupedData[dateKey] = { manual_views: 0, posts: 0, likes: 0 };
+      }
+
+      data.forEach(event => {
+        const dateKey = event.created_at.split('T')[0];
+        if (groupedData[dateKey]) {
+          if (event.event_type === 'view_manual') {
+            groupedData[dateKey].manual_views++;
+          } else if (event.event_type === 'new_post') {
+            groupedData[dateKey].posts++;
+          } else if (event.event_type === 'like') {
+            groupedData[dateKey].likes++;
+          }
+        }
+      });
+
+      return Object.entries(groupedData)
+        .map(([date, data]) => ({
+          date,
+          day: new Date(date).toLocaleDateString('pt-BR', { weekday: 'short' }),
+          manual_views: data.manual_views,
+          posts: data.posts,
+          likes: data.likes
+        }))
+        .reverse();
+
+    } catch (error) {
+      console.error('Error fetching analytics chart data:', error);
+      return [];
+    }
+  };
+
   const getDashboardStats = (): DashboardStats => {
     return {
       dau: 147,
@@ -1010,6 +1152,31 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       likes_today: 0,
       avg_rating: 4.2,
     };
+  };
+
+  // Get category distribution
+  const getCategoryDistribution = async () => {
+    try {
+      const { data } = await supabase
+        .from('products')
+        .select('category')
+        .eq('status', 'active');
+
+      if (!data) return [];
+
+      const categoryCount: Record<string, number> = {};
+      data.forEach(product => {
+        categoryCount[product.category] = (categoryCount[product.category] || 0) + 1;
+      });
+
+      return Object.entries(categoryCount).map(([name, value]) => ({
+        name,
+        value
+      }));
+    } catch (error) {
+      console.error('Error fetching category distribution:', error);
+      return [];
+    }
   };
 
   const trackEvent = async (event: Omit<LegacyAnalyticsEvent, 'id' | 'timestamp'>) => {
@@ -1029,6 +1196,72 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       console.error('Error tracking event:', error);
+    }
+  };
+
+  // Ad impression tracking
+  const trackAdImpression = async (adId: string) => {
+    try {
+      // Get current count and increment
+      const { data: ad } = await supabase
+        .from('advertisements')
+        .select('impressions_count')
+        .eq('id', adId)
+        .single();
+
+      if (ad) {
+        const { error } = await supabase
+          .from('advertisements')
+          .update({ 
+            impressions_count: (ad.impressions_count || 0) + 1
+          })
+          .eq('id', adId);
+
+        if (error) {
+          console.error('Error tracking ad impression:', error);
+        }
+      }
+
+      // Track analytics event
+      await trackEvent({
+        type: 'ad_impression',
+        ad_id: adId
+      });
+    } catch (error) {
+      console.error('Error tracking ad impression:', error);
+    }
+  };
+
+  // Ad click tracking
+  const trackAdClick = async (adId: string) => {
+    try {
+      // Get current count and increment
+      const { data: ad } = await supabase
+        .from('advertisements')
+        .select('clicks_count')
+        .eq('id', adId)
+        .single();
+
+      if (ad) {
+        const { error } = await supabase
+          .from('advertisements')
+          .update({ 
+            clicks_count: (ad.clicks_count || 0) + 1
+          })
+          .eq('id', adId);
+
+        if (error) {
+          console.error('Error tracking ad click:', error);
+        }
+      }
+
+      // Track analytics event
+      await trackEvent({
+        type: 'ad_click',
+        ad_id: adId
+      });
+    } catch (error) {
+      console.error('Error tracking ad click:', error);
     }
   };
 
@@ -1178,6 +1411,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     getAdStats,
     trackEvent,
     getDashboardStats,
+    // Real analytics functions
+    getDashboardStatsReal,
+    getAnalyticsChartData,
+    getCategoryDistribution,
+    trackAdImpression,
+    trackAdClick,
     findProductByBarcode,
     
     // Editable content
