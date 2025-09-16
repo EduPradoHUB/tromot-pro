@@ -642,7 +642,30 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      security_audit_summary: {
+        Row: {
+          created_at: string | null
+          event_type: string | null
+          id: string | null
+          ip_masked: string | null
+          metadata_safe: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_type?: string | null
+          id?: string | null
+          ip_masked?: never
+          metadata_safe?: never
+        }
+        Update: {
+          created_at?: string | null
+          event_type?: string | null
+          id?: string | null
+          ip_masked?: never
+          metadata_safe?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_current_user_role: {
@@ -703,6 +726,14 @@ export type Database = {
       }
       is_profile_owner: {
         Args: { profile_user_id: string }
+        Returns: boolean
+      }
+      is_system_operation: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_verified_admin: {
+        Args: Record<PropertyKey, never>
         Returns: boolean
       }
       log_distributor_access: {
