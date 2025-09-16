@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import * as React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, ChevronRight, Star, Eye, Download, Smartphone, ScanLine, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -31,42 +31,42 @@ export default function Home() {
   } = appContext;
   
   const navigate = useNavigate();
-  const [globalSearch, setGlobalSearch] = useState('');
-  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
+  const [globalSearch, setGlobalSearch] = React.useState('');
+  const [showBarcodeScanner, setShowBarcodeScanner] = React.useState(false);
   
-  const [heroContent, setHeroContent] = useState({
+  const [heroContent, setHeroContent] = React.useState({
     title: 'Soluções Eletrônicas',
     subtitle: 'para Instaladores',
     description: 'Acesse manuais, compartilhe instalações e encontre suporte técnico especializado.'
   });
 
-  const [featuresContent, setFeaturesContent] = useState({
+  const [featuresContent, setFeaturesContent] = React.useState({
     title: 'Por que usar o TROMOT Pro?',
     description: 'Desenvolvido especialmente para instaladores e técnicos, oferecendo tudo que você precisa em um só lugar.'
   });
 
-  const [featureCard1, setFeatureCard1] = useState({
+  const [featureCard1, setFeatureCard1] = React.useState({
     title: 'Manuais Sempre Disponíveis',
     description: 'Acesse manuais de instalação em PDF ou imagem, sempre atualizados e organizados por produto.'
   });
 
-  const [featureCard2, setFeatureCard2] = useState({
+  const [featureCard2, setFeatureCard2] = React.useState({
     title: 'Rede Colaborativa', 
     description: 'Compartilhe suas instalações, veja o trabalho de outros técnicos e aprenda com a comunidade.'
   });
 
-  const [featureCard3, setFeatureCard3] = useState({
+  const [featureCard3, setFeatureCard3] = React.useState({
     title: 'Busca Inteligente',
     description: 'Encontre qualquer produto, veículo ou categoria de forma rápida e precisa em todo o app.'
   });
 
-  const [quickSearchContent, setQuickSearchContent] = useState({
+  const [quickSearchContent, setQuickSearchContent] = React.useState({
     title: 'Busca Geral',
     description: 'Pesquise produtos, veículos e categorias em todo o app'
   });
 
   // Plugin autoplay para carrossel
-  const autoplayPlugin = useCallback(() => Autoplay({
+  const autoplayPlugin = React.useCallback(() => Autoplay({
     delay: 2000,
     stopOnInteraction: true
   }), []);

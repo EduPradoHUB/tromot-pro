@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Search, Package, User, LogOut, Menu, BarChart3, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,10 +24,10 @@ export const Layout: React.FC<LayoutProps> = ({
   const navigate = useNavigate();
 
   // Footer editable content states
-  const [footerDescription, setFooterDescription] = useState('App para instaladores e técnicos de produtos eletrônicos automotivos.');
-  const [supportTitle, setSupportTitle] = useState('Suporte');
-  const [legalTitle, setLegalTitle] = useState('Legal');
-  const [copyright, setCopyright] = useState('© 2025 Tromot Indústria Eletrônica. Todos os direitos reservados.');
+  const [footerDescription, setFooterDescription] = React.useState('App para instaladores e técnicos de produtos eletrônicos automotivos.');
+  const [supportTitle, setSupportTitle] = React.useState('Suporte');
+  const [legalTitle, setLegalTitle] = React.useState('Legal');
+  const [copyright, setCopyright] = React.useState('© 2025 Tromot Indústria Eletrônica. Todos os direitos reservados.');
 
   // Update footer content when editable content changes
   React.useEffect(() => {

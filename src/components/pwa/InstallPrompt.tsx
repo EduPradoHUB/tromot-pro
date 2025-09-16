@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import * as React from 'react';
 import { Download, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -8,10 +8,10 @@ const DISMISS_KEY = 'pwa-install-dismissed';
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 dias em millisegundos
 
 export const InstallPrompt = () => {
-  const [showPrompt, setShowPrompt] = useState(false);
+  const [showPrompt, setShowPrompt] = React.useState(false);
   const { isInstallable, isInstalled, installApp } = usePWA();
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Não mostrar se já está instalado
     if (isInstalled) return;
 
