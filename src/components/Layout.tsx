@@ -24,6 +24,7 @@ export const Layout: React.FC<LayoutProps> = ({
   } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   // Footer editable content states
   const [footerDescription, setFooterDescription] = React.useState('App para instaladores e técnicos de produtos eletrônicos automotivos.');
@@ -150,16 +151,74 @@ const navigationItems = [
               </Button>
             )}
 
-            {/* Mobile Menu Button - Simple Navigation */}
+            {/* Mobile Menu Button */}
             <div className="md:hidden">
-              <Button variant="ghost" size="icon" asChild>
-                <Link to="/perfil">
-                  <Menu className="h-5 w-5" />
-                </Link>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                <Menu className="h-5 w-5" />
               </Button>
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu Overlay */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden">
+            <div 
+              className="fixed inset-0 z-40 bg-black/50" 
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            <div className="fixed top-16 left-0 right-0 z-50 bg-background border-b shadow-lg">
+              <div className="container py-4">
+                <nav className="space-y-2">
+                  {navigationItems.map(item => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                        isActive(item.path) 
+                          ? 'bg-primary text-primary-foreground' 
+                          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                      }`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <item.icon className="h-5 w-5" />
+                      <span className="font-medium">{item.name}</span>
+                    </Link>
+                  ))}
+                  
+                  {profile && (
+                    <>
+                      <div className="border-t pt-2 mt-2">
+                        <Link
+                          to="/perfil"
+                          className="flex items-center space-x-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          <User className="h-5 w-5" />
+                          <span className="font-medium">Perfil</span>
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            handleLogout();
+                          }}
+                          className="flex items-center space-x-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors w-full text-left"
+                        >
+                          <LogOut className="h-5 w-5" />
+                          <span className="font-medium">Sair</span>
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </nav>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
