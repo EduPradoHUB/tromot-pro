@@ -1,3 +1,3 @@
-import { useToast, toast } from "@/hooks/use-toast";
+import { toast, useToast } from "@/lib/toast-fallback";
 
 export { useToast, toast };
