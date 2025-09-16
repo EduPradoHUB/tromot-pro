@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -31,7 +31,7 @@ export default function TechnicianDashboard() {
   
   const { toast } = useToast();
   
-  const [productForm, setProductForm] = useState({
+  const [productForm, setProductForm] = React.useState({
     name: '',
     code: '',
     barcode_ean: '',
@@ -44,15 +44,15 @@ export default function TechnicianDashboard() {
     compatibility: '[]'
   });
   
-  const [categoryForm, setCategoryForm] = useState({
+  const [categoryForm, setCategoryForm] = React.useState({
     name: '',
     description: '',
     active: true
   });
   
-  const [editingProduct, setEditingProduct] = useState<any>(null);
-  const [editingCategory, setEditingCategory] = useState<any>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = React.useState<any>(null);
+  const [editingCategory, setEditingCategory] = React.useState<any>(null);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
 
   // Verificar se o usuário é ADM, Técnico Tromot ou Suporte Tromot
   if (!profile || !(['ADM', 'Técnico Tromot', 'Suporte Tromot'] as const).includes(profile.role as any)) {

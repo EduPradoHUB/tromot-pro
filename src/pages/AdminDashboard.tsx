@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -58,10 +58,10 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   
   // Estado para o sistema de desfazer
-  const [deletedProduct, setDeletedProduct] = useState<any>(null);
+  const [deletedProduct, setDeletedProduct] = React.useState<any>(null);
   
   
-  const [productForm, setProductForm] = useState({
+  const [productForm, setProductForm] = React.useState({
     name: '',
     code: '',
     barcode_ean: '',
@@ -75,14 +75,14 @@ export default function AdminDashboard() {
     out_of_production: false
   });
   
-  const [bannerForm, setBannerForm] = useState({
+  const [bannerForm, setBannerForm] = React.useState({
     title: '',
     image_url: '',
     link_url: '',
     active: true
   });
   
-  const [adForm, setAdForm] = useState({
+  const [adForm, setAdForm] = React.useState({
     advertiser: '',
     slot: 'home_hero' as 'home_hero' | 'product_banner' | 'feed_sponsored',
     creative_url: '',
@@ -96,19 +96,19 @@ export default function AdminDashboard() {
     target_products: [] as string[]
   });
   
-  const [vehicleForm, setVehicleForm] = useState({
+  const [vehicleForm, setVehicleForm] = React.useState({
     brand: '',
     model: '',
     years: ''
   });
   
-  const [categoryForm, setCategoryForm] = useState({
+  const [categoryForm, setCategoryForm] = React.useState({
     name: '',
     description: '',
     active: true
   });
   
-  const [distributorForm, setDistributorForm] = useState({
+  const [distributorForm, setDistributorForm] = React.useState({
     name: '',
     phone: '',
     whatsapp: '',
@@ -118,17 +118,17 @@ export default function AdminDashboard() {
     active: true
   });
   
-  const [editingProduct, setEditingProduct] = useState<any>(null);
-  const [editingCategory, setEditingCategory] = useState<any>(null);
-  const [editingVehicle, setEditingVehicle] = useState<any>(null);
-  const [editingAdvertisement, setEditingAdvertisement] = useState<any>(null);
-  const [editingDistributor, setEditingDistributor] = useState<any>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [uploadingFile, setUploadingFile] = useState(false);
+  const [editingProduct, setEditingProduct] = React.useState<any>(null);
+  const [editingCategory, setEditingCategory] = React.useState<any>(null);
+  const [editingVehicle, setEditingVehicle] = React.useState<any>(null);
+  const [editingAdvertisement, setEditingAdvertisement] = React.useState<any>(null);
+  const [editingDistributor, setEditingDistributor] = React.useState<any>(null);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [uploadingFile, setUploadingFile] = React.useState(false);
   
   // Estados para filtros e busca de produtos
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [filters, setFilters] = React.useState({
     withoutManual: false,
     withoutPhoto: false,
     outOfProduction: false,

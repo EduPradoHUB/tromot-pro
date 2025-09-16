@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,11 +12,11 @@ import { toast } from '@/hooks/use-toast';
 export default function InstallApp() {
   const { isInstallable, isInstalled, hasPrompt, installApp } = usePWA();
   const { permission, isSupported, requestPermission, showNotification } = useNotifications();
-  const [installing, setInstalling] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(false);
+  const [installing, setInstalling] = React.useState(false);
+  const [showInstructions, setShowInstructions] = React.useState(false);
 
   // Check if already installed
-  useEffect(() => {
+  React.useEffect(() => {
     if (isInstalled) {
       toast({
         title: "App já instalado!",

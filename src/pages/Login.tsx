@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,22 +11,22 @@ import { useApp } from '@/contexts/AppContext';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [whatsapp, setWhatsapp] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [customerType, setCustomerType] = useState<'lojista_instalador' | 'distribuidor_representante' | 'usuario_final'>('usuario_final');
-  const [resetEmail, setResetEmail] = useState('');
-  const [formLoading, setFormLoading] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [acceptAnalytics, setAcceptAnalytics] = useState(false);
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [name, setName] = React.useState('');
+  const [whatsapp, setWhatsapp] = React.useState('');
+  const [city, setCity] = React.useState('');
+  const [state, setState] = React.useState('');
+  const [customerType, setCustomerType] = React.useState<'lojista_instalador' | 'distribuidor_representante' | 'usuario_final'>('usuario_final');
+  const [resetEmail, setResetEmail] = React.useState('');
+  const [formLoading, setFormLoading] = React.useState(false);
+  const [acceptTerms, setAcceptTerms] = React.useState(false);
+  const [acceptAnalytics, setAcceptAnalytics] = React.useState(false);
   const { login, signUp, resetPassword, user, profile, loading } = useApp();
   const navigate = useNavigate();
 
   // Redirect if already logged in
-  useEffect(() => {
+  React.useEffect(() => {
     if (!loading && user && profile) {
       navigate('/', { replace: true });
     }

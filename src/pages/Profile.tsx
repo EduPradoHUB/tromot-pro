@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -10,8 +10,8 @@ import { toast } from '@/hooks/use-toast';
 
 export default function Profile() {
   const { profile, updateProfile } = useApp();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editData, setEditData] = React.useState({
     name: profile?.name || '',
     phone: profile?.phone || '',
     whatsapp: profile?.whatsapp || '',

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Phone, MessageCircle, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -30,16 +30,16 @@ export default function WhereToBuy() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { legacyProducts, profile, trackEvent } = useApp();
-  const [product, setProduct] = useState<any>(null);
-  const [distributors, setDistributors] = useState<DistributorPublic[]>([]);
-  const [distributorContacts, setDistributorContacts] = useState<Map<string, DistributorContact>>(new Map());
-  const [loading, setLoading] = useState(true);
-  const [userState, setUserState] = useState(profile?.state || '');
-  const [userCity, setUserCity] = useState(profile?.city || '');
-  const [showLocationForm, setShowLocationForm] = useState(false);
-  const [contactingDistributor, setContactingDistributor] = useState<string | null>(null);
+  const [product, setProduct] = React.useState<any>(null);
+  const [distributors, setDistributors] = React.useState<DistributorPublic[]>([]);
+  const [distributorContacts, setDistributorContacts] = React.useState<Map<string, DistributorContact>>(new Map());
+  const [loading, setLoading] = React.useState(true);
+  const [userState, setUserState] = React.useState(profile?.state || '');
+  const [userCity, setUserCity] = React.useState(profile?.city || '');
+  const [showLocationForm, setShowLocationForm] = React.useState(false);
+  const [contactingDistributor, setContactingDistributor] = React.useState<string | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (id) {
       const foundProduct = legacyProducts.find(p => p.id === id);
       setProduct(foundProduct);
@@ -51,7 +51,7 @@ export default function WhereToBuy() {
     }
   }, [id, legacyProducts, navigate]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (profile?.state && profile?.city) {
       setUserState(profile.state);
       setUserCity(profile.city);
@@ -60,7 +60,7 @@ export default function WhereToBuy() {
     }
   }, [profile]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (userState) {
       fetchDistributors();
     }

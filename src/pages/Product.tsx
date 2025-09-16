@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -33,16 +33,16 @@ export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { products, posts, ratings, questions, currentUser, trackEvent, answerQuestion, findProductByBarcode } = useApp();
-  const [product, setProduct] = useState<any>(null);
-  const [productPosts, setProductPosts] = useState<Post[]>([]);
-  const [productRatings, setProductRatings] = useState<Rating[]>([]);
-  const [productQuestions, setProductQuestions] = useState<Question[]>([]);
-  const [answerText, setAnswerText] = useState<{ [key: string]: string }>({});
-  const [showPostModal, setShowPostModal] = useState(false);
-  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
-  const [showInlinePlayer, setShowInlinePlayer] = useState(false);
+  const [product, setProduct] = React.useState<any>(null);
+  const [productPosts, setProductPosts] = React.useState<Post[]>([]);
+  const [productRatings, setProductRatings] = React.useState<Rating[]>([]);
+  const [productQuestions, setProductQuestions] = React.useState<Question[]>([]);
+  const [answerText, setAnswerText] = React.useState<{ [key: string]: string }>({});
+  const [showPostModal, setShowPostModal] = React.useState(false);
+  const [showBarcodeScanner, setShowBarcodeScanner] = React.useState(false);
+  const [showInlinePlayer, setShowInlinePlayer] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (id) {
       const foundProduct = products.find(p => p.id === id);
       if (foundProduct) {
