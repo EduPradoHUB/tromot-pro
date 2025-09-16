@@ -329,31 +329,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         options: {
           emailRedirectTo: redirectUrl,
           data: {
-            name: name
-          }
-        }
-      });
-
-      // Create profile manually if user is created
-      if (data.user && !error) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            user_id: data.user.id,
             name: name,
-            email: email,
-            role: 'Cliente',
             customer_type: customerType || 'usuario_final',
             whatsapp: whatsapp || null,
             city: city || null,
             state: state || null
-          });
-        
-        if (profileError) {
-          console.error('Error creating profile:', profileError);
+          }
         }
-      }
-
+      });
+      
       return { error };
     } catch (error) {
       return { error: error as Error };
