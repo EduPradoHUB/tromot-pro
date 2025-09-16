@@ -11,7 +11,8 @@ import { useApp } from '@/contexts/AppContext';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { BulkProductUpload } from '@/components/BulkProductUpload';
 import { PostModeration } from '@/components/PostModeration';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+// Replaced Dialog imports with custom implementation to avoid React hooks conflicts
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/CustomDialog';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 
@@ -53,8 +54,21 @@ export default function TechnicianDashboard() {
   const [editingProduct, setEditingProduct] = React.useState<any>(null);
   const [editingCategory, setEditingCategory] = React.useState<any>(null);
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [dialogContent, setDialogContent] = React.useState<'product' | 'category' | null>(null);
 
-  // Verificar se o usuário é ADM, Técnico Tromot ou Suporte Tromot
+  const openDialog = (type: 'product' | 'category') => {
+    setDialogContent(type);
+    setDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setDialogContent(null);
+    setDialogOpen(false);
+    setEditingProduct(null);
+    setEditingCategory(null);
+  };
+
+// Verificar se o usuário é ADM, Técnico Tromot ou Suporte Tromot
   if (!profile || !(['ADM', 'Técnico Tromot', 'Suporte Tromot'] as const).includes(profile.role as any)) {
     return (
       <div className="container py-8">

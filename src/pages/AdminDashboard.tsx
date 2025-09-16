@@ -15,7 +15,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { BulkProductUpload } from '@/components/BulkProductUpload';
 import { PostModeration } from '@/components/PostModeration';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+// Replaced Dialog imports with custom implementation to avoid React hooks conflicts
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/CustomDialog';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 
@@ -124,6 +125,7 @@ export default function AdminDashboard() {
   const [editingAdvertisement, setEditingAdvertisement] = React.useState<any>(null);
   const [editingDistributor, setEditingDistributor] = React.useState<any>(null);
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [dialogContent, setDialogContent] = React.useState<'product' | 'banner' | 'ad' | 'vehicle' | 'category' | 'distributor' | null>(null);
   const [uploadingFile, setUploadingFile] = React.useState(false);
   
   // Estados para filtros e busca de produtos
@@ -346,6 +348,21 @@ export default function AdminDashboard() {
         variant: "destructive"
       });
     }
+  };
+
+  const openDialog = (type: 'product' | 'banner' | 'ad' | 'vehicle' | 'category' | 'distributor') => {
+    setDialogContent(type);
+    setDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setDialogContent(null);
+    setDialogOpen(false);
+    setEditingProduct(null);
+    setEditingCategory(null);
+    setEditingVehicle(null);
+    setEditingAdvertisement(null);
+    setEditingDistributor(null);
   };
 
   const handleDeleteDistributor = async (id: string) => {

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Download, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { usePWA } from '@/hooks/usePWA';
 
 const DISMISS_KEY = 'pwa-install-dismissed';
@@ -74,62 +73,70 @@ export const InstallPrompt = () => {
   }
 
   return (
-    <Dialog open={showPrompt} onOpenChange={setShowPrompt}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-full">
-              <Smartphone className="w-6 h-6 text-primary" />
+    <>
+      {showPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div 
+            className="fixed inset-0 bg-black/50" 
+            onClick={() => setShowPrompt(false)}
+          />
+          <div className="relative bg-background rounded-2xl shadow-lg border sm:max-w-md mx-4 w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-primary/10 rounded-full">
+                  <Smartphone className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold">
+                    Instalar TROMOT PRO
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Acesse rapidamente seus manuais
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-gradient-card rounded-2xl p-4 border border-border/50">
+                  <h4 className="font-semibold mb-3 text-primary">Benefícios do TROMOT PRO:</h4>
+                  <ul className="text-sm space-y-2">
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-tromot-red rounded-full"></div>
+                      Acesso offline aos manuais técnicos
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-tromot-red rounded-full"></div>
+                      Notificações de novos produtos e atualizações
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-tromot-red rounded-full"></div>
+                      Interface otimizada para instaladores
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-tromot-red rounded-full"></div>
+                      Acesso rápido direto da tela inicial
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button onClick={handleInstall} className="flex-1 bg-tromot-red hover:bg-tromot-red/90" size="lg">
+                    <Download className="w-4 h-4 mr-2" />
+                    Instalar TROMOT PRO
+                  </Button>
+                  <Button variant="outline" onClick={handleDismiss} size="lg">
+                    Depois
+                  </Button>
+                </div>
+
+                <p className="text-xs text-muted-foreground text-center">
+                  Você pode instalar o app a qualquer momento através do menu do seu navegador
+                </p>
+              </div>
             </div>
-            <div>
-              <DialogTitle className="text-lg font-semibold">
-                Instalar TROMOT PRO
-              </DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground">
-                Acesse rapidamente seus manuais
-              </DialogDescription>
-            </div>
           </div>
-        </DialogHeader>
-
-        <div className="space-y-4">
-          <div className="bg-gradient-card rounded-2xl p-4 border border-border/50">
-            <h4 className="font-semibold mb-3 text-primary">Benefícios do TROMOT PRO:</h4>
-            <ul className="text-sm space-y-2">
-              <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-tromot-red rounded-full"></div>
-                Acesso offline aos manuais técnicos
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-tromot-red rounded-full"></div>
-                Notificações de novos produtos e atualizações
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-tromot-red rounded-full"></div>
-                Interface otimizada para instaladores
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-tromot-red rounded-full"></div>
-                Acesso rápido direto da tela inicial
-              </li>
-            </ul>
-          </div>
-
-          <div className="flex gap-3">
-            <Button onClick={handleInstall} className="flex-1 bg-tromot-red hover:bg-tromot-red/90" size="lg">
-              <Download className="w-4 h-4 mr-2" />
-              Instalar TROMOT PRO
-            </Button>
-            <Button variant="outline" onClick={handleDismiss} size="lg">
-              Depois
-            </Button>
-          </div>
-
-          <p className="text-xs text-muted-foreground text-center">
-            Você pode instalar o app a qualquer momento através do menu do seu navegador
-          </p>
         </div>
-      </DialogContent>
-    </Dialog>
+      )}
+    </>
   );
 };
