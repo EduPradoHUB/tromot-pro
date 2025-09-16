@@ -11,6 +11,7 @@ import AdSlot from '@/components/AdSlot';
 import { PWAInstallButtonSimple } from '@/components/PWAInstallButtonSimple';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
 import { EditableContent } from '@/components/EditableContent';
+import { BannerCarousel } from '@/components/BannerCarousel';
 import { toast } from '@/hooks/use-toast';
 
 export default function Home() {
@@ -205,37 +206,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Admin Banners Section */}
+      {/* Admin Banners Carousel Section */}
       {banners.length > 0 && (
-        <section className="sm:container px-0">
-          {banners.length === 1 ? (
-            <div className="flex justify-center">
-              <div className="aspect-[4/5] w-full max-w-sm sm:max-w-md overflow-hidden shadow-card">
-                <img 
-                  src={banners[0].image_url} 
-                  alt={banners[0].title} 
-                  className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
-                  onClick={() => banners[0].link_url && window.open(banners[0].link_url, '_blank')} 
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="w-full max-w-4xl mx-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {banners.map(banner => (
-                  <div key={banner.id} className="aspect-[4/5] overflow-hidden shadow-card">
-                    <img 
-                      src={banner.image_url} 
-                      alt={banner.title} 
-                      className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
-                      onClick={() => banner.link_url && window.open(banner.link_url, '_blank')} 
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </section>
+        <BannerCarousel banners={banners} />
       )}
 
       {/* Quick Search */}
