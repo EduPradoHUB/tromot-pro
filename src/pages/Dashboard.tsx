@@ -30,13 +30,13 @@ export default function Dashboard() {
       setLoading(true);
       const [statsData, analyticsData, categoriesData] = await Promise.all([
         getDashboardStatsReal(),
-        getAnalyticsChartData(7),
+        getAnalyticsChartData(),
         getCategoryDistribution()
       ]);
 
-      setStats(statsData);
-      setChartData(analyticsData);
-      setCategoryData(categoriesData.map((cat, index) => ({
+      setStats(statsData || {});
+      setChartData(analyticsData || {});
+      setCategoryData((categoriesData || []).map((cat: any, index: number) => ({
         ...cat,
         color: [
           'hsl(var(--primary))',

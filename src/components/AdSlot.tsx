@@ -22,7 +22,7 @@ export default function AdSlot({ slot, className = '', productId }: AdSlotProps)
   const productCategory = productId ? products.find(p => p.id === productId)?.category : undefined;
 
   useEffect(() => {
-    const activeAd = getActiveAd(slot, productId, productCategory);
+    const activeAd = getActiveAd(slot);
     setAd(activeAd);
     setImpressionTracked(false);
   }, [slot, productId, productCategory, getActiveAd]);

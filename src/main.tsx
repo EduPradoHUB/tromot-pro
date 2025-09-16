@@ -64,4 +64,4 @@ if ('serviceWorker' in navigator) {
 }
 
 
-createRoot(document.getElementById("root")!).render(React.createElement(App));
+createRoot(document.getElementById("root")!).render(<App />);

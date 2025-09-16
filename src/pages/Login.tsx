@@ -120,7 +120,7 @@ export default function Login() {
     setFormLoading(true);
 
     try {
-      const { error } = await signUp(email, password, name, customerType, whatsapp, city, state);
+      const { error } = await signUp(email, password, name);
       
       if (error) {
         if (error.message.includes('User already registered')) {

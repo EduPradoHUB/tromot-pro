@@ -2,158 +2,23 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 
-// Simple types to avoid deep type issues
-interface SimpleProduct {
-  id: string;
-  name: string;
-  code: string;
-  barcode_ean?: string;
-  category: string;
-  description: string;
-  image_url?: string;
-  manual_url?: string;
-  manual_type: string;
-  video_url?: string;
-  compatibility: any;
-  out_of_production: boolean;
-  no_manual_available?: boolean;
-  rating?: number;
-  rating_count?: number;
-  rating_average?: number;
-  created_at: string;
-  updated_at: string;
-}
-
-interface SimpleBanner {
-  id: string;
-  title: string;
-  image_url: string;
-  link_url: string;
-  active: boolean;
-  created_at: string;
-}
-
-interface SimpleAdvertisement {
-  id: string;
-  advertiser: string;
-  slot: string;
-  creative_url: string;
-  creative_aspect_ratio: string;
-  target_url: string;
-  start_date: string;
-  end_date: string;
-  daily_cap: number;
-  active: boolean;
-  status?: string;
-  impressions_count?: number;
-  clicks_count?: number;
-  created_at: string;
-}
-
-interface SimpleVehicle {
-  id: string;
-  brand: string;
-  model: string;
-  years: string[];
-  created_at: string;
-}
-
-interface SimpleCategory {
-  id: string;
-  name: string;
-  description: string;
-  active: boolean;
-  created_at: string;
-}
-
-interface SimpleDistributor {
-  id: string;
-  name: string;
-  phone: string;
-  whatsapp: string;
-  state: string;
-  city: string;
-  cover_entire_state: boolean;
-  active: boolean;
-  created_at: string;
-}
-
-interface SimpleProfile {
-  id: string;
-  user_id: string;
-  display_name?: string;
-  name?: string;
-  email?: string;
-  phone?: string;
-  whatsapp?: string;
-  city?: string;
-  state?: string;
-  avatar_url?: string;
-  role: string;
-  customer_type?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface LegacyUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  avatar?: string;
-}
-
-interface LegacyPost {
-  id: string;
-  product_id: string;
-  author_id: string;
-  author_name?: string;
-  author_role?: string;
-  photo_url: string;
-  caption: string;
-  likes_count: number;
-  status: string;
-  created_at: string;
-}
-
-interface LegacyRating {
-  id: string;
-  product_id: string;
-  user_id: string;
-  author_id?: string;
-  author_name?: string;
-  rating: number;
-  comment: string;
-  created_at: string;
-}
-
-interface LegacyQuestion {
-  id: string;
-  product_id: string;
-  user_id: string;
-  author_id?: string;
-  author_name?: string;
-  question: string;
-  answer?: string;
-  created_at: string;
-}
-
+// Context type definitions
 interface AppContextType {
   // Auth state
   user: User | null;
   session: Session | null;
-  profile: SimpleProfile | null;
+  profile: any;
   loading: boolean;
 
   // Data
-  products: SimpleProduct[];
-  banners: SimpleBanner[];
-  advertisements: SimpleAdvertisement[];
-  vehicles: SimpleVehicle[];
-  categories: SimpleCategory[];
-  distributors: SimpleDistributor[];
+  products: any[];
+  banners: any[];
+  advertisements: any[];
+  vehicles: any[];
+  categories: any[];
+  distributors: any[];
   editableContent: any;
-  legacyProducts: SimpleProduct[];
+  legacyProducts: any[];
 
   // Auth methods
   signIn: (email: string, password: string) => Promise<{ error?: any }>;
@@ -172,7 +37,7 @@ interface AppContextType {
   createProduct: (data: any) => Promise<boolean>;
   updateProduct: (id: string, updates: any) => Promise<boolean>;
   deleteProduct: (id: string) => Promise<boolean>;
-  findProductByBarcode: (barcode: string) => SimpleProduct | null;
+  findProductByBarcode: (barcode: string) => any;
 
   // Banner methods
   createBanner: (data: any) => Promise<boolean>;
@@ -183,8 +48,8 @@ interface AppContextType {
   createAdvertisement: (data: any) => Promise<boolean>;
   updateAdvertisement: (id: string, updates: any) => Promise<boolean>;
   deleteAdvertisement: (id: string) => Promise<boolean>;
-  getActiveAd: (slot: string) => SimpleAdvertisement | null;
-  trackAdImpression: (adId: string) => void;
+  getActiveAd: (slot: string) => any;
+  trackAdImpression: (adId: string, slot?: string, adData?: any) => void;
   trackAdClick: (adId: string) => void;
 
   // Vehicle methods
@@ -207,15 +72,15 @@ interface AppContextType {
 
   // Post moderation
   moderatePost: (postId: string, action: string) => Promise<boolean>;
-  reportPost: (postId: string, reason: string) => Promise<boolean>;
+  reportPost: (postId: string) => Promise<boolean>;
 
   // Legacy compatibility
-  currentUser: LegacyUser | null;
-  posts: LegacyPost[];
-  ratings: LegacyRating[];
-  questions: LegacyQuestion[];
+  currentUser: any;
+  posts: any[];
+  ratings: any[];
+  questions: any[];
   dashboardStats: any;
-  getDashboardStats: () => Promise<any>;
+  getDashboardStats: (period?: string) => Promise<any>;
   getDashboardStatsReal: () => Promise<any>;
   getAnalyticsChartData: () => Promise<any>;
   getCategoryDistribution: () => Promise<any>;
@@ -225,7 +90,7 @@ interface AppContextType {
   submitQuestion: (productId: string, question: string) => Promise<boolean>;
   submitRating: (productId: string, rating: number, comment: string) => Promise<boolean>;
   answerQuestion: (questionId: string, answer: string) => Promise<boolean>;
-  trackEvent: (event: string, data?: any) => void;
+  trackEvent: (eventData: any) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -239,7 +104,7 @@ export function useApp(): AppContextType {
 }
 
 // Fetch distributors function
-const fetchDistributorsPublic = async (): Promise<SimpleDistributor[]> => {
+const fetchDistributorsPublic = async () => {
   try {
     const { data, error } = await supabase
       .from('distributors')
@@ -258,22 +123,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // State
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<SimpleProfile | null>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const [products, setProducts] = useState<SimpleProduct[]>([]);
-  const [banners, setBanners] = useState<SimpleBanner[]>([]);
-  const [advertisements, setAdvertisements] = useState<SimpleAdvertisement[]>([]);
-  const [vehicles, setVehicles] = useState<SimpleVehicle[]>([]);
-  const [categories, setCategories] = useState<SimpleCategory[]>([]);
-  const [distributors, setDistributors] = useState<SimpleDistributor[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [banners, setBanners] = useState<any[]>([]);
+  const [advertisements, setAdvertisements] = useState<any[]>([]);
+  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [distributors, setDistributors] = useState<any[]>([]);
   const [editableContent, setEditableContent] = useState<any>({});
 
   // Legacy state
-  const [currentUser, setCurrentUser] = useState<LegacyUser | null>(null);
-  const [posts] = useState<LegacyPost[]>([]);
-  const [ratings] = useState<LegacyRating[]>([]);
-  const [questions] = useState<LegacyQuestion[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [posts] = useState<any[]>([]);
+  const [ratings] = useState<any[]>([]);
+  const [questions] = useState<any[]>([]);
   const [dashboardStats] = useState<any>({});
 
   // Auth methods
@@ -307,38 +172,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     try {
       const productsResult = await supabase.from('products').select('*');
-      const bannersResult = await supabase.from('banners').select('*').eq('status', 'active');
+      const bannersResult = await supabase.from('banners').select('*').eq('active', true);
       const advertisementsResult = await supabase.from('advertisements').select('*');
       const vehiclesResult = await supabase.from('vehicles').select('*');
       const categoriesResult = await supabase.from('categories').select('*');
       const distributorsResult = await fetchDistributorsPublic();
 
-      if (productsResult.data) {
-        setProducts(productsResult.data);
-      }
-
-      if (bannersResult.data) {
-        setBanners(bannersResult.data);
-      }
-
-      if (advertisementsResult.data) {
-        setAdvertisements(advertisementsResult.data.map((ad: any) => ({
-          ...ad,
-          active: ad.active !== false
-        })));
-      }
-
-      if (vehiclesResult.data) {
-        setVehicles(vehiclesResult.data);
-      }
-
-      if (categoriesResult.data) {
-        setCategories(categoriesResult.data);
-      }
-
-      if (distributorsResult) {
-        setDistributors(distributorsResult);
-      }
+      setProducts(productsResult.data || []);
+      setBanners(bannersResult.data || []);
+      setAdvertisements((advertisementsResult.data || []).map((ad: any) => ({
+        ...ad,
+        active: ad.status === 'active'
+      })));
+      setVehicles(vehiclesResult.data || []);
+      setCategories(categoriesResult.data || []);
+      setDistributors(distributorsResult || []);
 
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -377,15 +225,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return advertisements.find(ad => ad.slot === slot && ad.active) || null;
   }, [advertisements]);
 
-  const trackAdImpression = React.useCallback((adId: string) => {
-    console.log('Track ad impression:', adId);
+  const trackAdImpression = React.useCallback((adId: string, slot?: string, adData?: any) => {
+    console.log('Track ad impression:', { adId, slot, adData });
   }, []);
 
   const trackAdClick = React.useCallback((adId: string) => {
     console.log('Track ad click:', adId);
   }, []);
 
-  const reportPost = React.useCallback(async (postId: string, reason: string) => {
+  const reportPost = React.useCallback(async (postId: string) => {
     return true;
   }, []);
 
@@ -405,8 +253,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return true;
   }, []);
 
-  const trackEvent = React.useCallback((event: string, data?: any) => {
-    console.log('Track event:', event, data);
+  const trackEvent = React.useCallback((eventData: any) => {
+    console.log('Track event:', eventData);
   }, []);
 
   const getAnalyticsChartData = React.useCallback(async () => {
@@ -493,7 +341,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return true;
   }, []);
 
-  const getDashboardStats = React.useCallback(async () => {
+  const getDashboardStats = React.useCallback(async (period?: string) => {
     return {};
   }, []);
 
@@ -526,7 +374,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             setProfile(profile);
             setCurrentUser({
               id: profile.user_id,
-              name: profile.display_name || session.user.email || '',
+              name: profile.name || session.user.email || '',
               email: session.user.email || '',
               role: profile.role || 'Cliente',
               avatar: profile.avatar_url
@@ -560,7 +408,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             setProfile(profile);
             setCurrentUser({
               id: profile.user_id,
-              name: profile.display_name || session.user.email || '',
+              name: profile.name || session.user.email || '',
               email: session.user.email || '',
               role: profile.role || 'Cliente',
               avatar: profile.avatar_url

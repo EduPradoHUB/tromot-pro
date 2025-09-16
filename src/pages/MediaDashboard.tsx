@@ -76,7 +76,7 @@ export default function MediaDashboard() {
     return acc;
   }, {} as Record<string, { impressions: number; clicks: number }>);
 
-  const slotPerformanceData = Object.entries(slotPerformanceMap).map(([slot, data]) => ({
+  const slotPerformanceData = Object.entries(slotPerformanceMap).map(([slot, data]: [string, { impressions: number; clicks: number }]) => ({
     slot,
     impressions: data.impressions,
     clicks: data.clicks,
