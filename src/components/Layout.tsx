@@ -2,7 +2,8 @@ import * as React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Search, Package, User, LogOut, Menu, BarChart3, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+// Temporarily disable Avatar to fix React hooks conflicts  
+// import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 // Temporarily disable DropdownMenu to fix React hooks conflicts
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApp } from '@/contexts/AppContext';
@@ -98,10 +99,10 @@ const navigationItems = [
               <div className="flex items-center space-x-2">
                 {/* User Avatar */}
                 <div className="flex items-center space-x-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={profile.avatar_url} alt={profile.name} />
-                    <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
+                  {/* Simple Avatar Replacement */}
+                  <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
+                    {profile.name.charAt(0).toUpperCase()}
+                  </div>
                   <span className="hidden md:block text-sm font-medium">{profile.name}</span>
                 </div>
                 

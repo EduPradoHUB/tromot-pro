@@ -2,7 +2,8 @@ import * as React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+// Temporarily disable Avatar to fix React hooks conflicts
+// import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Heart, Flag } from 'lucide-react';
 import { Post } from '@/lib/types';
 import { useApp } from '@/contexts/AppContext';
@@ -28,9 +29,10 @@ export function PostCard({ post }: PostCardProps) {
     <Card className="shadow-card">
       <CardContent className="p-4">
         <div className="flex items-start gap-3 mb-3">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback>{post.author_name.charAt(0)}</AvatarFallback>
-          </Avatar>
+          {/* Simple Avatar Replacement */}
+          <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
+            {post.author_name.charAt(0).toUpperCase()}
+          </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">{post.author_name}</span>

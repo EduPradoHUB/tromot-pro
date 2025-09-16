@@ -428,9 +428,10 @@ export default function ProductPage() {
                   <Card key={question.id} className="shadow-card">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3 mb-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback>{question.author_name.charAt(0)}</AvatarFallback>
-                        </Avatar>
+                        {/* Simple Avatar Replacement */}
+                        <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
+                          {question.author_name.charAt(0).toUpperCase()}
+                        </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-medium text-sm">{question.author_name}</span>
@@ -446,11 +447,10 @@ export default function ProductPage() {
                         <>
                           <Separator className="my-3" />
                           <div className="flex items-start gap-3">
-                            <Avatar className="h-8 w-8">
-                              <AvatarFallback className="bg-primary text-primary-foreground">
-                                T
-                              </AvatarFallback>
-                            </Avatar>
+                            {/* Simple Avatar Replacement for Technician */}
+                            <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
+                              T
+                            </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
                                 <span className="font-medium text-sm">{question.answer_by}</span>
@@ -510,9 +510,10 @@ export default function ProductPage() {
                     <Card key={rating.id} className="shadow-card">
                       <CardContent className="p-4">
                         <div className="flex items-start gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback>{rating.author_name.charAt(0)}</AvatarFallback>
-                          </Avatar>
+                          {/* Simple Avatar Replacement */}
+                          <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
+                            {rating.author_name.charAt(0).toUpperCase()}
+                          </div>
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-2">
                               <span className="font-medium text-sm">{rating.author_name}</span>
