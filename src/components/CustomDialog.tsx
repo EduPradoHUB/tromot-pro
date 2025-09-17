@@ -69,6 +69,7 @@ export const DialogTitle = ({ children }: CustomDialogTitleProps) => {
 };
 
 export const DialogTrigger = ({ asChild, children }: CustomDialogTriggerProps) => {
-  // For simplicity, just return the children as-is
+  // For DialogTrigger, we need to clone the child and add onClick handler
+  // This is handled by each dialog's own button click events
   return <>{children}</>;
 };

@@ -784,7 +784,7 @@ export default function AdminDashboard() {
               }
             }}>
               <DialogTrigger asChild>
-                <Button>
+                <Button onClick={() => setProductDialogOpen(true)}>
                   <Plus className="w-4 h-4 mr-2" />
                   Novo Produto
                 </Button>
@@ -1168,7 +1168,7 @@ export default function AdminDashboard() {
               }
             }}>
               <DialogTrigger asChild>
-                <Button>
+                <Button onClick={() => setCategoryDialogOpen(true)}>
                   <Plus className="w-4 h-4 mr-2" />
                   Nova Categoria
                 </Button>
@@ -1265,7 +1265,7 @@ export default function AdminDashboard() {
               }
             }}>
               <DialogTrigger asChild>
-                <Button onClick={() => setEditingDistributor(null)}>
+                <Button onClick={() => setDistributorDialogOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Novo Distribuidor
                 </Button>
@@ -1405,7 +1405,7 @@ export default function AdminDashboard() {
             
             <Dialog open={bannerDialogOpen} onOpenChange={setBannerDialogOpen}>
               <DialogTrigger asChild>
-                <Button>
+                <Button onClick={() => setBannerDialogOpen(true)}>
                   <Plus className="w-4 h-4 mr-2" />
                   Novo Banner
                 </Button>
@@ -1544,7 +1544,7 @@ export default function AdminDashboard() {
               }
             }}>
               <DialogTrigger asChild>
-                <Button>
+                <Button onClick={() => setAdDialogOpen(true)}>
                   <Plus className="w-4 h-4 mr-2" />
                   Nova Propaganda
                 </Button>
@@ -1872,7 +1872,7 @@ export default function AdminDashboard() {
               }
             }}>
               <DialogTrigger asChild>
-                <Button>
+                <Button onClick={() => setVehicleDialogOpen(true)}>
                   <Plus className="w-4 h-4 mr-2" />
                   Novo Veículo
                 </Button>
