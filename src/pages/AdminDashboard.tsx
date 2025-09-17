@@ -1549,9 +1549,18 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Propagandas</h2>
             
+            <Button onClick={() => openDialog('ad')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Propaganda
+            </Button>
+          </div>
+          
+          {/* Advertisement Dialog */}
+          {dialogContent === 'ad' && (
             <Dialog open={dialogOpen} onOpenChange={(open) => {
               setDialogOpen(open);
               if (!open) {
+                closeDialog();
                 setEditingAdvertisement(null);
                 setAdForm({
                   advertiser: '',
@@ -1569,10 +1578,7 @@ export default function AdminDashboard() {
               }
             }}>
               <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Nova Propaganda
-                </Button>
+                <div />
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -1758,7 +1764,7 @@ export default function AdminDashboard() {
                 </div>
               </DialogContent>
             </Dialog>
-          </div>
+          )}
           
           {/* Explicativo sobre tamanhos das artes */}
           <Card className="bg-muted/50">
