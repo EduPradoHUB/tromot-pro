@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useApp } from '@/contexts/AppContext';
@@ -10,7 +10,7 @@ interface QuestionFormProps {
 
 export function QuestionForm({ productId }: QuestionFormProps) {
   const { currentUser, submitQuestion } = useApp();
-  const [question, setQuestion] = React.useState('');
+  const [question, setQuestion] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

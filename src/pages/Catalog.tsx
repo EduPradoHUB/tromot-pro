@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, Star, Eye, Grid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -20,16 +20,16 @@ import { PWAInstallButtonSimple } from '@/components/PWAInstallButtonSimple';
 
 export default function Catalog() {
   const { legacyProducts: products, vehicles, trackEvent } = useApp();
-  const [viewMode, setViewMode] = React.useState<'grid' | 'list'>('grid');
-  const [localSearch, setLocalSearch] = React.useState('');
-  const [selectedCategory, setSelectedCategory] = React.useState('Todos');
-  const [selectedBrand, setSelectedBrand] = React.useState('Todos');
-  const [selectedModel, setSelectedModel] = React.useState('');
-  const [selectedYear, setSelectedYear] = React.useState('');
-  const [sortBy, setSortBy] = React.useState('name');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [localSearch, setLocalSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('Todos');
+  const [selectedBrand, setSelectedBrand] = useState('Todos');
+  const [selectedModel, setSelectedModel] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
+  const [sortBy, setSortBy] = useState('name');
 
   // Aplicar filtros da URL na inicialização
-  React.useEffect(() => {
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const brandParam = urlParams.get('brand');
     const modelParam = urlParams.get('model');
@@ -48,7 +48,7 @@ export default function Catalog() {
     ? vehicles.find(v => v.brand === selectedBrand && v.model === selectedModel)?.years || []
     : [];
 
-  const filteredProducts = React.useMemo(() => {
+  const filteredProducts = useMemo(() => {
     let filtered = products;
 
     // Text search
