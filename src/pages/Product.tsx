@@ -19,7 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/AppContextSimple';
 import { PostCard } from '@/components/PostCard';
 import { RatingForm } from '@/components/RatingForm';
 import { QuestionForm } from '@/components/QuestionForm';

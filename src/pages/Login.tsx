@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/AppContextSimple';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {

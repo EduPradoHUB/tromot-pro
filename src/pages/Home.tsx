@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 // Removed problematic carousel imports to fix React hooks conflicts
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/AppContextSimple';
 import AdSlot from '@/components/AdSlot';
 import { PWAInstallButtonSimple } from '@/components/PWAInstallButtonSimple';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialogSimple';
