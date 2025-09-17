@@ -91,11 +91,8 @@ export default function ProductPage() {
     const foundProduct = await findProductByBarcode(barcode);
     
     if (foundProduct) {
+      // Navegar diretamente sem mostrar toast - a navegação já indica sucesso
       navigate(`/produto/${foundProduct.id}`);
-      toast({
-        title: "Produto encontrado!",
-        description: `Navegando para ${foundProduct.name}`,
-      });
     } else {
       toast({
         title: "Produto não encontrado",

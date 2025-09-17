@@ -79,7 +79,7 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
 
   const uploadCroppedImage = async () => {
     if (!completedCrop || !previewCanvasRef.current || !imgRef.current) {
-      alert("Por favor, selecione uma área da imagem.");
+      console.error("Por favor, selecione uma área da imagem.");
       return;
     }
 
@@ -102,7 +102,7 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
       setOpen(false);
       setImgSrc('');
       
-      alert("Foto de perfil atualizada com sucesso!");
+      console.log("Foto de perfil atualizada com sucesso!");
     } catch (error: any) {
       console.error('❌ Erro no upload de avatar:', error);
       
@@ -116,7 +116,7 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
         errorMessage = "Falha no upload. Verifique sua conexão e tente novamente.";
       }
 
-      alert(`Erro: ${errorMessage}`);
+      console.error(`Erro: ${errorMessage}`);
     } finally {
       setUploading(false);
     }

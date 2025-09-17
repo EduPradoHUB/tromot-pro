@@ -1,9 +1,10 @@
-import * as React from "react";
+import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
 import { Layout } from "@/components/Layout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { Toaster } from "@/components/ui/toaster";
 // Temporarily disable PWA components to fix React hooks conflicts
 // import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 // import { PWAStatusIndicator } from "@/components/PWAStatusIndicator";
@@ -32,6 +33,7 @@ function AppContent() {
   return (
     <>
       {/* PWA components temporarily disabled to fix React hooks conflicts */}
+      <Toaster />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<PasswordReset />} />

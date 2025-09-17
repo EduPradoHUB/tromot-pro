@@ -33,20 +33,20 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
     if (file) {
       // Validação de tipo de arquivo
       if (!file.type.startsWith('image/')) {
-        alert("Tipo de arquivo inválido. Por favor, selecione apenas arquivos de imagem.");
+        console.error("Tipo de arquivo inválido. Por favor, selecione apenas arquivos de imagem.");
         return;
       }
 
       // Validação de tamanho
       const maxSize = 10 * 1024 * 1024; // 10MB
       if (file.size > maxSize) {
-        alert("Arquivo muito grande. A imagem deve ter no máximo 10MB.");
+        console.error("Arquivo muito grande. A imagem deve ter no máximo 10MB.");
         return;
       }
 
       // Aviso para formatos problemáticos
       if (file.type === 'image/heic' || file.type === 'image/heif') {
-        alert("Imagens HEIC podem ter problemas. Considere converter para JPG.");
+        console.warn("Imagens HEIC podem ter problemas. Considere converter para JPG.");
       }
 
       console.log('📷 Imagem selecionada:', { name: file.name, size: file.size, type: file.type });
@@ -73,19 +73,19 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
     
     if (!imageFile || !formData.caption.trim() || !formData.vehicleBrand.trim() || 
         !formData.vehicleModel.trim() || !formData.vehicleYear.trim()) {
-      alert("Campos obrigatórios. Por favor, preencha todos os campos e selecione uma foto.");
+      console.error("Campos obrigatórios. Por favor, preencha todos os campos e selecione uma foto.");
       return;
     }
 
     if (!currentUser) {
-      alert("Erro. Você precisa estar logado para compartilhar uma instalação.");
+      console.error("Erro. Você precisa estar logado para compartilhar uma instalação.");
       return;
     }
 
     // Validação adicional de tamanho de arquivo
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (imageFile.size > maxSize) {
-      alert("Arquivo muito grande. A imagem deve ter no máximo 10MB.");
+      console.error("Arquivo muito grande. A imagem deve ter no máximo 10MB.");
       return;
     }
 
@@ -129,7 +129,7 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
 
       console.log('✅ Post criado com sucesso:', data);
 
-      alert("Sucesso! Sua instalação foi enviada para análise. Aguarde a aprovação do administrador.");
+      console.log("Sucesso! Sua instalação foi enviada para análise. Aguarde a aprovação do administrador.");
       
       // Atualizar dados após criação bem-sucedida
       window.location.reload();
@@ -149,7 +149,7 @@ export function PostUploadModal({ isOpen, onClose, productId }: PostUploadModalP
         errorMessage = "Falha no upload da imagem. Verifique sua conexão e tente novamente.";
       }
 
-      alert("Erro: " + errorMessage);
+      console.error("Erro: " + errorMessage);
     } finally {
       setLoading(false);
     }

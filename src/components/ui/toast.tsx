@@ -1,4 +1,4 @@
-import * as React from "react"
+import React, { createContext, useContext, useState, useCallback } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -9,7 +9,7 @@ interface ToastContextType {
   removeToast: (id: string) => void
 }
 
-const ToastContext = React.createContext<ToastContextType | null>(null)
+const ToastContext = createContext<ToastContextType | null>(null)
 
 interface ToastData {
   id: string
@@ -19,9 +19,9 @@ interface ToastData {
 }
 
 const ToastProvider = ({ children }: { children: React.ReactNode }) => {
-  const [toasts, setToasts] = React.useState<ToastData[]>([])
+  const [toasts, setToasts] = useState<ToastData[]>([])
 
-  const addToast = React.useCallback((toast: Omit<ToastData, 'id'>) => {
+  const addToast = useCallback((toast: Omit<ToastData, 'id'>) => {
     const id = Math.random().toString(36).substring(2, 9)
     setToasts(prev => [...prev, { ...toast, id }])
     
@@ -31,7 +31,7 @@ const ToastProvider = ({ children }: { children: React.ReactNode }) => {
     }, 5000)
   }, [])
 
-  const removeToast = React.useCallback((id: string) => {
+  const removeToast = useCallback((id: string) => {
     setToasts(prev => prev.filter(toast => toast.id !== id))
   }, [])
 
@@ -44,7 +44,7 @@ const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 }
 
 const ToastViewport = () => {
-  const context = React.useContext(ToastContext)
+  const context = useContext(ToastContext)
   if (!context) return null
 
   return (

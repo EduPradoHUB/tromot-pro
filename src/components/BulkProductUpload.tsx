@@ -58,7 +58,7 @@ export const BulkProductUpload: React.FC = () => {
         setFile(selectedFile);
         parseFileData(selectedFile);
       } else {
-        alert("Arquivo inválido. Por favor, selecione um arquivo CSV ou Excel (.xlsx/.xls).");
+        console.error("Arquivo inválido. Por favor, selecione um arquivo CSV ou Excel (.xlsx/.xls).");
       }
     }
   };
@@ -70,7 +70,7 @@ export const BulkProductUpload: React.FC = () => {
       setParsedData(validated);
       setShowPreview(true);
     } catch (error) {
-      alert("Erro ao processar arquivo. Não foi possível processar o arquivo.");
+      console.error("Erro ao processar arquivo. Não foi possível processar o arquivo.");
     }
   };
 
@@ -94,7 +94,7 @@ export const BulkProductUpload: React.FC = () => {
   const handleImport = async () => {
     const validProducts = parsedData.filter(p => p.isValid);
     if (validProducts.length === 0) {
-      alert("Nenhum produto válido. Corrija os erros antes de importar.");
+      console.error("Nenhum produto válido. Corrija os erros antes de importar.");
       return;
     }
 
@@ -181,7 +181,7 @@ export const BulkProductUpload: React.FC = () => {
     setImporting(false);
     setShowPreview(false);
     
-    alert(`Importação concluída: ${result.success} produtos processados com sucesso, ${result.errors} erros.`);
+    console.log(`Importação concluída: ${result.success} produtos processados com sucesso, ${result.errors} erros.`);
   };
 
   const getValidationIcon = (isValid: boolean, errors: string[]) => {

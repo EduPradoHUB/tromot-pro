@@ -84,11 +84,8 @@ export default function Home() {
   const handleBarcodeDetected = async (barcode: string) => {
     const product = await findProductByBarcode(barcode);
     if (product) {
+      // Navegar diretamente sem mostrar toast - a navegação já indica sucesso
       navigate(`/produto/${product.id}`);
-      toast({
-        title: "Produto encontrado!",
-        description: `Navegando para ${product.name}`
-      });
     } else {
       toast({
         title: "Produto não encontrado",

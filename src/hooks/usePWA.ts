@@ -226,8 +226,8 @@ export const usePWA = () => {
       instructions = 'Para instalar o TROMOT PRO:\n\n1. Abra no Chrome ou Edge\n2. Toque no menu do navegador\n3. Selecione "Instalar app"';
     }
 
-    console.log('[PWA] Showing manual installation instructions');
-    alert(instructions);
+    console.log('[PWA] Manual installation instructions:', instructions);
+    // Use visual notification instead of alert for better UX
     return false;
   };
 
