@@ -1270,9 +1270,18 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Distribuidores</h2>
             
+            <Button onClick={() => openDialog('distributor')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Distribuidor
+            </Button>
+          </div>
+          
+          {/* Distributor Dialog */}
+          {dialogContent === 'distributor' && (
             <Dialog open={dialogOpen} onOpenChange={(open) => {
               setDialogOpen(open);
               if (!open) {
+                closeDialog();
                 setEditingDistributor(null);
                 setDistributorForm({
                   name: '',
@@ -1286,10 +1295,7 @@ export default function AdminDashboard() {
               }
             }}>
               <DialogTrigger asChild>
-                <Button onClick={() => setEditingDistributor(null)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Novo Distribuidor
-                </Button>
+                <div />
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -1368,7 +1374,7 @@ export default function AdminDashboard() {
                 </div>
               </DialogContent>
             </Dialog>
-          </div>
+          )}
           
           <div className="grid gap-4">
             {distributors.map((distributor) => (
