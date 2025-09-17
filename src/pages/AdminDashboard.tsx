@@ -773,9 +773,18 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Produtos</h2>
             
+            <Button onClick={() => openDialog('product')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Produto
+            </Button>
+          </div>
+          
+          {/* Product Dialog */}
+          {dialogContent === 'product' && (
             <Dialog open={dialogOpen} onOpenChange={(open) => {
               setDialogOpen(open);
               if (!open) {
+                closeDialog();
                 setEditingProduct(null);
                 setProductForm({
                   name: '',
@@ -793,10 +802,7 @@ export default function AdminDashboard() {
               }
             }}>
               <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Novo Produto
-                </Button>
+                <div />
               </DialogTrigger>
               
               <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -966,7 +972,7 @@ export default function AdminDashboard() {
                 </div>
               </DialogContent>
             </Dialog>
-          </div>
+          )}
           
           {/* Filtros e Busca */}
           <div className="space-y-4">
