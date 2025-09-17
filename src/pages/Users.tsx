@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/custom-alert-dialog';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Users as UsersIcon, UserCheck, UserCog } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -102,6 +102,22 @@ export default function Users() {
     }
   };
 
+  const stats = useMemo(() => {
+    const roleStats = profiles.reduce((acc, profile) => {
+      acc[profile.role] = (acc[profile.role] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const customerTypeStats = profiles.reduce((acc, profile) => {
+      if (profile.customer_type) {
+        acc[profile.customer_type] = (acc[profile.customer_type] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+
+    return { roleStats, customerTypeStats };
+  }, [profiles]);
+
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case 'ADM':
@@ -136,6 +152,82 @@ export default function Users() {
           <Button onClick={loadProfiles} variant="outline">
             Atualizar
           </Button>
+        </div>
+
+        {/* Estatísticas de Usuários */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <Card className="shadow-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
+              <UsersIcon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{profiles.length}</div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Administradores</CardTitle>
+              <UserCog className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-destructive">{stats.roleStats['ADM'] || 0}</div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Técnicos</CardTitle>
+              <UserCheck className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary">{stats.roleStats['Técnico Tromot'] || 0}</div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Clientes</CardTitle>
+              <UsersIcon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-muted-foreground">{stats.roleStats['Cliente'] || 0}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Estatísticas por Tipo de Cliente */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Card className="shadow-card">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Lojistas/Instaladores</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary">{stats.customerTypeStats['lojista_instalador'] || 0}</div>
+              <p className="text-xs text-muted-foreground">profissionais do setor</p>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-card">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Distribuidores/Representantes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-secondary">{stats.customerTypeStats['distribuidor_representante'] || 0}</div>
+              <p className="text-xs text-muted-foreground">parceiros comerciais</p>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-card">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Usuários Finais</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-muted-foreground">{stats.customerTypeStats['usuario_final'] || 0}</div>
+              <p className="text-xs text-muted-foreground">consumidores</p>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="grid gap-4">
