@@ -1,10 +1,10 @@
-import * as React from 'react';
+import { useState, useEffect } from 'react';
 
 export const useNotifications = () => {
-  const [permission, setPermission] = React.useState<NotificationPermission>('default');
-  const [isSupported, setIsSupported] = React.useState(false);
+  const [permission, setPermission] = useState<NotificationPermission>('default');
+  const [isSupported, setIsSupported] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Check if notifications are supported
     setIsSupported('Notification' in window && 'serviceWorker' in navigator);
     

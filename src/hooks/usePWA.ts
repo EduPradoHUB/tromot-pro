@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState, useEffect } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -31,12 +31,12 @@ const checkInstallationStatus = () => {
 };
 
 export const usePWA = () => {
-  const [installPrompt, setInstallPrompt] = React.useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstallable, setIsInstallable] = React.useState(true); // Mais permissivo - sempre mostrar opção
-  const [isInstalled, setIsInstalled] = React.useState(false);
-  const [hasPrompt, setHasPrompt] = React.useState(false);
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstallable, setIsInstallable] = useState(true); // Mais permissivo - sempre mostrar opção
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [hasPrompt, setHasPrompt] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('[PWA] Initializing PWA hook');
     
     // Verificar se já está instalado
