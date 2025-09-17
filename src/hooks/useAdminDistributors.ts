@@ -10,15 +10,13 @@ type DistributorInsert = Database['public']['Tables']['distributors']['Insert'];
  * Usado apenas em contextos administrativos
  */
 export const useAdminDistributors = () => {
-  console.log('🔧 useAdminDistributors: Hook iniciado');
+  console.log('🔧 useAdminDistributors: Iniciando hook');
   
   const [distributors, setDistributors] = useState<Distributor[]>([]);
   const [loading, setLoading] = useState(false);
-  
-  console.log('🔧 useAdminDistributors: Estados inicializados');
 
   const fetchDistributors = async () => {
-    console.log('🔧 useAdminDistributors: fetchDistributors chamado');
+    console.log('🔧 useAdminDistributors: Buscando distribuidores');
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -26,18 +24,13 @@ export const useAdminDistributors = () => {
         .select('*')
         .order('name');
 
-      if (error) {
-        console.error('❌ useAdminDistributors: Erro na query:', error);
-        throw error;
-      }
-      
-      console.log('✅ useAdminDistributors: Dados recebidos:', data?.length || 0, 'distribuidores');
+      if (error) throw error;
       setDistributors(data || []);
+      console.log('✅ useAdminDistributors: Distribuidores carregados:', data?.length);
     } catch (error) {
       console.error('❌ useAdminDistributors: Erro ao buscar distribuidores:', error);
     } finally {
       setLoading(false);
-      console.log('🔧 useAdminDistributors: Loading finalizado');
     }
   };
 
@@ -83,11 +76,11 @@ export const useAdminDistributors = () => {
   };
 
   useEffect(() => {
-    console.log('🔧 useAdminDistributors: useEffect executado');
+    console.log('🔧 useAdminDistributors: useEffect chamado');
     fetchDistributors();
   }, []);
 
-  console.log('🔧 useAdminDistributors: Retornando objeto do hook');
+  console.log('🔧 useAdminDistributors: Retornando dados');
   return {
     distributors,
     loading,
