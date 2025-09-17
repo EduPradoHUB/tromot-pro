@@ -10,10 +10,13 @@ type DistributorInsert = Database['public']['Tables']['distributors']['Insert'];
  * Usado apenas em contextos administrativos
  */
 export const useAdminDistributors = () => {
+  console.log('🔧 useAdminDistributors: Iniciando hook');
+  
   const [distributors, setDistributors] = useState<Distributor[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchDistributors = async () => {
+    console.log('🔧 useAdminDistributors: Buscando distribuidores');
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -23,14 +26,16 @@ export const useAdminDistributors = () => {
 
       if (error) throw error;
       setDistributors(data || []);
+      console.log('✅ useAdminDistributors: Distribuidores carregados:', data?.length);
     } catch (error) {
-      console.error('Erro ao buscar distribuidores (admin):', error);
+      console.error('❌ useAdminDistributors: Erro ao buscar distribuidores:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const createDistributor = async (data: DistributorInsert): Promise<Distributor> => {
+    console.log('🔧 useAdminDistributors: Criando distribuidor');
     const { data: distributor, error } = await supabase
       .from('distributors')
       .insert(data)
@@ -44,6 +49,7 @@ export const useAdminDistributors = () => {
   };
 
   const updateDistributor = async (id: string, data: Partial<DistributorInsert>): Promise<Distributor> => {
+    console.log('🔧 useAdminDistributors: Atualizando distribuidor:', id);
     const { data: distributor, error } = await supabase
       .from('distributors')
       .update(data)
@@ -58,6 +64,7 @@ export const useAdminDistributors = () => {
   };
 
   const deleteDistributor = async (id: string): Promise<void> => {
+    console.log('🔧 useAdminDistributors: Deletando distribuidor:', id);
     const { error } = await supabase
       .from('distributors')
       .delete()
@@ -69,9 +76,11 @@ export const useAdminDistributors = () => {
   };
 
   useEffect(() => {
+    console.log('🔧 useAdminDistributors: useEffect chamado');
     fetchDistributors();
   }, []);
 
+  console.log('🔧 useAdminDistributors: Retornando dados');
   return {
     distributors,
     loading,
