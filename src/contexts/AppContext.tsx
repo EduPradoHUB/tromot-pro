@@ -1,4 +1,5 @@
-import React, { useState, useContext, useEffect, useCallback, createContext } from 'react';
+import { useState, useContext, useEffect, useCallback, createContext } from 'react';
+import type { FC, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
@@ -232,7 +233,7 @@ export const useApp = () => {
   return context;
 };
 
-export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
