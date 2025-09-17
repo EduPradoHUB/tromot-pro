@@ -38,7 +38,7 @@ export function BannerCarousel({
   };
   if (banners.length === 0) return null;
   if (banners.length === 1) {
-    return <section className="sm:container px-0 mt-[5px]">
+    return <section className="sm:container px-0">
         <div className="flex justify-center">
           <div className="aspect-[4/5] w-full max-w-sm sm:max-w-md overflow-hidden shadow-card">
             <img src={banners[0].image_url} alt={banners[0].title} className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => banners[0].link_url && window.open(banners[0].link_url, '_blank')} />
@@ -46,7 +46,7 @@ export function BannerCarousel({
         </div>
       </section>;
   }
-  return <section className="sm:container px-0 mt-[5px]">
+  return <section className="sm:container px-0">
       <div className="relative w-full max-w-4xl mx-auto">
         {/* Carousel Container */}
         <div className="relative overflow-hidden shadow-card">

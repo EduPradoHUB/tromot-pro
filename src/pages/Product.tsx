@@ -19,16 +19,15 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import { useApp } from '@/contexts/AppContextSimple';
+import { useApp } from '@/contexts/AppContext';
 import { PostCard } from '@/components/PostCard';
 import { RatingForm } from '@/components/RatingForm';
 import { QuestionForm } from '@/components/QuestionForm';
 import { PostUploadModal } from '@/components/PostUploadModal';
-import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialogSimple';
+import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
 import { Product, Post, Rating, Question } from '@/lib/types';
 import AdSlot from '@/components/AdSlot';
-// Temporarily disabled to fix React hooks conflicts
-// import { toast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -95,8 +94,11 @@ export default function ProductPage() {
       // Navegar diretamente sem mostrar toast - a navegação já indica sucesso
       navigate(`/produto/${foundProduct.id}`);
     } else {
-      // Temporarily using alert instead of toast to fix React hooks conflicts
-      alert(`Produto não encontrado: ${barcode}`);
+      toast({
+        title: "Produto não encontrado",
+        description: `Nenhum produto encontrado com o código ${barcode}`,
+        variant: "destructive",
+      });
     }
   };
 

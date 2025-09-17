@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useApp } from '@/contexts/AppContext';
-// Temporarily disabled to fix React hooks conflicts
-// import { toast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 interface QuestionFormProps {
   productId: string;
@@ -17,21 +16,29 @@ export function QuestionForm({ productId }: QuestionFormProps) {
     e.preventDefault();
     
     if (!currentUser) {
-      // Temporarily using alert instead of toast to fix React hooks conflicts
-      alert("Você precisa estar logado para fazer uma pergunta.");
+      toast({
+        title: "Erro",
+        description: "Você precisa estar logado para fazer uma pergunta.",
+        variant: "destructive",
+      });
       return;
     }
 
     if (!question.trim()) {
-      // Temporarily using alert instead of toast to fix React hooks conflicts
-      alert("Digite sua pergunta.");
+      toast({
+        title: "Erro",
+        description: "Digite sua pergunta.",
+        variant: "destructive",
+      });
       return;
     }
 
     submitQuestion(productId, question.trim());
     
-    // Temporarily using alert instead of toast to fix React hooks conflicts
-    alert("Sua pergunta foi enviada!");
+    toast({
+      title: "Sucesso",
+      description: "Sua pergunta foi enviada!",
+    });
 
     setQuestion('');
   };

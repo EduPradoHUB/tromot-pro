@@ -3,9 +3,8 @@ import { Edit2, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useApp } from '@/contexts/AppContextSimple';
-// Temporarily disabled to fix React hooks conflicts
-// import { toast } from '@/hooks/use-toast';
+import { useApp } from '@/contexts/AppContext';
+import { toast } from '@/hooks/use-toast';
 
 interface EditableContentProps {
   section: string;
@@ -57,12 +56,17 @@ export const EditableContent: React.FC<EditableContentProps> = ({
           description: editDescription 
         });
         setIsEditing(false);
-        // Temporarily disabled toast to fix React hooks conflicts
-        console.log("Conteúdo atualizado com sucesso!");
+        toast({
+          title: "Conteúdo atualizado!",
+          description: "As alterações foram salvas com sucesso."
+        });
       }
     } catch (error) {
-      // Temporarily disabled toast to fix React hooks conflicts
-      console.error("Erro ao salvar alterações:", error);
+      toast({
+        title: "Erro ao salvar",
+        description: "Não foi possível salvar as alterações.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }

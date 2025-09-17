@@ -1,11 +1,10 @@
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AppProvider } from "@/contexts/AppContextSimple";
+import { AppProvider } from "@/contexts/AppContext";
 import { Layout } from "@/components/Layout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-// Temporarily disable Toaster to fix React hooks conflicts
-// import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/toaster";
 // Temporarily disable PWA components to fix React hooks conflicts
 // import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 // import { PWAStatusIndicator } from "@/components/PWAStatusIndicator";
@@ -33,7 +32,8 @@ const queryClient = new QueryClient();
 function AppContent() {
   return (
     <>
-      {/* Toaster and PWA components temporarily disabled to fix React hooks conflicts */}
+      {/* PWA components temporarily disabled to fix React hooks conflicts */}
+      <Toaster />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<PasswordReset />} />

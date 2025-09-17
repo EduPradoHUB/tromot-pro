@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 // import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 // Temporarily disable DropdownMenu to fix React hooks conflicts
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { useApp } from '@/contexts/AppContextSimple';
+import { useApp } from '@/contexts/AppContext';
 import { EditableContent } from '@/components/EditableContent';
 interface LayoutProps {
   children: React.ReactNode;
