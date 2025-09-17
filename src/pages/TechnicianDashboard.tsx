@@ -32,7 +32,7 @@ export default function TechnicianDashboard() {
   
   const { toast } = useToast();
   
-  const [productForm, setProductForm] = React.useState({
+  const [productForm, setProductForm] = useState({
     name: '',
     code: '',
     barcode_ean: '',
@@ -45,16 +45,16 @@ export default function TechnicianDashboard() {
     compatibility: '[]'
   });
   
-  const [categoryForm, setCategoryForm] = React.useState({
+  const [categoryForm, setCategoryForm] = useState({
     name: '',
     description: '',
     active: true
   });
   
-  const [editingProduct, setEditingProduct] = React.useState<any>(null);
-  const [editingCategory, setEditingCategory] = React.useState<any>(null);
-  const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [dialogContent, setDialogContent] = React.useState<'product' | 'category' | null>(null);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogContent, setDialogContent] = useState<'product' | 'category' | null>(null);
 
   const openDialog = (type: 'product' | 'category') => {
     setDialogContent(type);

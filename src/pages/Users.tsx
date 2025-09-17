@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,10 +13,10 @@ type Profile = Database['public']['Tables']['profiles']['Row'];
 
 export default function Users() {
   const { fetchAllProfiles, updateUserRole } = useApp();
-  const [profiles, setProfiles] = React.useState<Profile[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     loadProfiles();
   }, []);
 

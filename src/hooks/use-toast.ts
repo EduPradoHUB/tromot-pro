@@ -1,4 +1,4 @@
-import * as React from "react"
+import React, { useState, useEffect } from 'react';
 
 interface ToastProps {
   title?: React.ReactNode
@@ -48,9 +48,9 @@ export function toast(props: ToastProps) {
 }
 
 export function useToast() {
-  const [toasts, setToasts] = React.useState<(ToastProps & { id: string })[]>([])
+  const [toasts, setToasts] = useState<(ToastProps & { id: string })[]>([])
 
-  React.useEffect(() => {
+  useEffect(() => {
     toastCallback = (newToast: ToastProps) => {
       const id = Math.random().toString(36).substring(2, 9)
       const toastWithId = { ...newToast, id }
