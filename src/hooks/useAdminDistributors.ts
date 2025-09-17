@@ -10,15 +10,10 @@ type DistributorInsert = Database['public']['Tables']['distributors']['Insert'];
  * Usado apenas em contextos administrativos
  */
 export const useAdminDistributors = () => {
-  console.log('🔧 useAdminDistributors: Hook iniciado');
-  
   const [distributors, setDistributors] = useState<Distributor[]>([]);
   const [loading, setLoading] = useState(false);
-  
-  console.log('🔧 useAdminDistributors: Estados inicializados');
 
   const fetchDistributors = async () => {
-    console.log('🔧 useAdminDistributors: fetchDistributors chamado');
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -26,23 +21,16 @@ export const useAdminDistributors = () => {
         .select('*')
         .order('name');
 
-      if (error) {
-        console.error('❌ useAdminDistributors: Erro na query:', error);
-        throw error;
-      }
-      
-      console.log('✅ useAdminDistributors: Dados recebidos:', data?.length || 0, 'distribuidores');
+      if (error) throw error;
       setDistributors(data || []);
     } catch (error) {
-      console.error('❌ useAdminDistributors: Erro ao buscar distribuidores:', error);
+      console.error('Erro ao buscar distribuidores (admin):', error);
     } finally {
       setLoading(false);
-      console.log('🔧 useAdminDistributors: Loading finalizado');
     }
   };
 
   const createDistributor = async (data: DistributorInsert): Promise<Distributor> => {
-    console.log('🔧 useAdminDistributors: Criando distribuidor');
     const { data: distributor, error } = await supabase
       .from('distributors')
       .insert(data)
@@ -56,7 +44,6 @@ export const useAdminDistributors = () => {
   };
 
   const updateDistributor = async (id: string, data: Partial<DistributorInsert>): Promise<Distributor> => {
-    console.log('🔧 useAdminDistributors: Atualizando distribuidor:', id);
     const { data: distributor, error } = await supabase
       .from('distributors')
       .update(data)
@@ -71,7 +58,6 @@ export const useAdminDistributors = () => {
   };
 
   const deleteDistributor = async (id: string): Promise<void> => {
-    console.log('🔧 useAdminDistributors: Deletando distribuidor:', id);
     const { error } = await supabase
       .from('distributors')
       .delete()
@@ -83,11 +69,9 @@ export const useAdminDistributors = () => {
   };
 
   useEffect(() => {
-    console.log('🔧 useAdminDistributors: useEffect executado');
     fetchDistributors();
   }, []);
 
-  console.log('🔧 useAdminDistributors: Retornando objeto do hook');
   return {
     distributors,
     loading,

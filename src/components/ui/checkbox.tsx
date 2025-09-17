@@ -1,4 +1,4 @@
-import * as React from "react"
+import React, { forwardRef, ChangeEvent } from "react"
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -7,9 +7,9 @@ interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>
   onCheckedChange?: (checked: boolean) => void
 }
 
-const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
+const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   ({ className, checked, onCheckedChange, ...props }, ref) => {
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
       onCheckedChange?.(e.target.checked)
     }
 
