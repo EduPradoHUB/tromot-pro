@@ -1165,9 +1165,18 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Categorias</h2>
             
+            <Button onClick={() => openDialog('category')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Categoria
+            </Button>
+          </div>
+          
+          {/* Category Dialog */}
+          {dialogContent === 'category' && (
             <Dialog open={dialogOpen} onOpenChange={(open) => {
               setDialogOpen(open);
               if (!open) {
+                closeDialog();
                 setEditingCategory(null);
                 setCategoryForm({
                   name: '',
@@ -1177,10 +1186,7 @@ export default function AdminDashboard() {
               }
             }}>
               <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Nova Categoria
-                </Button>
+                <div />
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -1221,7 +1227,7 @@ export default function AdminDashboard() {
                 </div>
               </DialogContent>
             </Dialog>
-          </div>
+           )}
           
           <div className="grid gap-4">
             {categories.map((category) => (
