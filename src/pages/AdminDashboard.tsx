@@ -124,8 +124,14 @@ export default function AdminDashboard() {
   const [editingVehicle, setEditingVehicle] = useState<any>(null);
   const [editingAdvertisement, setEditingAdvertisement] = useState<any>(null);
   const [editingDistributor, setEditingDistributor] = useState<any>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogContent, setDialogContent] = useState<'product' | 'banner' | 'ad' | 'vehicle' | 'category' | 'distributor' | null>(null);
+  
+  // Estados para diálogos separados
+  const [productDialogOpen, setProductDialogOpen] = useState(false);
+  const [bannerDialogOpen, setBannerDialogOpen] = useState(false);
+  const [adDialogOpen, setAdDialogOpen] = useState(false);
+  const [vehicleDialogOpen, setVehicleDialogOpen] = useState(false);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [distributorDialogOpen, setDistributorDialogOpen] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
   
   // Estados para filtros e busca de produtos
@@ -294,7 +300,7 @@ export default function AdminDashboard() {
         active: true
       });
       
-      setDialogOpen(false);
+      setDistributorDialogOpen(false);
       
       toast({
         title: "Sucesso",
@@ -326,7 +332,7 @@ export default function AdminDashboard() {
       });
       
       setEditingDistributor(null);
-      setDialogOpen(false);
+      setDistributorDialogOpen(false);
       
       toast({
         title: "Sucesso",
@@ -339,21 +345,6 @@ export default function AdminDashboard() {
         variant: "destructive"
       });
     }
-  };
-
-  const openDialog = (type: 'product' | 'banner' | 'ad' | 'vehicle' | 'category' | 'distributor') => {
-    setDialogContent(type);
-    setDialogOpen(true);
-  };
-
-  const closeDialog = () => {
-    setDialogContent(null);
-    setDialogOpen(false);
-    setEditingProduct(null);
-    setEditingCategory(null);
-    setEditingVehicle(null);
-    setEditingAdvertisement(null);
-    setEditingDistributor(null);
   };
 
   const handleDeleteDistributor = async (id: string) => {
@@ -405,7 +396,7 @@ export default function AdminDashboard() {
         out_of_production: false
       });
       
-      setDialogOpen(false);
+      setProductDialogOpen(false);
       
       toast({
         title: "Produto criado",
@@ -431,7 +422,7 @@ export default function AdminDashboard() {
         active: true
       });
       
-      setDialogOpen(false);
+      setBannerDialogOpen(false);
       
       toast({
         title: "Banner criado",
@@ -464,7 +455,7 @@ export default function AdminDashboard() {
         target_products: []
       });
       
-      setDialogOpen(false);
+      setAdDialogOpen(false);
       
       toast({
         title: "Propaganda criada",
@@ -492,7 +483,7 @@ export default function AdminDashboard() {
         years: ''
       });
       
-      setDialogOpen(false);
+      setVehicleDialogOpen(false);
       
       toast({
         title: "Veículo criado",
@@ -514,7 +505,7 @@ export default function AdminDashboard() {
       model: vehicle.model,
       years: vehicle.years.join(', ')
     });
-    setDialogOpen(true);
+    setVehicleDialogOpen(true);
   };
 
   const handleUpdateVehicle = async () => {
@@ -533,7 +524,7 @@ export default function AdminDashboard() {
       });
       
       setEditingVehicle(null);
-      setDialogOpen(false);
+    setCategoryDialogOpen(false);
       
       toast({
         title: "Veículo atualizado",
@@ -577,7 +568,7 @@ export default function AdminDashboard() {
         active: true
       });
       
-      setDialogOpen(false);
+      setCategoryDialogOpen(false);
       
       toast({
         title: "Categoria criada",
@@ -651,7 +642,7 @@ export default function AdminDashboard() {
       });
       
       setEditingProduct(null);
-      setDialogOpen(false);
+      setVehicleDialogOpen(false);
       
       toast({
         title: "Produto atualizado",
@@ -677,7 +668,7 @@ export default function AdminDashboard() {
       });
       
       setEditingCategory(null);
-      setDialogOpen(false);
+      setVehicleDialogOpen(false);
       
       toast({
         title: "Categoria atualizada",
@@ -728,7 +719,7 @@ export default function AdminDashboard() {
       });
       
       setEditingAdvertisement(null);
-      setDialogOpen(false);
+      setAdDialogOpen(false);
       
       toast({
         title: "Propaganda atualizada",
@@ -773,8 +764,8 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Produtos</h2>
             
-            <Dialog open={dialogOpen} onOpenChange={(open) => {
-              setDialogOpen(open);
+            <Dialog open={productDialogOpen} onOpenChange={(open) => {
+              setProductDialogOpen(open);
               if (!open) {
                 setEditingProduct(null);
                 setProductForm({
@@ -1140,7 +1131,7 @@ export default function AdminDashboard() {
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" onClick={() => {
                         handleEditProduct(product);
-                        setDialogOpen(true);
+                        setProductDialogOpen(true);
                       }}>
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -1165,8 +1156,8 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Categorias</h2>
             
-            <Dialog open={dialogOpen} onOpenChange={(open) => {
-              setDialogOpen(open);
+            <Dialog open={categoryDialogOpen} onOpenChange={(open) => {
+              setCategoryDialogOpen(open);
               if (!open) {
                 setEditingCategory(null);
                 setCategoryForm({
@@ -1238,7 +1229,7 @@ export default function AdminDashboard() {
                      <div className="flex gap-2">
                        <Button variant="outline" size="sm" onClick={() => {
                          handleEditCategory(category);
-                         setDialogOpen(true);
+                          setCategoryDialogOpen(true);
                        }}>
                          <Edit className="w-4 h-4" />
                        </Button>
@@ -1258,8 +1249,8 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Distribuidores</h2>
             
-            <Dialog open={dialogOpen} onOpenChange={(open) => {
-              setDialogOpen(open);
+            <Dialog open={distributorDialogOpen} onOpenChange={(open) => {
+              setDistributorDialogOpen(open);
               if (!open) {
                 setEditingDistributor(null);
                 setDistributorForm({
@@ -1412,7 +1403,7 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Banners</h2>
             
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <Dialog open={bannerDialogOpen} onOpenChange={setBannerDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
@@ -1533,8 +1524,8 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Propagandas</h2>
             
-            <Dialog open={dialogOpen} onOpenChange={(open) => {
-              setDialogOpen(open);
+            <Dialog open={adDialogOpen} onOpenChange={(open) => {
+              setAdDialogOpen(open);
               if (!open) {
                 setEditingAdvertisement(null);
                 setAdForm({
@@ -1807,7 +1798,7 @@ export default function AdminDashboard() {
                      <div className="flex gap-2">
                        <Button variant="outline" size="sm" onClick={() => {
                          handleEditAdvertisement(ad);
-                         setDialogOpen(true);
+                          setAdDialogOpen(true);
                        }}>
                          <Edit className="w-4 h-4" />
                        </Button>
@@ -1869,8 +1860,8 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Veículos</h2>
             
-            <Dialog open={dialogOpen} onOpenChange={(open) => {
-              setDialogOpen(open);
+            <Dialog open={vehicleDialogOpen} onOpenChange={(open) => {
+              setVehicleDialogOpen(open);
               if (!open) {
                 setEditingVehicle(null);
                 setVehicleForm({
