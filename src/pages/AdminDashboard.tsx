@@ -21,6 +21,8 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 
 export default function AdminDashboard() {
+  console.log('🔧 AdminDashboard: Componente iniciado');
+  
   const { 
     profile, 
     products, 
@@ -48,6 +50,8 @@ export default function AdminDashboard() {
     uploadFile
   } = useApp();
   
+  console.log('🔧 AdminDashboard: Context carregado, profile:', profile?.role);
+  
   // Use admin-specific hook for distributors to get complete data
   const { 
     distributors, 
@@ -55,6 +59,8 @@ export default function AdminDashboard() {
     updateDistributor: updateAdminDistributor,
     deleteDistributor: deleteAdminDistributor 
   } = useAdminDistributors();
+  
+  console.log('🔧 AdminDashboard: Hook distributors carregado');
   
   const { toast } = useToast();
   
