@@ -44,48 +44,38 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
       setError(null);
       setIsScanning(true);
 
-      // Verificar se há câmeras disponíveis
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
-      
-      if (videoDevices.length === 0) {
-        throw new Error('Nenhuma câmera encontrada no dispositivo');
-      }
+      // Configurar stream de vídeo primeiro
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      });
 
-      // Inicializar o leitor de código de barras
-      codeReaderRef.current = new BrowserMultiFormatReader();
-
-      // Configurar hints para melhor detecção
-      const hints = new Map();
-      hints.set(2, true); // TRY_HARDER
-      hints.set(3, true); // PURE_BARCODE
-      codeReaderRef.current.setHints(hints);
-
-      // Preferir câmera traseira em dispositivos móveis
-      const preferredDevice = videoDevices.find(device => 
-        device.label.toLowerCase().includes('back') || 
-        device.label.toLowerCase().includes('environment')
-      ) || videoDevices[0];
+      streamRef.current = stream;
 
       if (videoRef.current) {
-        // Usar decodeOnceFromVideoDevice para melhor compatibilidade
-        await codeReaderRef.current.decodeOnceFromVideoDevice(
-          preferredDevice.deviceId,
-          videoRef.current
-        ).then(result => {
-          if (result) {
-            const barcodeText = result.getText();
-            onBarcodeDetected(barcodeText);
-            onOpenChange(false);
-            stopScanning();
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+
+        // Inicializar o leitor de código de barras após o vídeo estar funcionando
+        codeReaderRef.current = new BrowserMultiFormatReader();
+
+        // Iniciar decodificação contínua
+        codeReaderRef.current.decodeFromVideoDevice(
+          undefined, // deixar o browser escolher a câmera
+          videoRef.current,
+          (result, error) => {
+            if (result) {
+              const barcodeText = result.getText();
+              onBarcodeDetected(barcodeText);
+              onOpenChange(false);
+              stopScanning();
+            }
+            // Ignorar erros de decodificação, continuar tentando
           }
-        }).catch(error => {
-          console.log('Scanning error:', error);
-          // Continuar tentando escanear
-          if (codeReaderRef.current && isScanning) {
-            setTimeout(startScanning, 100);
-          }
-        });
+        );
       }
     } catch (err) {
       console.error('Erro ao inicializar scanner:', err);
