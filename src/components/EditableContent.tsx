@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useApp } from '@/contexts/AppContext';
-import { toast } from '@/hooks/use-toast';
+// Temporarily disabled to fix React hooks conflicts
+// import { toast } from '@/hooks/use-toast';
 
 interface EditableContentProps {
   section: string;
@@ -56,17 +57,12 @@ export const EditableContent: React.FC<EditableContentProps> = ({
           description: editDescription 
         });
         setIsEditing(false);
-        toast({
-          title: "Conteúdo atualizado!",
-          description: "As alterações foram salvas com sucesso."
-        });
+        // Temporarily disabled toast to fix React hooks conflicts
+        console.log("Conteúdo atualizado com sucesso!");
       }
     } catch (error) {
-      toast({
-        title: "Erro ao salvar",
-        description: "Não foi possível salvar as alterações.",
-        variant: "destructive"
-      });
+      // Temporarily disabled toast to fix React hooks conflicts
+      console.error("Erro ao salvar alterações:", error);
     } finally {
       setLoading(false);
     }

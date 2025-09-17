@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Star } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
-import { toast } from '@/hooks/use-toast';
+// Temporarily disabled to fix React hooks conflicts
+// import { toast } from '@/hooks/use-toast';
 
 interface RatingFormProps {
   productId: string;
@@ -19,29 +20,21 @@ export function RatingForm({ productId }: RatingFormProps) {
     e.preventDefault();
     
     if (!currentUser) {
-      toast({
-        title: "Erro",
-        description: "Você precisa estar logado para avaliar.",
-        variant: "destructive",
-      });
+      // Temporarily using alert instead of toast to fix React hooks conflicts
+      alert("Você precisa estar logado para avaliar.");
       return;
     }
 
     if (rating === 0) {
-      toast({
-        title: "Erro", 
-        description: "Selecione uma nota para o produto.",
-        variant: "destructive",
-      });
+      // Temporarily using alert instead of toast to fix React hooks conflicts
+      alert("Selecione uma nota para o produto.");
       return;
     }
 
     submitRating(productId, rating, comment);
     
-    toast({
-      title: "Sucesso",
-      description: "Sua avaliação foi enviada!",
-    });
+    // Temporarily using alert instead of toast to fix React hooks conflicts
+    alert("Sua avaliação foi enviada!");
 
     setRating(0);
     setComment('');

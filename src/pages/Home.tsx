@@ -9,10 +9,11 @@ import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
 import AdSlot from '@/components/AdSlot';
 import { PWAInstallButtonSimple } from '@/components/PWAInstallButtonSimple';
-import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
+import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialogSimple';
 import { EditableContent } from '@/components/EditableContent';
 import { BannerCarousel } from '@/components/BannerCarousel';
-import { toast } from '@/hooks/use-toast';
+// Temporarily disabled to fix React hooks conflicts
+// import { toast } from '@/hooks/use-toast';
 
 export default function Home() {
   console.log('🏠 Renderizando componente Home...');
@@ -87,11 +88,8 @@ export default function Home() {
       // Navegar diretamente sem mostrar toast - a navegação já indica sucesso
       navigate(`/produto/${product.id}`);
     } else {
-      toast({
-        title: "Produto não encontrado",
-        description: `Nenhum produto encontrado com o código ${barcode}`,
-        variant: "destructive"
-      });
+      // Temporarily using alert instead of toast to fix React hooks conflicts
+      alert(`Produto não encontrado: ${barcode}`);
     }
   };
   

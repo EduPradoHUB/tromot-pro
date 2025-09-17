@@ -24,10 +24,11 @@ import { PostCard } from '@/components/PostCard';
 import { RatingForm } from '@/components/RatingForm';
 import { QuestionForm } from '@/components/QuestionForm';
 import { PostUploadModal } from '@/components/PostUploadModal';
-import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
+import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialogSimple';
 import { Product, Post, Rating, Question } from '@/lib/types';
 import AdSlot from '@/components/AdSlot';
-import { toast } from '@/hooks/use-toast';
+// Temporarily disabled to fix React hooks conflicts
+// import { toast } from '@/hooks/use-toast';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -94,11 +95,8 @@ export default function ProductPage() {
       // Navegar diretamente sem mostrar toast - a navegação já indica sucesso
       navigate(`/produto/${foundProduct.id}`);
     } else {
-      toast({
-        title: "Produto não encontrado",
-        description: `Nenhum produto encontrado com o código ${barcode}`,
-        variant: "destructive",
-      });
+      // Temporarily using alert instead of toast to fix React hooks conflicts
+      alert(`Produto não encontrado: ${barcode}`);
     }
   };
 
