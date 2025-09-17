@@ -1909,9 +1909,18 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Veículos</h2>
             
+            <Button onClick={() => openDialog('vehicle')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Veículo
+            </Button>
+          </div>
+          
+          {/* Vehicle Dialog */}
+          {dialogContent === 'vehicle' && (
             <Dialog open={dialogOpen} onOpenChange={(open) => {
               setDialogOpen(open);
               if (!open) {
+                closeDialog();
                 setEditingVehicle(null);
                 setVehicleForm({
                   brand: '',
@@ -1921,10 +1930,7 @@ export default function AdminDashboard() {
               }
             }}>
               <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Novo Veículo
-                </Button>
+                <div />
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -1966,7 +1972,7 @@ export default function AdminDashboard() {
                 </div>
               </DialogContent>
             </Dialog>
-          </div>
+          )}
           
           <div className="grid gap-4">
             {vehicles.map((vehicle) => (
