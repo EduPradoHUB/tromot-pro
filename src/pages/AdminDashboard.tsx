@@ -1412,12 +1412,28 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Banners</h2>
             
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <Button onClick={() => openDialog('banner')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Banner
+            </Button>
+          </div>
+          
+          {/* Banner Dialog */}
+          {dialogContent === 'banner' && (
+            <Dialog open={dialogOpen} onOpenChange={(open) => {
+              setDialogOpen(open);
+              if (!open) {
+                closeDialog();
+                setBannerForm({
+                  title: '',
+                  image_url: '',
+                  link_url: '',
+                  active: true
+                });
+              }
+            }}>
               <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Novo Banner
-                </Button>
+                <div />
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -1490,7 +1506,7 @@ export default function AdminDashboard() {
                 </div>
               </DialogContent>
             </Dialog>
-          </div>
+          )}
           
           <div className="grid gap-4">
             {banners.map((banner) => (
