@@ -55,41 +55,37 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
       // Inicializar o leitor de código de barras
       codeReaderRef.current = new BrowserMultiFormatReader();
 
+      // Configurar hints para melhor detecção
+      const hints = new Map();
+      hints.set(2, true); // TRY_HARDER
+      hints.set(3, true); // PURE_BARCODE
+      codeReaderRef.current.setHints(hints);
+
       // Preferir câmera traseira em dispositivos móveis
       const preferredDevice = videoDevices.find(device => 
         device.label.toLowerCase().includes('back') || 
         device.label.toLowerCase().includes('environment')
       ) || videoDevices[0];
 
-      // Configurar stream de vídeo
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          deviceId: preferredDevice.deviceId,
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
-      });
-
-      streamRef.current = stream;
-
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-
-        // Iniciar decodificação
-        codeReaderRef.current.decodeFromVideoDevice(
+        // Usar decodeOnceFromVideoDevice para melhor compatibilidade
+        await codeReaderRef.current.decodeOnceFromVideoDevice(
           preferredDevice.deviceId,
-          videoRef.current,
-          (result, error) => {
-            if (result) {
-              const barcodeText = result.getText();
-              onBarcodeDetected(barcodeText);
-              onOpenChange(false);
-              stopScanning();
-            }
+          videoRef.current
+        ).then(result => {
+          if (result) {
+            const barcodeText = result.getText();
+            onBarcodeDetected(barcodeText);
+            onOpenChange(false);
+            stopScanning();
           }
-        );
+        }).catch(error => {
+          console.log('Scanning error:', error);
+          // Continuar tentando escanear
+          if (codeReaderRef.current && isScanning) {
+            setTimeout(startScanning, 100);
+          }
+        });
       }
     } catch (err) {
       console.error('Erro ao inicializar scanner:', err);
