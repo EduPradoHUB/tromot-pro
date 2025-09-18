@@ -325,7 +325,8 @@ export type Database = {
           created_at: string
           id: string
           likes_count: number | null
-          photo_url: string
+          photo_url: string | null
+          photos_urls: string[] | null
           product_id: string
           reports_count: number | null
           status: Database["public"]["Enums"]["content_status"] | null
@@ -337,7 +338,8 @@ export type Database = {
           created_at?: string
           id?: string
           likes_count?: number | null
-          photo_url: string
+          photo_url?: string | null
+          photos_urls?: string[] | null
           product_id: string
           reports_count?: number | null
           status?: Database["public"]["Enums"]["content_status"] | null
@@ -349,7 +351,8 @@ export type Database = {
           created_at?: string
           id?: string
           likes_count?: number | null
-          photo_url?: string
+          photo_url?: string | null
+          photos_urls?: string[] | null
           product_id?: string
           reports_count?: number | null
           status?: Database["public"]["Enums"]["content_status"] | null

@@ -36,7 +36,8 @@ export interface Post {
   author_id: string;
   author_name: string;
   author_role: string;
-  photo_url: string;
+  photo_url: string; // Manter para compatibilidade
+  photos_urls?: string[]; // Novo campo para múltiplas fotos
   caption: string;
   likes_count: number;
   created_at: string;

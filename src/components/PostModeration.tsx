@@ -4,44 +4,28 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
 import { Check, X, Eye } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { ImageCarousel } from './ImageCarousel';
 
 export const PostModeration: React.FC = () => {
   const { posts, products, moderatePost } = useApp();
-  const { toast } = useToast();
   
   const pendingPosts = posts.filter(post => post.status === 'pending');
   
   const handleApprove = async (postId: string) => {
     try {
       await moderatePost(postId, 'approved');
-      toast({
-        title: "Post aprovado",
-        description: "Post foi aprovado e está visível para todos."
-      });
+      console.log("Post aprovado e está visível para todos.");
     } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Falha ao aprovar post.",
-        variant: "destructive"
-      });
+      console.error("Falha ao aprovar post.");
     }
   };
   
   const handleReject = async (postId: string) => {
     try {
       await moderatePost(postId, 'rejected');
-      toast({
-        title: "Post rejeitado",
-        description: "Post foi rejeitado e removido da fila.",
-        variant: "destructive"
-      });
+      console.log("Post foi rejeitado e removido da fila.");
     } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Falha ao rejeitar post.",
-        variant: "destructive"
-      });
+      console.error("Falha ao rejeitar post.");
     }
   };
   
@@ -62,53 +46,62 @@ export const PostModeration: React.FC = () => {
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Posts Pendentes de Moderação</h3>
       
-      {pendingPosts.map((post) => (
-        <Card key={post.id}>
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <div>
-                <CardTitle className="text-base">{getProductName(post.product_id)}</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Por {post.author_name} ({post.author_role})
-                </p>
+      {pendingPosts.map((post) => {
+        // Usar photos_urls se disponível, senão usar photo_url para compatibilidade
+        const images = post.photos_urls && post.photos_urls.length > 0 
+          ? post.photos_urls 
+          : post.photo_url 
+          ? [post.photo_url] 
+          : [];
+
+        return (
+          <Card key={post.id}>
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="text-base">{getProductName(post.product_id)}</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Por {post.author_name} ({post.author_role})
+                  </p>
+                </div>
+                <Badge variant="secondary">Pendente</Badge>
               </div>
-              <Badge variant="secondary">Pendente</Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="aspect-video w-full max-w-md">
-                <img 
-                  src={post.photo_url} 
-                  alt="Post do usuário"
-                  className="w-full h-full object-cover rounded-md"
-                />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Carrossel de imagens */}
+                {images.length > 0 && (
+                  <ImageCarousel 
+                    images={images}
+                    className="max-w-md"
+                  />
+                )}
+                
+                <p className="text-sm">{post.caption}</p>
+                
+                <div className="flex space-x-2">
+                  <Button 
+                    size="sm" 
+                    onClick={() => handleApprove(post.id)}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Check className="h-4 w-4 mr-1" />
+                    Aprovar
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={() => handleReject(post.id)}
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Rejeitar
+                  </Button>
+                </div>
               </div>
-              
-              <p className="text-sm">{post.caption}</p>
-              
-              <div className="flex space-x-2">
-                <Button 
-                  size="sm" 
-                  onClick={() => handleApprove(post.id)}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  <Check className="h-4 w-4 mr-1" />
-                  Aprovar
-                </Button>
-                <Button 
-                  size="sm" 
-                  variant="destructive"
-                  onClick={() => handleReject(post.id)}
-                >
-                  <X className="h-4 w-4 mr-1" />
-                  Rejeitar
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 };

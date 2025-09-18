@@ -64,6 +64,7 @@ interface LegacyPost {
   author_name: string;
   author_role: string;
   photo_url: string;
+  photos_urls?: string[]; // Novo campo para múltiplas fotos
   caption: string;
   likes_count: number;
   created_at: string;
@@ -895,6 +896,7 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
           author_name: (post.profiles as any)?.name || 'Usuário desconhecido',
           author_role: (post.profiles as any)?.role || 'Cliente',
           photo_url: post.photo_url,
+          photos_urls: post.photos_urls || (post.photo_url ? [post.photo_url] : []),
           caption: post.caption || '',
           likes_count: post.likes_count || 0,
           created_at: post.created_at,

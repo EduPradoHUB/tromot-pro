@@ -2,11 +2,10 @@ import * as React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-// Temporarily disable Avatar to fix React hooks conflicts
-// import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Heart, Flag } from 'lucide-react';
 import { Post } from '@/lib/types';
 import { useApp } from '@/contexts/AppContext';
+import { ImageCarousel } from './ImageCarousel';
 
 interface PostCardProps {
   post: Post;
@@ -24,6 +23,13 @@ export function PostCard({ post }: PostCardProps) {
     if (!currentUser) return;
     reportPost(post.id);
   };
+
+  // Usar photos_urls se disponível, senão usar photo_url para compatibilidade
+  const images = post.photos_urls && post.photos_urls.length > 0 
+    ? post.photos_urls 
+    : post.photo_url 
+    ? [post.photo_url] 
+    : [];
 
   return (
     <Card className="shadow-card">
@@ -46,11 +52,13 @@ export function PostCard({ post }: PostCardProps) {
           </div>
         </div>
 
-        <img
-          src={post.photo_url}
-          alt="Foto da instalação"
-          className="w-full h-48 object-cover rounded-lg mb-3"
-        />
+        {/* Carrossel de imagens */}
+        {images.length > 0 && (
+          <ImageCarousel 
+            images={images}
+            className="mb-3"
+          />
+        )}
 
         <p className="text-sm mb-3">{post.caption}</p>
 
