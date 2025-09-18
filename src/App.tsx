@@ -33,7 +33,7 @@ function AppContent() {
   return (
     <>
       {/* PWA components temporarily disabled to fix React hooks conflicts */}
-      <Toaster />
+      {/* <Toaster /> - Temporarily disabled due to React hooks conflicts */}
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<PasswordReset />} />
