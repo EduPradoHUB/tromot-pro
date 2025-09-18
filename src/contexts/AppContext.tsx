@@ -861,6 +861,7 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
         { data: advertisementsData },
         { data: vehiclesData },
         { data: categoriesData },
+        { data: postsData },
         distributorsPublicData
       ] = await Promise.all([
         supabase.from('products').select('*'),
@@ -868,6 +869,13 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
         supabase.from('advertisements').select('*'),
         supabase.from('vehicles').select('*'),
         supabase.from('categories').select('*'),
+        supabase.from('posts').select(`
+          *,
+          profiles!posts_author_id_fkey (
+            name,
+            role
+          )
+        `),
         fetchDistributorsPublic()
       ]);
 
@@ -877,6 +885,25 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
       if (vehiclesData) setVehicles(vehiclesData);
       if (categoriesData) setCategories(categoriesData);
       if (distributorsPublicData) setDistributors(distributorsPublicData);
+      
+      // Convert posts to legacy format for backward compatibility
+      if (postsData) {
+        const legacyPosts: LegacyPost[] = postsData.map(post => ({
+          id: post.id,
+          product_id: post.product_id,
+          author_id: post.author_id,
+          author_name: (post.profiles as any)?.name || 'Usuário desconhecido',
+          author_role: (post.profiles as any)?.role || 'Cliente',
+          photo_url: post.photo_url,
+          caption: post.caption || '',
+          likes_count: post.likes_count || 0,
+          created_at: post.created_at,
+          status: post.status as 'approved' | 'pending' | 'rejected',
+          liked_by_user: false,
+          reports_count: post.reports_count || 0
+        }));
+        setPosts(legacyPosts);
+      }
       
       // Also fetch editable content
       await fetchEditableContent();
