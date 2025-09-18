@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
 import { Layout } from "@/components/Layout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { NotificationManager } from "@/components/NotificationManager";
 import { Toaster } from "@/components/ui/toaster";
 // Temporarily disable PWA components to fix React hooks conflicts
 // import { InstallPrompt } from "@/components/pwa/InstallPrompt";
@@ -108,6 +109,7 @@ function AppContent() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AppProvider>
+      <NotificationManager />
       <BrowserRouter>
         <AppContent />
       </BrowserRouter>

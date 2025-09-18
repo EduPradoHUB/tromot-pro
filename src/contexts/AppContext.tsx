@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 import { DistributorPublic, fetchDistributorsPublic } from '@/lib/distributorUtils';
+import { useNotifications } from '@/hooks/useNotifications';
 
 // Database types
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -239,6 +240,9 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Notifications hook
+  const notifications = useNotifications();
   const [products, setProducts] = useState<Product[]>([]);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
@@ -682,6 +686,40 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
       .eq('id', id);
     
     if (error) throw error;
+    
+    // Se o post foi aprovado, enviar notificação
+    if (status === 'approved') {
+      try {
+        // Buscar dados do post para notificação
+        const { data: postData, error: postError } = await supabase
+          .from('posts')
+          .select(`
+            id,
+            author_id,
+            product_id,
+            products (name),
+            profiles (name)
+          `)
+          .eq('id', id)
+          .single();
+
+        if (!postError && postData) {
+          // Chamar edge function para enviar notificação
+          await supabase.functions.invoke('send-post-notification', {
+            body: {
+              postId: postData.id,
+              productName: postData.products?.name || 'Produto',
+              authorName: postData.profiles?.name || 'Usuário'
+            }
+          });
+          
+          console.log('Notification sent for approved post:', id);
+        }
+      } catch (notificationError) {
+        console.error('Error sending notification:', notificationError);
+        // Não falhar a moderação se a notificação falhar
+      }
+    }
     
     // Update local state for legacy posts
     setPosts(prev => prev.map(post => 
