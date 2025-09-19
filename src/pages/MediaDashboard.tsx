@@ -7,6 +7,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Eye, MousePointer, Target } from 'lucide-react';
+import { AdminBroadcastCard } from '@/components/notifications/AdminBroadcastCard';
+import { NotificationPreferences } from '@/components/notifications/NotificationPreferences';
+
 export default function MediaDashboard() {
   const {
     currentUser,
@@ -79,6 +82,12 @@ export default function MediaDashboard() {
         <Button onClick={() => window.location.href = '/admin'}>
           Nova Campanha
         </Button>
+      </div>
+
+      {/* Sistema de Notificações - Apenas para ADMIN */}
+      <div className="mb-8">
+        <AdminBroadcastCard />
+        <NotificationPreferences />
       </div>
 
       {/* Métricas Gerais */}
