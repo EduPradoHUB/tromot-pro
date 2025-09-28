@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApp } from '@/contexts/AppContext';
 import { EditableContent } from '@/components/EditableContent';
+import { EditableContactLink } from '@/components/EditableContactLink';
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -30,6 +31,10 @@ export const Layout: React.FC<LayoutProps> = ({
   const [supportTitle, setSupportTitle] = useState('Suporte');
   const [legalTitle, setLegalTitle] = useState('Legal');
   const [copyright, setCopyright] = useState('© 2025 Tromot Indústria Eletrônica. Todos os direitos reservados.');
+  const [supportPhone, setSupportPhone] = useState('(16) 99303-2002');
+  const [supportPhoneLink, setSupportPhoneLink] = useState('tel:+5516993032002');
+  const [supportEmail, setSupportEmail] = useState('suporte@tromot.com');
+  const [supportEmailLink, setSupportEmailLink] = useState('mailto:suporte@tromot.com');
 
   // Update footer content when editable content changes
   useEffect(() => {
@@ -48,6 +53,20 @@ export const Layout: React.FC<LayoutProps> = ({
     const copyrightContent = getEditableContent('footer-copyright');
     if (copyrightContent?.description) {
       setCopyright(copyrightContent.description);
+    }
+    const phoneContent = getEditableContent('footer-support-phone');
+    if (phoneContent?.title) {
+      setSupportPhone(phoneContent.title);
+    }
+    if (phoneContent?.subtitle) {
+      setSupportPhoneLink(phoneContent.subtitle);
+    }
+    const emailContent = getEditableContent('footer-support-email');
+    if (emailContent?.title) {
+      setSupportEmail(emailContent.title);
+    }
+    if (emailContent?.subtitle) {
+      setSupportEmailLink(emailContent.subtitle);
     }
   }, [getEditableContent, editableContent]);
   const handleLogout = async () => {
@@ -207,17 +226,34 @@ export const Layout: React.FC<LayoutProps> = ({
               <EditableContent section="footer-description" description={footerDescription} descriptionClassName="text-sm text-muted-foreground" onContentUpdate={content => setFooterDescription(content.description || footerDescription)} />
             </div>
             <div>
-              <EditableContent section="footer-support-title" title={supportTitle} titleClassName="font-semibold mb-4" onContentUpdate={content => setSupportTitle(content.title || supportTitle)} />
+              <EditableContent 
+                section="footer-support-title" 
+                title={supportTitle} 
+                titleClassName="font-semibold mb-4" 
+                onContentUpdate={content => setSupportTitle(content.title || supportTitle)} 
+              />
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <a href="tel:+5516993032002" className="hover:text-foreground">
-                    (16) 99303-2002
-                  </a>
+                  <EditableContactLink 
+                    section="footer-support-phone" 
+                    text={supportPhone}
+                    href={supportPhoneLink}
+                    onUpdate={(text, href) => {
+                      setSupportPhone(text);
+                      setSupportPhoneLink(href);
+                    }}
+                  />
                 </li>
                 <li>
-                  <a href="mailto:suporte@tromot.com" className="hover:text-foreground">
-                    suporte@tromot.com
-                  </a>
+                  <EditableContactLink 
+                    section="footer-support-email" 
+                    text={supportEmail}
+                    href={supportEmailLink}
+                    onUpdate={(text, href) => {
+                      setSupportEmail(text);
+                      setSupportEmailLink(href);
+                    }}
+                  />
                 </li>
               </ul>
             </div>
