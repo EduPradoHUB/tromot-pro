@@ -86,44 +86,32 @@ export const EditableContactLink: React.FC<EditableContactLinkProps> = ({
       )}
       
       {isEditing ? (
-        <div className="space-y-4 p-4 bg-slate-800/95 backdrop-blur-sm border rounded-lg shadow-lg min-w-[320px] max-w-[400px]">
-          <div className="text-white text-xs font-semibold mb-3 pb-2 border-b border-slate-600">
-            Editar Contato
-          </div>
-          
+        <div className="space-y-4 p-4 bg-slate-800/95 backdrop-blur-sm border rounded-lg shadow-lg min-w-[300px]">
           <div>
-            <Label className="text-sm font-medium mb-2 block text-white">
-              📝 Texto exibido
-            </Label>
+            <Label className="text-sm font-medium mb-2 block text-white">Texto exibido</Label>
             <Input
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
               placeholder="Ex: (16) 99303-2002"
-              className="bg-white text-black border-slate-300"
+              className="text-black"
             />
           </div>
           
           <div>
-            <Label className="text-sm font-medium mb-2 block text-white">
-              🔗 Link (href)
-            </Label>
+            <Label className="text-sm font-medium mb-2 block text-white">Link/URL</Label>
             <Input
               value={editHref}
               onChange={(e) => setEditHref(e.target.value)}
               placeholder="Ex: tel:+5516993032002 ou mailto:suporte@tromot.com"
-              className="bg-white text-black border-slate-300 font-mono text-xs"
+              className="text-black"
             />
-            <p className="text-xs text-slate-400 mt-1">
-              Para telefone use: tel:+55XX... | Para email: mailto:...
-            </p>
           </div>
           
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2">
             <Button 
               size="sm" 
               onClick={handleSave}
               disabled={loading}
-              className="flex-1"
             >
               <Save className="h-3 w-3 mr-1" />
               Salvar
@@ -133,7 +121,7 @@ export const EditableContactLink: React.FC<EditableContactLinkProps> = ({
               variant="outline" 
               onClick={handleCancel}
               disabled={loading}
-              className="bg-white text-black hover:bg-slate-100 border-slate-300"
+              className="text-black hover:text-black"
             >
               <X className="h-3 w-3 mr-1" />
               Cancelar
