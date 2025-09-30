@@ -1,4 +1,4 @@
-import { useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 
 interface ToastProps {
   title?: ReactNode
