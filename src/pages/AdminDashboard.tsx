@@ -756,16 +756,16 @@ export default function AdminDashboard() {
       </div>
 
       <Tabs defaultValue="products" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-1 mb-6 h-auto">
-          <TabsTrigger value="products" className="text-xs md:text-sm px-2 py-1">Produtos</TabsTrigger>
-          <TabsTrigger value="bulk-upload" className="text-xs md:text-sm px-2 py-1">Upload</TabsTrigger>
-          <TabsTrigger value="categories" className="text-xs md:text-sm px-2 py-1">Categorias</TabsTrigger>
-          <TabsTrigger value="distributors" className="text-xs md:text-sm px-2 py-1">Distribuidores</TabsTrigger>
-          <TabsTrigger value="banners" className="text-xs md:text-sm px-2 py-1">Banners</TabsTrigger>
-          <TabsTrigger value="advertisements" className="text-xs md:text-sm px-2 py-1">Propagandas</TabsTrigger>
-          <TabsTrigger value="content" className="text-xs md:text-sm px-2 py-1">Conteúdo</TabsTrigger>
-          <TabsTrigger value="vehicles" className="text-xs md:text-sm px-2 py-1">Veículos</TabsTrigger>
-          <TabsTrigger value="moderation" className="text-xs md:text-sm px-2 py-1">Moderação</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2 mb-6 h-auto p-2">
+          <TabsTrigger value="products" className="text-xs md:text-sm px-3 py-2.5 md:py-2">Produtos</TabsTrigger>
+          <TabsTrigger value="bulk-upload" className="text-xs md:text-sm px-3 py-2.5 md:py-2">Upload</TabsTrigger>
+          <TabsTrigger value="categories" className="text-xs md:text-sm px-3 py-2.5 md:py-2">Categorias</TabsTrigger>
+          <TabsTrigger value="distributors" className="text-xs md:text-sm px-3 py-2.5 md:py-2">Distribuidores</TabsTrigger>
+          <TabsTrigger value="banners" className="text-xs md:text-sm px-3 py-2.5 md:py-2">Banners</TabsTrigger>
+          <TabsTrigger value="advertisements" className="text-xs md:text-sm px-3 py-2.5 md:py-2">Propagandas</TabsTrigger>
+          <TabsTrigger value="content" className="text-xs md:text-sm px-3 py-2.5 md:py-2">Conteúdo</TabsTrigger>
+          <TabsTrigger value="vehicles" className="text-xs md:text-sm px-3 py-2.5 md:py-2">Veículos</TabsTrigger>
+          <TabsTrigger value="moderation" className="text-xs md:text-sm px-3 py-2.5 md:py-2">Moderação</TabsTrigger>
         </TabsList>
 
         {/* Products Tab */}
