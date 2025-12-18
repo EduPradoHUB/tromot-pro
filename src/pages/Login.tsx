@@ -8,7 +8,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { useApp } from '@/contexts/AppContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { FileText, ArrowRight } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -391,10 +392,32 @@ export default function Login() {
                    disabled={formLoading}
                  >
                    {formLoading ? 'Enviando...' : 'Enviar link de redefinição'}
-                 </Button>
+               </Button>
               </form>
             </TabsContent>
           </Tabs>
+        </CardContent>
+      </Card>
+
+      {/* Botão de Acesso Rápido a Manuais */}
+      <Card className="w-full max-w-md mt-4 shadow-card border-dashed border-2 border-primary/30">
+        <CardContent className="p-4">
+          <div className="text-center mb-3">
+            <p className="text-sm text-muted-foreground">
+              Quer apenas consultar um manual de instalação?
+            </p>
+          </div>
+          <Button 
+            variant="outline" 
+            className="w-full group"
+            asChild
+          >
+            <Link to="/manuais-publico">
+              <FileText className="h-4 w-4 mr-2" />
+              Acessar Manuais sem Cadastro
+              <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </Button>
         </CardContent>
       </Card>
     </div>

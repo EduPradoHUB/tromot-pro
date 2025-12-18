@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
 import { Layout } from "@/components/Layout";
+import { PublicLayout } from "@/components/PublicLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { NotificationManager } from "@/components/NotificationManager";
 import { Toaster } from "@/components/ui/toaster";
@@ -13,6 +14,8 @@ import { Toaster } from "@/components/ui/toaster";
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import Product from "./pages/Product";
+import PublicCatalog from "./pages/PublicCatalog";
+import PublicProduct from "./pages/PublicProduct";
 import WhereToBuy from "./pages/WhereToBuy";
 import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
@@ -38,6 +41,11 @@ function AppContent() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<PasswordReset />} />
+        
+        {/* Rotas Públicas - Acesso sem cadastro */}
+        <Route path="/manuais-publico" element={<PublicLayout><PublicCatalog /></PublicLayout>} />
+        <Route path="/manual/:id" element={<PublicLayout><PublicProduct /></PublicLayout>} />
+        
         <Route path="/" element={
           <ProtectedRoute>
             <Layout><Home /></Layout>
