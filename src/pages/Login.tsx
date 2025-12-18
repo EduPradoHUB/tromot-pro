@@ -396,28 +396,24 @@ export default function Login() {
               </form>
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
 
-      {/* Botão de Acesso Rápido a Manuais */}
-      <Card className="w-full max-w-md mt-4 shadow-card border-dashed border-2 border-primary/30">
-        <CardContent className="p-4">
-          <div className="text-center mb-3">
-            <p className="text-sm text-muted-foreground">
+          {/* Separador e Botão de Acesso Rápido a Manuais */}
+          <div className="mt-6 pt-4 border-t border-border">
+            <p className="text-sm text-muted-foreground text-center mb-3">
               Quer apenas consultar um manual de instalação?
             </p>
+            <Button 
+              variant="outline" 
+              className="w-full group"
+              asChild
+            >
+              <Link to="/manuais-publico">
+                <FileText className="h-4 w-4 mr-2" />
+                Acessar Manuais sem Cadastro
+                <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </Button>
           </div>
-          <Button 
-            variant="outline" 
-            className="w-full group"
-            asChild
-          >
-            <Link to="/manuais-publico">
-              <FileText className="h-4 w-4 mr-2" />
-              Acessar Manuais sem Cadastro
-              <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </Button>
         </CardContent>
       </Card>
     </div>
