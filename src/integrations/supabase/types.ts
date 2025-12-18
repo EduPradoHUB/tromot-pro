@@ -589,7 +589,7 @@ export type Database = {
           created_at: string | null
           event_type: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           metadata: Json | null
           new_value: string | null
           old_value: string | null
@@ -600,7 +600,7 @@ export type Database = {
           created_at?: string | null
           event_type: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           new_value?: string | null
           old_value?: string | null
@@ -611,7 +611,7 @@ export type Database = {
           created_at?: string | null
           event_type?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           new_value?: string | null
           old_value?: string | null
@@ -648,10 +648,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_current_user_role: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      get_current_user_role: { Args: never; Returns: string }
       get_distributor_contact_secure: {
         Args: { distributor_id: string }
         Returns: {
@@ -696,26 +693,11 @@ export type Database = {
           user_id: string
         }[]
       }
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_authenticated_user: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_profile_owner: {
-        Args: { profile_user_id: string }
-        Returns: boolean
-      }
-      is_system_operation: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_verified_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      is_admin: { Args: never; Returns: boolean }
+      is_authenticated_user: { Args: never; Returns: boolean }
+      is_profile_owner: { Args: { profile_user_id: string }; Returns: boolean }
+      is_system_operation: { Args: never; Returns: boolean }
+      is_verified_admin: { Args: never; Returns: boolean }
       log_distributor_access: {
         Args: {
           p_access_type: string

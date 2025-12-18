@@ -756,7 +756,7 @@ export default function AdminDashboard() {
       </div>
 
       <Tabs defaultValue="products" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-1 mb-6">
+        <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-1 mb-6 h-auto">
           <TabsTrigger value="products" className="text-xs md:text-sm px-2 py-1">Produtos</TabsTrigger>
           <TabsTrigger value="bulk-upload" className="text-xs md:text-sm px-2 py-1">Upload</TabsTrigger>
           <TabsTrigger value="categories" className="text-xs md:text-sm px-2 py-1">Categorias</TabsTrigger>
