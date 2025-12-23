@@ -1,10 +1,9 @@
-import { useState, useContext, useEffect, useCallback, createContext } from 'react';
+import React, { useState, useContext, useEffect, useCallback, createContext } from 'react';
 import type { FC, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 import { DistributorPublic, fetchDistributorsPublic } from '@/lib/distributorUtils';
-import { useNotifications } from '@/hooks/useNotifications';
 
 // Database types
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -241,8 +240,6 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // Notifications hook
-  const notifications = useNotifications();
   const [products, setProducts] = useState<Product[]>([]);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
