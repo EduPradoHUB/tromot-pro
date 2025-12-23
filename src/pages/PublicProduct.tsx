@@ -11,7 +11,8 @@ import {
   LogIn,
   Camera,
   MessageCircle,
-  Lock
+  Lock,
+  Share2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -76,6 +77,38 @@ export default function PublicProduct() {
     return /\.(mp4|webm|ogg|mov|avi)(\?.*)?$/i.test(url);
   };
 
+  const handleShare = async () => {
+    if (!product) return;
+    
+    const shareUrl = `${window.location.origin}/manual/${product.id}`;
+    const shareData = {
+      title: product.name,
+      text: `Veja o manual de instalação: ${product.name}`,
+      url: shareUrl,
+    };
+    
+    try {
+      if (navigator.share && navigator.canShare?.(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast({ 
+          title: "Link copiado!", 
+          description: "Cole e envie para seu cliente" 
+        });
+      }
+    } catch (error) {
+      // User cancelled share or error occurred
+      if ((error as Error).name !== 'AbortError') {
+        await navigator.clipboard.writeText(shareUrl);
+        toast({ 
+          title: "Link copiado!", 
+          description: "Cole e envie para seu cliente" 
+        });
+      }
+    }
+  };
+
   if (!product) {
     return (
       <div className="container py-8">
@@ -100,6 +133,14 @@ export default function PublicProduct() {
           <h1 className="text-2xl font-bold">{product.name}</h1>
           <p className="text-muted-foreground">Código: {product.code}</p>
         </div>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={handleShare}
+        >
+          <Share2 className="h-4 w-4 mr-2" />
+          Compartilhar
+        </Button>
         <Button 
           variant="outline" 
           size="sm"
