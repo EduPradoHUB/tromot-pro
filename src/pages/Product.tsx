@@ -168,30 +168,32 @@ export default function ProductPage() {
   return (
     <div className="container py-8">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/manuais')}>
+      <div className="flex items-start gap-4 mb-6">
+        <Button variant="ghost" size="icon" onClick={() => navigate('/manuais')} className="mt-1">
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold">{product.name}</h1>
           <p className="text-muted-foreground">Código: {product.code}</p>
         </div>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={handleShare}
-        >
-          <Share2 className="h-4 w-4 mr-2" />
-          Compartilhar
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => setShowBarcodeScanner(true)}
-        >
-          <ScanLine className="h-4 w-4 mr-2" />
-          Escanear
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleShare}
+          >
+            <Share2 className="h-4 w-4 mr-2" />
+            Compartilhar
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setShowBarcodeScanner(true)}
+          >
+            <ScanLine className="h-4 w-4 mr-2" />
+            Escanear
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
