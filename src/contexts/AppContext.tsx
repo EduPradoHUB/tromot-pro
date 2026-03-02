@@ -1100,87 +1100,96 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
     avatar: profile.avatar_url || undefined
   } : null;
 
-  // Auth state management
+  // Helper to load profile and data
+  const loadProfileAndData = useCallback(async (sessionUser: User) => {
+    try {
+      let { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', sessionUser.id)
+        .single();
+      
+      if (!profileData) {
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: sessionUser.id,
+            name: sessionUser.user_metadata?.name || sessionUser.email?.split('@')[0] || 'Usuário',
+            email: sessionUser.email || '',
+            role: sessionUser.email === 'eduardo@tromot.com.br' ? 'ADM' : 'Cliente'
+          })
+          .select()
+          .single();
+        
+        if (createError) {
+          console.error('Error creating profile:', createError);
+        } else {
+          profileData = newProfile;
+        }
+      }
+      
+      setProfile(profileData);
+      console.log('✅ Perfil carregado:', profileData?.name);
+      await fetchData();
+      console.log('✅ Dados carregados!');
+    } catch (error) {
+      console.error('❌ Erro ao carregar perfil/dados:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Auth state management - getSession first, then listen for changes
   useEffect(() => {
     console.log('🚀 Inicializando AppContext...');
-    
+    let isMounted = true;
+
+    // 1. Restore session from storage first
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      if (!isMounted) return;
+      console.log('🔐 getSession result:', currentSession?.user?.email ?? 'no session');
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+
+      if (currentSession?.user) {
+        loadProfileAndData(currentSession.user);
+      } else {
+        setProfile(null);
+        fetchData().finally(() => {
+          if (isMounted) setLoading(false);
+        });
+      }
+    });
+
+    // 2. Listen for subsequent auth changes (sign-in, sign-out, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('🔐 Auth state change:', event, session?.user?.email);
-        
-        // Only synchronous state updates here to avoid deadlock
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          console.log('👤 Usuário logado, buscando perfil...');
-          // Defer Supabase calls with setTimeout to avoid deadlock
-          setTimeout(async () => {
-            try {
-              // Fetch user profile
-              let { data: profileData } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('user_id', session.user.id)
-                .single();
-              
-              // If profile doesn't exist, create one
-              if (!profileData) {
-                const { data: newProfile, error: createError } = await supabase
-                  .from('profiles')
-                  .insert({
-                    user_id: session.user.id,
-                    name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Usuário',
-                    email: session.user.email || '',
-                    role: session.user.email === 'eduardo@tromot.com.br' ? 'ADM' : 'Cliente'
-                  })
-                  .select()
-                  .single();
-                
-                if (createError) {
-                  console.error('Error creating profile:', createError);
-                } else {
-                  profileData = newProfile;
-                }
-              }
-              
-              setProfile(profileData);
-              console.log('✅ Perfil carregado:', profileData?.name);
-              
-              // Fetch app data after profile is loaded
-              console.log('📊 Buscando dados da aplicação...');
-              await fetchData();
-              console.log('✅ Dados carregados, app pronto!');
-              setLoading(false);
-            } catch (error) {
-              console.error('❌ Erro ao carregar perfil/dados:', error);
-              setLoading(false);
-            }
+      (event, newSession) => {
+        if (!isMounted) return;
+        // Skip INITIAL_SESSION since getSession already handled it
+        if (event === 'INITIAL_SESSION') return;
+
+        console.log('🔐 Auth state change:', event, newSession?.user?.email);
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+
+        if (newSession?.user) {
+          // Defer to avoid deadlock
+          setTimeout(() => {
+            if (isMounted) loadProfileAndData(newSession.user);
           }, 0);
         } else {
-          console.log('🚪 Usuário não logado');
           setProfile(null);
-          
-          // Even for non-authenticated users, load public data (products, vehicles, etc.)
-          console.log('📊 Buscando dados públicos...');
-          fetchData().then(() => {
-            console.log('✅ Dados públicos carregados!');
-          }).catch((error) => {
-            console.error('❌ Erro ao carregar dados públicos:', error);
-          }).finally(() => {
-            setLoading(false);
+          fetchData().finally(() => {
+            if (isMounted) setLoading(false);
           });
         }
       }
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const value: AppContextType = {
