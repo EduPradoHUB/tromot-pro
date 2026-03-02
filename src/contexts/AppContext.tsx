@@ -724,15 +724,28 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
     ));
   };
 
-  // Function to find product by barcode
+  // Function to find product by barcode or product code
   const findProductByBarcode = async (barcode: string): Promise<LegacyProduct | null> => {
     try {
-      const { data, error } = await supabase
+      // Try barcode first
+      let { data, error } = await supabase
         .from('products')
         .select('*')
         .eq('barcode_ean', barcode)
         .eq('status', 'active')
         .single();
+
+      // If not found by barcode, try by product code
+      if (error || !data) {
+        const result = await supabase
+          .from('products')
+          .select('*')
+          .ilike('code', barcode)
+          .eq('status', 'active')
+          .single();
+        data = result.data;
+        error = result.error;
+      }
 
       if (error || !data) {
         return null;
