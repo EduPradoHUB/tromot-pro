@@ -1100,72 +1100,135 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
     avatar: profile.avatar_url || undefined
   } : null;
 
-  // Helper to load profile and data
-  const loadProfileAndData = useCallback(async (sessionUser: User) => {
-    try {
-      let { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', sessionUser.id)
-        .single();
-      
-      if (!profileData) {
-        const { data: newProfile, error: createError } = await supabase
-          .from('profiles')
-          .insert({
-            user_id: sessionUser.id,
-            name: sessionUser.user_metadata?.name || sessionUser.email?.split('@')[0] || 'Usuário',
-            email: sessionUser.email || '',
-            role: sessionUser.email === 'eduardo@tromot.com.br' ? 'ADM' : 'Cliente'
-          })
-          .select()
-          .single();
-        
-        if (createError) {
-          console.error('Error creating profile:', createError);
-        } else {
-          profileData = newProfile;
-        }
-      }
-      
-      setProfile(profileData);
-      console.log('✅ Perfil carregado:', profileData?.name);
-      await fetchData();
-      console.log('✅ Dados carregados!');
-    } catch (error) {
-      console.error('❌ Erro ao carregar perfil/dados:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Auth state management - getSession first, then listen for changes
+  // Auth state management
   useEffect(() => {
     console.log('🚀 Inicializando AppContext...');
     let isMounted = true;
 
-    // 1. Restore session from storage first
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      if (!isMounted) return;
-      console.log('🔐 getSession result:', currentSession?.user?.email ?? 'no session');
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-
-      if (currentSession?.user) {
-        loadProfileAndData(currentSession.user);
-      } else {
-        setProfile(null);
-        fetchData().finally(() => {
-          if (isMounted) setLoading(false);
-        });
+    const loadProfileAndData = async (sessionUser: User) => {
+      try {
+        let { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', sessionUser.id)
+          .single();
+        
+        if (!profileData) {
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert({
+              user_id: sessionUser.id,
+              name: sessionUser.user_metadata?.name || sessionUser.email?.split('@')[0] || 'Usuário',
+              email: sessionUser.email || '',
+              role: sessionUser.email === 'eduardo@tromot.com.br' ? 'ADM' : 'Cliente'
+            })
+            .select()
+            .single();
+          
+          if (createError) {
+            console.error('Error creating profile:', createError);
+          } else {
+            profileData = newProfile;
+          }
+        }
+        
+        if (isMounted) {
+          setProfile(profileData);
+          console.log('✅ Perfil carregado:', profileData?.name);
+        }
+      } catch (error) {
+        console.error('❌ Erro ao carregar perfil:', error);
       }
-    });
+    };
 
-    // 2. Listen for subsequent auth changes (sign-in, sign-out, token refresh)
+    const loadAllData = async () => {
+      try {
+        const [
+          { data: productsData },
+          { data: bannersData },
+          { data: advertisementsData },
+          { data: vehiclesData },
+          { data: categoriesData },
+          { data: postsData },
+          distributorsPublicData,
+          { data: editableData }
+        ] = await Promise.all([
+          supabase.from('products').select('*'),
+          supabase.from('banners').select('*'),
+          supabase.from('advertisements').select('*'),
+          supabase.from('vehicles').select('*'),
+          supabase.from('categories').select('*'),
+          supabase.from('posts').select(`*, profiles!posts_author_id_fkey (name, role)`),
+          fetchDistributorsPublic(),
+          supabase.from('editable_content').select('*')
+        ]);
+
+        if (!isMounted) return;
+        if (productsData) setProducts(productsData);
+        if (bannersData) setBanners(bannersData);
+        if (advertisementsData) setAdvertisements(advertisementsData);
+        if (vehiclesData) setVehicles(vehiclesData);
+        if (categoriesData) setCategories(categoriesData);
+        if (distributorsPublicData) setDistributors(distributorsPublicData);
+        if (editableData) setEditableContent(editableData);
+        
+        if (postsData) {
+          const legacyPosts: LegacyPost[] = postsData.map(post => ({
+            id: post.id,
+            product_id: post.product_id,
+            author_id: post.author_id,
+            author_name: (post.profiles as any)?.name || 'Usuário desconhecido',
+            author_role: (post.profiles as any)?.role || 'Cliente',
+            photo_url: post.photo_url,
+            photos_urls: post.photos_urls || (post.photo_url ? [post.photo_url] : []),
+            caption: post.caption || '',
+            likes_count: post.likes_count || 0,
+            created_at: post.created_at,
+            status: post.status as 'approved' | 'pending' | 'rejected',
+            liked_by_user: false,
+            reports_count: post.reports_count || 0
+          }));
+          setPosts(legacyPosts);
+        }
+        console.log('✅ Dados carregados!');
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    const initialize = async () => {
+      try {
+        // 1. Get session first
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        if (!isMounted) return;
+        
+        console.log('🔐 getSession result:', currentSession?.user?.email ?? 'no session');
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+
+        // 2. Load profile if logged in + load data in parallel
+        if (currentSession?.user) {
+          await Promise.all([
+            loadProfileAndData(currentSession.user),
+            loadAllData()
+          ]);
+        } else {
+          setProfile(null);
+          await loadAllData();
+        }
+      } catch (error) {
+        console.error('❌ Erro na inicialização:', error);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    initialize();
+
+    // 2. Listen for subsequent auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
         if (!isMounted) return;
-        // Skip INITIAL_SESSION since getSession already handled it
         if (event === 'INITIAL_SESSION') return;
 
         console.log('🔐 Auth state change:', event, newSession?.user?.email);
@@ -1173,15 +1236,10 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
         setUser(newSession?.user ?? null);
 
         if (newSession?.user) {
-          // Defer to avoid deadlock
-          setTimeout(() => {
-            if (isMounted) loadProfileAndData(newSession.user);
-          }, 0);
+          loadProfileAndData(newSession.user);
         } else {
           setProfile(null);
-          fetchData().finally(() => {
-            if (isMounted) setLoading(false);
-          });
+          setLoading(false);
         }
       }
     );
