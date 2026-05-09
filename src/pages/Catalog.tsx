@@ -17,6 +17,7 @@ import {
 import { useApp } from '@/contexts/AppContext';
 import { categories, brands } from '@/lib/data';
 import { PWAInstallButtonSimple } from '@/components/PWAInstallButtonSimple';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Catalog() {
   const { legacyProducts: products, vehicles, trackEvent } = useApp();
@@ -26,7 +27,24 @@ export default function Catalog() {
   const [selectedBrand, setSelectedBrand] = useState('Todos');
   const [selectedModel, setSelectedModel] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
-  const [sortBy, setSortBy] = useState('name');
+  const [sortBy, setSortBy] = useState('popularity');
+  const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from('analytics_events')
+        .select('product_id')
+        .eq('event_type', 'view_product');
+      if (data) {
+        const counts: Record<string, number> = {};
+        data.forEach((row: any) => {
+          if (row.product_id) counts[row.product_id] = (counts[row.product_id] || 0) + 1;
+        });
+        setViewCounts(counts);
+      }
+    })();
+  }, []);
 
   // Aplicar filtros da URL na inicialização
   useEffect(() => {
@@ -86,6 +104,9 @@ export default function Catalog() {
 
     // Sort
     switch (sortBy) {
+      case 'popularity':
+        filtered = [...filtered].sort((a, b) => (viewCounts[b.id] || 0) - (viewCounts[a.id] || 0));
+        break;
       case 'name':
         filtered.sort((a, b) => a.name.localeCompare(b.name));
         break;
@@ -98,7 +119,7 @@ export default function Catalog() {
     }
 
     return filtered;
-  }, [products, localSearch, selectedCategory, selectedBrand, selectedModel, selectedYear, sortBy]);
+  }, [products, localSearch, selectedCategory, selectedBrand, selectedModel, selectedYear, sortBy, viewCounts]);
 
   const handleProductView = (productId: string) => {
     trackEvent({ type: 'view_product', product_id: productId });
@@ -270,6 +291,7 @@ export default function Catalog() {
                   onChange={(e) => setSortBy(e.target.value)}
                   className="flex h-10 w-40 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
+                  <option value="popularity">Mais acessados</option>
                   <option value="name">Nome</option>
                   <option value="rating">Avaliação</option>
                   <option value="category">Categoria</option>

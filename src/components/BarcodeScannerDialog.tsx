@@ -207,10 +207,10 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
           ) : (
             <div className="space-y-4">
               <div>
-                <Label htmlFor="manual-barcode">Código do produto ou código de barras</Label>
+                <Label htmlFor="manual-barcode">Nome, código do produto ou código de barras</Label>
                 <Input
                   id="manual-barcode"
-                  placeholder="Ex: TR-1234 ou código de barras..."
+                  placeholder="Ex: TR-1234, alarme, ou EAN..."
                   value={manualInput}
                   onChange={(e) => setManualInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleManualSubmit()}
@@ -227,7 +227,7 @@ export const BarcodeScannerDialog: React.FC<BarcodeScannerDialogProps> = ({
               </Button>
               
               <p className="text-xs text-gray-500 text-center">
-                Digite o código do produto ou código de barras (EAN-13, UPC-A, etc.)
+                Você pode digitar o nome, o código do produto ou o código de barras.
               </p>
             </div>
           )}

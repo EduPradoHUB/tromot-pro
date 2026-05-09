@@ -256,12 +256,13 @@ export default function Home() {
           <div>
             <h2 className="text-3xl font-bold mb-2">Produtos</h2>
           </div>
-          <Button variant="outline" asChild>
-            <Link to="/manuais">
-              Ver Todos
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+          <Link
+            to="/manuais"
+            className="inline-flex items-center text-[#C41E3A] font-semibold border-b border-[rgba(196,30,58,0.3)] hover:border-[#C41E3A] transition-colors"
+          >
+            Ver Todos
+            <ChevronRight className="ml-1 h-4 w-4" />
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -321,14 +322,15 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="container py-[16px] mt-12">
+      <section className="bg-gradient-hero text-white py-12 mt-12">
+        <div className="container">
         <div className="text-center mb-12">
           <EditableContent
             section="features"
             title={featuresContent.title}
             description={featuresContent.description}
-            titleClassName="text-3xl font-bold mb-4"
-            descriptionClassName="text-muted-foreground max-w-2xl mx-auto"
+            titleClassName="text-3xl font-bold mb-4 text-white"
+            descriptionClassName="text-white/80 max-w-2xl mx-auto"
             onContentUpdate={(content) => setFeaturesContent({
               title: content.title || featuresContent.title,
               description: content.description || featuresContent.description
@@ -337,17 +339,17 @@ export default function Home() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          <Card className="shadow-card">
+          <Card className="shadow-card bg-white/5 border-white/10">
             <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Download className="h-6 w-6 text-primary" />
+              <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-[rgba(196,30,58,0.12)] shadow-[0_4px_12px_rgba(196,30,58,0.2)]">
+                <Download className="h-6 w-6 text-[#C41E3A]" />
               </div>
               <EditableContent
                 section="feature-card-1"
                 title={featureCard1.title}
                 description={featureCard1.description}
-                titleClassName="font-semibold mb-2"
-                descriptionClassName="text-sm text-muted-foreground"
+                titleClassName="font-semibold mb-2 text-white"
+                descriptionClassName="text-sm text-white/80"
                 onContentUpdate={(content) => setFeatureCard1({
                   title: content.title || featureCard1.title,
                   description: content.description || featureCard1.description
@@ -356,17 +358,17 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-card">
+          <Card className="shadow-card bg-white/5 border-white/10">
             <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Star className="h-6 w-6 text-primary" />
+              <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-[rgba(196,30,58,0.12)] shadow-[0_4px_12px_rgba(196,30,58,0.2)]">
+                <Star className="h-6 w-6 text-[#C41E3A]" />
               </div>
               <EditableContent
                 section="feature-card-2"
                 title={featureCard2.title}
                 description={featureCard2.description}
-                titleClassName="font-semibold mb-2"
-                descriptionClassName="text-sm text-muted-foreground"
+                titleClassName="font-semibold mb-2 text-white"
+                descriptionClassName="text-sm text-white/80"
                 onContentUpdate={(content) => setFeatureCard2({
                   title: content.title || featureCard2.title,
                   description: content.description || featureCard2.description
@@ -375,17 +377,17 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-card">
+          <Card className="shadow-card bg-white/5 border-white/10">
             <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Search className="h-6 w-6 text-primary" />
+              <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 bg-[rgba(196,30,58,0.12)] shadow-[0_4px_12px_rgba(196,30,58,0.2)]">
+                <Search className="h-6 w-6 text-[#C41E3A]" />
               </div>
               <EditableContent
                 section="feature-card-3"
                 title={featureCard3.title}
                 description={featureCard3.description}
-                titleClassName="font-semibold mb-2"
-                descriptionClassName="text-sm text-muted-foreground"
+                titleClassName="font-semibold mb-2 text-white"
+                descriptionClassName="text-sm text-white/80"
                 onContentUpdate={(content) => setFeatureCard3({
                   title: content.title || featureCard3.title,
                   description: content.description || featureCard3.description
@@ -393,6 +395,7 @@ export default function Home() {
               />
             </CardContent>
           </Card>
+        </div>
         </div>
       </section>
       

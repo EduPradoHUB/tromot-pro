@@ -66,7 +66,12 @@ export const EditableContactLink: React.FC<EditableContactLinkProps> = ({
 
   if (!isAdmin) {
     return (
-      <a href={href} className={className}>
+      <a
+        href={href}
+        className={className}
+        target={href.startsWith('http') ? '_blank' : undefined}
+        rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+      >
         {text}
       </a>
     );
@@ -129,7 +134,12 @@ export const EditableContactLink: React.FC<EditableContactLinkProps> = ({
           </div>
         </div>
       ) : (
-        <a href={href} className={className}>
+        <a
+          href={href}
+          className={className}
+          target={href.startsWith('http') ? '_blank' : undefined}
+          rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+        >
           {text}
         </a>
       )}
