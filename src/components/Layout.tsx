@@ -135,8 +135,16 @@ export const Layout: React.FC<LayoutProps> = ({
                 {/* User Avatar */}
                 <div className="flex items-center space-x-2">
                   {/* Simple Avatar Replacement */}
-                  <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
-                    {profile.name.charAt(0).toUpperCase()}
+                  <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium overflow-hidden">
+                    {profile.avatar_url ? (
+                      <img
+                        src={profile.avatar_url}
+                        alt={profile.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      profile.name.charAt(0).toUpperCase()
+                    )}
                   </div>
                   <span className="hidden md:block text-sm font-medium">{profile.name}</span>
                 </div>
