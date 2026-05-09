@@ -1120,33 +1120,18 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
     const loadProfileAndData = async (sessionUser: User) => {
       try {
-        let { data: profileData } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('user_id', sessionUser.id)
           .single();
         
-        if (!profileData) {
-          const { data: newProfile, error: createError } = await supabase
-            .from('profiles')
-            .insert({
-              user_id: sessionUser.id,
-              name: sessionUser.user_metadata?.name || sessionUser.email?.split('@')[0] || 'Usuário',
-              email: sessionUser.email || '',
-              role: sessionUser.email === 'eduardo@tromot.com.br' ? 'ADM' : 'Cliente'
-            })
-            .select()
-            .single();
-          
-          if (createError) {
-            console.error('Error creating profile:', createError);
-          } else {
-            profileData = newProfile;
-          }
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error('Error fetching profile:', profileError);
         }
         
         if (isMounted) {
-          setProfile(profileData);
+          setProfile(profileData ?? null);
           console.log('✅ Perfil carregado:', profileData?.name);
         }
       } catch (error) {
@@ -1219,19 +1204,17 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
 
-        // 2. Load profile if logged in + load data in parallel
+        // 2. Auth readiness must not wait for public data loading
         if (currentSession?.user) {
-          await Promise.all([
-            loadProfileAndData(currentSession.user),
-            loadAllData()
-          ]);
+          await loadProfileAndData(currentSession.user);
         } else {
           setProfile(null);
-          await loadAllData();
         }
+
+        if (isMounted) setLoading(false);
+        loadAllData();
       } catch (error) {
         console.error('❌ Erro na inicialização:', error);
-      } finally {
         if (isMounted) setLoading(false);
       }
     };
@@ -1249,7 +1232,11 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
         setUser(newSession?.user ?? null);
 
         if (newSession?.user) {
-          loadProfileAndData(newSession.user);
+          setProfile(null);
+          setLoading(true);
+          loadProfileAndData(newSession.user).finally(() => {
+            if (isMounted) setLoading(false);
+          });
         } else {
           setProfile(null);
           setLoading(false);

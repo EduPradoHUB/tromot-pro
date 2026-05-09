@@ -1,4 +1,3 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
@@ -15,6 +14,24 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
+  const isInIframe = (() => {
+    try {
+      return window.self !== window.top;
+    } catch {
+      return true;
+    }
+  })();
+
+  const isPreviewHost =
+    window.location.hostname.includes('id-preview--') ||
+    window.location.hostname.includes('lovableproject.com') ||
+    window.location.hostname.includes('lovable.app');
+
+  if (import.meta.env.DEV || isInIframe || isPreviewHost) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      registrations.forEach((registration) => registration.unregister());
+    });
+  } else {
   // Flag para controlar reload manual após SKIP_WAITING (evita loop de reload na 1ª instalação)
   let refreshingPage = false;
   window.addEventListener('load', async () => {
@@ -36,7 +53,6 @@ if ('serviceWorker' in navigator) {
               if (confirm('Uma nova versão do app está disponível. Atualizar agora?')) {
                 refreshingPage = true;
                 newWorker.postMessage({ type: 'SKIP_WAITING' });
-                window.location.reload();
               }
             }
           });
@@ -60,11 +76,10 @@ if ('serviceWorker' in navigator) {
     refreshingPage = false;
     window.location.reload();
   });
+  }
 }
 
 
 createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <App />
 );
