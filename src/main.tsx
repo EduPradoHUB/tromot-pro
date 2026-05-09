@@ -15,6 +15,8 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
+  // Flag para controlar reload manual após SKIP_WAITING (evita loop de reload na 1ª instalação)
+  let refreshingPage = false;
   window.addEventListener('load', async () => {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js');
@@ -32,6 +34,7 @@ if ('serviceWorker' in navigator) {
               
               // Notificar usuário sobre atualização disponível
               if (confirm('Uma nova versão do app está disponível. Atualizar agora?')) {
+                refreshingPage = true;
                 newWorker.postMessage({ type: 'SKIP_WAITING' });
                 window.location.reload();
               }
@@ -50,9 +53,11 @@ if ('serviceWorker' in navigator) {
     }
   });
 
-  // Escutar quando o novo SW assume controle
+  // Escutar quando o novo SW assume controle — só recarrega se foi atualização confirmada
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     console.log('[PWA] New service worker activated');
+    if (!refreshingPage) return;
+    refreshingPage = false;
     window.location.reload();
   });
 }
