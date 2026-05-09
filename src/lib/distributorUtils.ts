@@ -31,17 +31,18 @@ export type DistributorContact = {
  */
 export const fetchDistributorsPublic = async (state?: string, city?: string): Promise<DistributorPublic[]> => {
   try {
-    // First try the secure function for authenticated users
-    const { data, error } = await supabase
-      .rpc('search_distributors_secure', {
-        p_state: state || null,
-        p_city: city || null
-      });
+    const { data: { session } } = await supabase.auth.getSession();
+
+    // First try the secure function only for authenticated users
+    const { data, error } = session?.user
+      ? await supabase.rpc('search_distributors_secure', {
+          p_state: state || null,
+          p_city: city || null
+        })
+      : { data: null, error: { message: 'Usuário não autenticado' } };
 
     if (error) {
       // If secure function fails (user not authenticated or no location), fallback to basic query
-      console.warn('Secure distributors function failed, using basic query:', error.message);
-      
       const { data: basicData, error: basicError } = await supabase
         .from('distributors')
         .select('id, name, state, city, cover_entire_state, active, created_at')
