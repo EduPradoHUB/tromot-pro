@@ -727,6 +727,9 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
   // Function to find product by barcode or product code
   const findProductByBarcode = async (barcode: string): Promise<LegacyProduct | null> => {
     try {
+      // Normaliza entrada: remove espaços nas pontas
+      barcode = (barcode ?? '').trim();
+      if (!barcode) return null;
       // 1) Try barcode
       let { data, error } = await supabase
         .from('products')
