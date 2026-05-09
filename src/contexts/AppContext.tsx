@@ -1120,33 +1120,18 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
     const loadProfileAndData = async (sessionUser: User) => {
       try {
-        let { data: profileData } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('user_id', sessionUser.id)
           .single();
         
-        if (!profileData) {
-          const { data: newProfile, error: createError } = await supabase
-            .from('profiles')
-            .insert({
-              user_id: sessionUser.id,
-              name: sessionUser.user_metadata?.name || sessionUser.email?.split('@')[0] || 'Usuário',
-              email: sessionUser.email || '',
-              role: sessionUser.email === 'eduardo@tromot.com.br' ? 'ADM' : 'Cliente'
-            })
-            .select()
-            .single();
-          
-          if (createError) {
-            console.error('Error creating profile:', createError);
-          } else {
-            profileData = newProfile;
-          }
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error('Error fetching profile:', profileError);
         }
         
         if (isMounted) {
-          setProfile(profileData);
+          setProfile(profileData ?? null);
           console.log('✅ Perfil carregado:', profileData?.name);
         }
       } catch (error) {
