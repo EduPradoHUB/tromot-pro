@@ -67,11 +67,21 @@ export default function Home() {
 
   // Removed autoplay plugin to fix React hooks conflicts
   
-  const handleQuickSearch = () => {
-    if (globalSearch.trim()) {
-      // Navigate to catalog with search query
-      navigate(`/manuais?search=${encodeURIComponent(globalSearch.trim())}`);
+  const handleQuickSearch = async () => {
+    const query = globalSearch.trim();
+    if (!query) return;
+    // Tenta encontrar um produto direto (EAN, código ou nome)
+    try {
+      const product = await findProductByBarcode(query);
+      if (product) {
+        trackEvent({ type: 'view_product', product_id: product.id });
+        navigate(`/produto/${product.id}`);
+        return;
+      }
+    } catch (e) {
+      // fallback abaixo
     }
+    navigate(`/manuais?search=${encodeURIComponent(query)}`);
   };
   
   const handleProductView = (productId: string) => {
