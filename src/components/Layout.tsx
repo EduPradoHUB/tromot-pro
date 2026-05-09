@@ -31,8 +31,8 @@ export const Layout: React.FC<LayoutProps> = ({
   const [supportTitle, setSupportTitle] = useState('Suporte');
   const [legalTitle, setLegalTitle] = useState('Legal');
   const [copyright, setCopyright] = useState('© 2025 Tromot Indústria Eletrônica. Todos os direitos reservados.');
-  const [supportPhone, setSupportPhone] = useState('(16) 99303-2002');
-  const [supportPhoneLink, setSupportPhoneLink] = useState('tel:+5516993032002');
+  const [supportPhone, setSupportPhone] = useState('(16) 99182-3637');
+  const [supportPhoneLink, setSupportPhoneLink] = useState('https://api.whatsapp.com/send?phone=5516991823637');
   const [supportEmail, setSupportEmail] = useState('suporte@tromot.com');
   const [supportEmailLink, setSupportEmailLink] = useState('mailto:suporte@tromot.com');
 
@@ -238,6 +238,7 @@ export const Layout: React.FC<LayoutProps> = ({
                     section="footer-support-phone" 
                     text={supportPhone}
                     href={supportPhoneLink}
+                    className="hover:text-foreground"
                     onUpdate={(text, href) => {
                       setSupportPhone(text);
                       setSupportPhoneLink(href);

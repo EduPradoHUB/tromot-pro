@@ -44,7 +44,7 @@ All colors MUST be HSL.
     --tromot-gray: 0 0% 20%;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(var(--tromot-dark)), hsl(var(--tromot-gray)));
+    --gradient-hero: linear-gradient(135deg, #1a1a1a 0%, #2d0a10 100%);
     --gradient-card: linear-gradient(145deg, hsl(var(--background)), hsl(var(--muted)));
 
     /* Shadows */
@@ -95,7 +95,7 @@ All colors MUST be HSL.
     --tromot-dark: 0 0% 8%;
     --tromot-gray: 0 0% 15%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(var(--tromot-dark)), hsl(var(--tromot-gray)));
+    --gradient-hero: linear-gradient(135deg, #1a1a1a 0%, #2d0a10 100%);
     --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--muted)));
 
     --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
