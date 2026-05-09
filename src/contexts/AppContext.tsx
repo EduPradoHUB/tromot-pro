@@ -1204,19 +1204,17 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
 
-        // 2. Load profile if logged in + load data in parallel
+        // 2. Auth readiness must not wait for public data loading
         if (currentSession?.user) {
-          await Promise.all([
-            loadProfileAndData(currentSession.user),
-            loadAllData()
-          ]);
+          await loadProfileAndData(currentSession.user);
         } else {
           setProfile(null);
-          await loadAllData();
         }
+
+        if (isMounted) setLoading(false);
+        loadAllData();
       } catch (error) {
         console.error('❌ Erro na inicialização:', error);
-      } finally {
         if (isMounted) setLoading(false);
       }
     };
@@ -1234,7 +1232,11 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
         setUser(newSession?.user ?? null);
 
         if (newSession?.user) {
-          loadProfileAndData(newSession.user);
+          setProfile(null);
+          setLoading(true);
+          loadProfileAndData(newSession.user).finally(() => {
+            if (isMounted) setLoading(false);
+          });
         } else {
           setProfile(null);
           setLoading(false);
