@@ -323,9 +323,13 @@ export default function WhereToBuy() {
       {/* Distributors List */}
       {!showLocationForm && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h2 className="text-lg font-semibold">
-              Distribuidores em {userCity}, {userState}
+              {isAdmin && adminFilter === 'all'
+                ? 'Todos os distribuidores'
+                : isAdmin && adminFilter !== 'region'
+                ? `Distribuidores em ${adminFilter}`
+                : `Distribuidores em ${userCity}, ${userState}`}
             </h2>
             <Button
               variant="outline"
@@ -335,6 +339,28 @@ export default function WhereToBuy() {
               Alterar localização
             </Button>
           </div>
+
+          {isAdmin && (
+            <Card className="shadow-card border-dashed">
+              <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                <span className="text-sm font-medium text-muted-foreground">
+                  Filtro de administrador:
+                </span>
+                <Select value={adminFilter} onValueChange={setAdminFilter}>
+                  <SelectTrigger className="w-full sm:w-64">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="region">Minha região ({userState || '—'})</SelectItem>
+                    <SelectItem value="all">Todos os estados</SelectItem>
+                    {BR_STATES.map((uf) => (
+                      <SelectItem key={uf} value={uf}>{uf}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
+          )}
 
           {loading ? (
             <Card className="shadow-card">
