@@ -254,17 +254,6 @@ export const Layout: React.FC<LayoutProps> = ({
                     }}
                   />
                 </li>
-                <li>
-                  <EditableContactLink 
-                    section="footer-support-email" 
-                    text={supportEmail}
-                    href={supportEmailLink}
-                    onUpdate={(text, href) => {
-                      setSupportEmail(text);
-                      setSupportEmailLink(href);
-                    }}
-                  />
-                </li>
               </ul>
             </div>
             <div>
