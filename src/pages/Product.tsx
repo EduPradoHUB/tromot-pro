@@ -26,6 +26,7 @@ import { RatingForm } from '@/components/RatingForm';
 import { QuestionForm } from '@/components/QuestionForm';
 import { PostUploadModal } from '@/components/PostUploadModal';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
+import { SaveProductButton } from '@/components/SaveProductButton';
 import { Product, Post, Rating, Question } from '@/lib/types';
 import AdSlot from '@/components/AdSlot';
 import { toast } from '@/hooks/use-toast';
@@ -177,6 +178,7 @@ export default function ProductPage() {
           <p className="text-muted-foreground">Código: {product.code}</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
+          <SaveProductButton productId={product.id} productName={product.name} />
           <Button 
             variant="outline" 
             size="sm"

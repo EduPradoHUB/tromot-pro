@@ -29,6 +29,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 
 import InstallApp from "./pages/InstallApp";
+import Saved from "./pages/Saved";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -69,6 +70,11 @@ function AppContent() {
         <Route path="/perfil" element={
           <ProtectedRoute>
             <Layout><Profile /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/salvos" element={
+          <ProtectedRoute>
+            <Layout><Saved /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/dashboard" element={
