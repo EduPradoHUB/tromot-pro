@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Phone, MessageCircle, MapPin } from 'lucide-react';
+import { ArrowLeft, Phone, MessageCircle, MapPin, Crosshair } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -38,6 +38,7 @@ export default function WhereToBuy() {
   const [userCity, setUserCity] = React.useState(profile?.city || '');
   const [showLocationForm, setShowLocationForm] = React.useState(false);
   const [contactingDistributor, setContactingDistributor] = React.useState<string | null>(null);
+  const [locating, setLocating] = React.useState(false);
 
   React.useEffect(() => {
     if (id) {
@@ -155,6 +156,77 @@ export default function WhereToBuy() {
     }
   };
 
+  const handleUseGPS = () => {
+    if (!('geolocation' in navigator)) {
+      toast({
+        title: 'GPS indisponível',
+        description: 'Seu dispositivo não suporta geolocalização.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+          const res = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=pt`
+          );
+          const data = await res.json();
+          // Mapear sigla do estado a partir do nome (BigDataCloud retorna nome completo)
+          const stateMap: Record<string, string> = {
+            'Acre': 'AC', 'Alagoas': 'AL', 'Amapá': 'AP', 'Amazonas': 'AM',
+            'Bahia': 'BA', 'Ceará': 'CE', 'Distrito Federal': 'DF', 'Espírito Santo': 'ES',
+            'Goiás': 'GO', 'Maranhão': 'MA', 'Mato Grosso': 'MT', 'Mato Grosso do Sul': 'MS',
+            'Minas Gerais': 'MG', 'Pará': 'PA', 'Paraíba': 'PB', 'Paraná': 'PR',
+            'Pernambuco': 'PE', 'Piauí': 'PI', 'Rio de Janeiro': 'RJ', 'Rio Grande do Norte': 'RN',
+            'Rio Grande do Sul': 'RS', 'Rondônia': 'RO', 'Roraima': 'RR', 'Santa Catarina': 'SC',
+            'São Paulo': 'SP', 'Sergipe': 'SE', 'Tocantins': 'TO',
+          };
+          const principalSubdivision = data.principalSubdivision || '';
+          const detectedState = stateMap[principalSubdivision] || principalSubdivision;
+          const detectedCity = data.city || data.locality || data.localityInfo?.administrative?.find((a: any) => a.adminLevel === 8)?.name || '';
+
+          if (!detectedState || !detectedCity) {
+            toast({
+              title: 'Não foi possível identificar',
+              description: 'Preencha sua cidade e estado manualmente.',
+              variant: 'destructive',
+            });
+            return;
+          }
+
+          setUserState(detectedState);
+          setUserCity(detectedCity);
+          setShowLocationForm(false);
+          toast({
+            title: 'Localização detectada',
+            description: `${detectedCity}, ${detectedState}`,
+          });
+        } catch (err) {
+          console.error('Erro reverse geocode:', err);
+          toast({
+            title: 'Erro',
+            description: 'Não foi possível obter sua localização.',
+            variant: 'destructive',
+          });
+        } finally {
+          setLocating(false);
+        }
+      },
+      (err) => {
+        setLocating(false);
+        toast({
+          title: 'Permissão negada',
+          description: 'Autorize o acesso ao GPS para detectar sua localização.',
+          variant: 'destructive',
+        });
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  };
+
   if (!product) {
     return (
       <div className="container py-8">
@@ -194,6 +266,24 @@ export default function WhereToBuy() {
             <p className="text-muted-foreground">
               Para encontrar os distribuidores mais próximos, informe sua localização:
             </p>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleUseGPS}
+              disabled={locating}
+              className="w-full"
+            >
+              <Crosshair className="h-4 w-4 mr-2" />
+              {locating ? 'Detectando localização...' : 'Usar minha localização (GPS)'}
+            </Button>
+            <div className="relative my-2">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">ou informe manualmente</span>
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <Input
                 placeholder="Estado"
