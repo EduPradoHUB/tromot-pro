@@ -397,8 +397,9 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
     
     if (error) throw error;
     
-    // Refresh profile data
-    fetchData();
+    // Refresh profile state so the UI reflects the saved values
+    const updated = await fetchProfile(user.id);
+    if (updated) setProfile(updated);
   };
 
   // File upload function
