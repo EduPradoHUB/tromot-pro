@@ -63,26 +63,12 @@ export default function Users() {
 
   const handleDeleteUser = async (userId: string, userName: string) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.access_token) {
-        throw new Error('Usuário não autenticado');
-      }
-
-      // Call edge function to delete user
-      const response = await fetch(`https://bclktrcbwpwsxksbhqsv.supabase.co/functions/v1/delete-user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ userId }),
+      const { error: invokeError } = await supabase.functions.invoke('delete-user', {
+        body: { userId },
       });
 
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Erro ao banir usuário');
+      if (invokeError) {
+        throw new Error('Erro ao banir usuário');
       }
 
       // Remove from local state
@@ -96,7 +82,7 @@ export default function Users() {
       console.error('Error deleting user:', error);
       toast({
         title: "Erro",
-        description: error instanceof Error ? error.message : "Não foi possível banir o usuário.",
+        description: "Não foi possível banir o usuário.",
         variant: "destructive",
       });
     }

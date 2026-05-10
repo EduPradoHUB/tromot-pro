@@ -76,7 +76,7 @@ serve(async (req) => {
     if (deleteError) {
       console.error('Error deleting user:', deleteError);
       return new Response(
-        JSON.stringify({ error: 'Erro ao banir usuário', details: deleteError.message }),
+        JSON.stringify({ error: 'Erro ao banir usuário' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -89,7 +89,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in delete-user function:', error);
     return new Response(
-      JSON.stringify({ error: 'Erro interno do servidor', details: error.message }),
+      JSON.stringify({ error: 'Erro interno do servidor' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

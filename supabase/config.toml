@@ -7,8 +7,5 @@ schemas = ["public", "graphql_public"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
 
-[functions.create-admin]
-verify_jwt = false
-
 [functions.send-post-notification]
-verify_jwt = false
+verify_jwt = true
