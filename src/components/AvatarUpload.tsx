@@ -187,9 +187,9 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
           />
           
           {/* Modal Content */}
-          <div className="relative bg-background border rounded-2xl shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="relative bg-background border rounded-2xl shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b">
+            <div className="flex items-center justify-between p-4 border-b shrink-0">
               <h2 className="text-lg font-semibold">Editar Foto de Perfil</h2>
               <button
                 onClick={() => { setOpen(false); setImgSrc(''); }}
@@ -199,8 +199,8 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
               </button>
             </div>
             
-            {/* Content */}
-            <div className="p-6 space-y-4">
+            {/* Content (scrollable) */}
+            <div className="p-4 space-y-4 overflow-y-auto flex-1">
               {!imgSrc && (
                 <div className="flex flex-col items-center justify-center py-8 space-y-4 text-center">
                   <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
@@ -293,13 +293,13 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
               )}
             </div>
 
-            {/* Footer */}
-            <div className="flex justify-end gap-2 p-6 border-t">
+            {/* Footer (always visible) */}
+            <div className="flex justify-end gap-2 p-4 border-t shrink-0 bg-background rounded-b-2xl">
               <Button variant="outline" onClick={() => { setOpen(false); setImgSrc(''); }}>
                 Cancelar
               </Button>
               <Button onClick={uploadCroppedImage} disabled={uploading || !completedCrop}>
-                {uploading ? 'Enviando...' : 'Salvar Foto'}
+                {uploading ? 'Enviando...' : 'Cortar e salvar'}
               </Button>
             </div>
           </div>
