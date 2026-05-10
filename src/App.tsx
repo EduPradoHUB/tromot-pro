@@ -7,9 +7,6 @@ import { PublicLayout } from "@/components/PublicLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { NotificationManager } from "@/components/NotificationManager";
 import { Toaster } from "@/components/ui/toaster";
-// Temporarily disable PWA components to fix React hooks conflicts
-// import { InstallPrompt } from "@/components/pwa/InstallPrompt";
-// import { PWAStatusIndicator } from "@/components/PWAStatusIndicator";
 
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
@@ -27,7 +24,6 @@ import Login from "./pages/Login";
 import PasswordReset from "./pages/PasswordReset";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
-
 import InstallApp from "./pages/InstallApp";
 import Saved from "./pages/Saved";
 import NotFound from "./pages/NotFound";
@@ -37,16 +33,14 @@ const queryClient = new QueryClient();
 function AppContent() {
   return (
     <>
-      {/* PWA components temporarily disabled to fix React hooks conflicts */}
-      {/* <Toaster /> - Temporarily disabled due to React hooks conflicts */}
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<PasswordReset />} />
-        
+
         {/* Rotas Públicas - Acesso sem cadastro */}
         <Route path="/manuais-publico" element={<PublicLayout><PublicCatalog /></PublicLayout>} />
         <Route path="/manual/:id" element={<PublicLayout><PublicProduct /></PublicLayout>} />
-        
+
         <Route path="/" element={
           <ProtectedRoute>
             <Layout><Home /></Layout>
@@ -87,8 +81,9 @@ function AppContent() {
             <Layout><AdminDashboard /></Layout>
           </ProtectedRoute>
         } />
+        {/* SECURITY FIX: /tecnico agora exige role específico */}
         <Route path="/tecnico" element={
-          <ProtectedRoute>
+          <ProtectedRoute requireRoles={['ADM', 'Técnico Tromot', 'Suporte Tromot']}>
             <Layout><TechnicianDashboard /></Layout>
           </ProtectedRoute>
         } />
@@ -113,7 +108,7 @@ function AppContent() {
           </ProtectedRoute>
         } />
         <Route path="/instalar" element={<InstallApp />} />
-        
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

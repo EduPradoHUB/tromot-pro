@@ -404,7 +404,7 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   // File upload function
   const uploadFile = async (bucket: string, path: string, file: File): Promise<string> => {
-    console.log('🔄 Iniciando upload:', { bucket, path, fileSize: file.size, fileType: file.type });
+    if (import.meta.env.DEV) console.log('🔄 Iniciando upload:', { bucket, path, fileSize: file.size, fileType: file.type });
     
     if (!user) {
       console.error('❌ Usuário não autenticado para upload');
@@ -435,7 +435,7 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
       .from(bucket)
       .getPublicUrl(data.path);
     
-    console.log('✅ Upload concluído com sucesso:', publicUrl);
+    if (import.meta.env.DEV) console.log('✅ Upload concluído');
     return publicUrl;
   };
 
@@ -711,7 +711,7 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
             }
           });
           
-          console.log('Notification sent for approved post:', id);
+          if (import.meta.env.DEV) console.log('Notification sent for approved post');
         }
       } catch (notificationError) {
         console.error('Error sending notification:', notificationError);
@@ -1136,7 +1136,7 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   // Auth state management
   useEffect(() => {
-    console.log('🚀 Inicializando AppContext...');
+    if (import.meta.env.DEV) console.log('🚀 Inicializando AppContext...');
     let isMounted = true;
 
     const loadProfileAndData = async (sessionUser: User) => {
@@ -1153,7 +1153,7 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
         
         if (isMounted) {
           setProfile(profileData ?? null);
-          console.log('✅ Perfil carregado:', profileData?.name);
+          if (import.meta.env.DEV) console.log('✅ Perfil carregado');
         }
       } catch (error) {
         console.error('❌ Erro ao carregar perfil:', error);
@@ -1242,7 +1242,7 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
           console.error('Erro ao carregar avaliações:', e);
         }
 
-        console.log('✅ Dados carregados!');
+        if (import.meta.env.DEV) console.log('✅ Dados carregados!');
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -1254,7 +1254,7 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
         const { data: { session: currentSession } } = await supabase.auth.getSession();
         if (!isMounted) return;
         
-        console.log('🔐 getSession result:', currentSession?.user?.email ?? 'no session');
+        if (import.meta.env.DEV) console.log('🔐 getSession result:', currentSession?.user?.email ?? 'no session');
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
 
@@ -1281,7 +1281,7 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
         if (!isMounted) return;
         if (event === 'INITIAL_SESSION') return;
 
-        console.log('🔐 Auth state change:', event, newSession?.user?.email);
+        if (import.meta.env.DEV) console.log('🔐 Auth state change:', event);
         setSession(newSession);
         setUser(newSession?.user ?? null);
 

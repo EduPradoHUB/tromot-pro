@@ -5,23 +5,15 @@ import { useApp } from '@/contexts/AppContext';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
+  requireRoles?: Array<'ADM' | 'Técnico Tromot' | 'Suporte Tromot' | 'Cliente'>;
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
-  requireAdmin = false 
+  requireAdmin = false,
+  requireRoles
 }) => {
-  console.log('🛡️ ProtectedRoute - checking auth...');
-  
   const { user, profile, loading } = useApp();
-  
-  console.log('🛡️ ProtectedRoute estado:', { 
-    hasUser: !!user, 
-    hasProfile: !!profile, 
-    loading, 
-    requireAdmin,
-    userRole: profile?.role 
-  });
 
   if (loading) {
     return (
@@ -36,6 +28,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (requireAdmin && profile.role !== 'ADM') {
+    return <Navigate to="/" replace />;
+  }
+
+  if (requireRoles && !requireRoles.includes(profile.role as any)) {
     return <Navigate to="/" replace />;
   }
 

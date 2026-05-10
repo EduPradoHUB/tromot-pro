@@ -1,16 +1,30 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const ALLOWED_ORIGINS = [
+  'https://tromot.com',
+  'https://www.tromot.com',
+  'https://app.tromot.com',
+  'https://bc258fac-6bb8-419b-8b51-b94515b0f521.lovableproject.com',
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin') ?? '';
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Vary': 'Origin',
+  };
+}
 
 interface NotificationRequest {
   postId: string;
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -92,32 +106,13 @@ serve(async (req) => {
       .neq('user_id', user.id);
 
     if (profilesError) {
-      console.error('Error fetching profiles:', profilesError);
       return new Response(
         JSON.stringify({ error: 'Falha ao processar destinatários' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Aqui você pode implementar diferentes provedores de notificação
-    // Por enquanto, vamos usar notificações web através do service worker
-    
-    const notificationPayload = {
-      title: 'Nova Instalação!',
-      body: `${authorName} postou uma nova instalação de ${productName}`,
-      icon: '/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png',
-      badge: '/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png',
-      data: {
-        postId,
-        productName,
-        authorName,
-        url: `/produto/${postId}`
-      },
-      tag: 'new-installation',
-      requireInteraction: false
-    };
-
-    // Log analytics event (attributed to caller)
+    // Log analytics event
     await supabase
       .from('analytics_events')
       .insert({
@@ -130,25 +125,22 @@ serve(async (req) => {
         },
       });
 
-    console.log(`Notification prepared for ${profiles?.length || 0} users`);
-
     return new Response(
-      JSON.stringify({ 
-        success: true, 
+      JSON.stringify({
+        success: true,
         message: 'Notification sent successfully',
         recipientCount: profiles?.length || 0
       }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
 
   } catch (error) {
-    console.error('Error in send-post-notification:', error);
     return new Response(
       JSON.stringify({ error: 'Erro interno' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });
