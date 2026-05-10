@@ -42,24 +42,35 @@ export const fetchDistributorsPublic = async (state?: string, city?: string): Pr
       : { data: null, error: { message: 'Usuário não autenticado' } };
 
     if (error) {
-      // If secure function fails (user not authenticated or no location), fallback to basic query
-      const { data: basicData, error: basicError } = await supabase
+      // Fallback only when state was provided. NEVER return all distributors
+      // — that would expose distributors of other regions to the user.
+      if (!state) {
+        return [];
+      }
+
+      let query = supabase
         .from('distributors')
         .select('id, name, state, city, cover_entire_state, active, created_at')
         .eq('active', true)
-        .limit(50); // Limit for performance
-      
+        .eq('state', state);
+
+      if (city) {
+        // Match exact city OR distributors that cover the entire state
+        query = query.or(`city.eq.${city},cover_entire_state.eq.true`);
+      }
+
+      const { data: basicData, error: basicError } = await query.limit(50);
+
       if (basicError) {
         console.error('Erro ao buscar distribuidores básicos:', basicError);
-        return []; // Return empty array instead of throwing
+        return [];
       }
-      
-      // Transform to match expected format with masked data for non-authenticated users
+
       return (basicData || []).map(distributor => ({
         ...distributor,
-        phone_display: null, // No phone data for non-authenticated users
-        whatsapp_display: null, // No whatsapp data for non-authenticated users
-        has_contact: false // No contact info available
+        phone_display: null,
+        whatsapp_display: null,
+        has_contact: false,
       }));
     }
 
