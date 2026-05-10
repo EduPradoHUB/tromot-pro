@@ -13,7 +13,6 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     name: profile?.name || '',
-    phone: profile?.phone || '',
     whatsapp: profile?.whatsapp || '',
     city: profile?.city || '',
     state: profile?.state || ''
@@ -27,9 +26,30 @@ export default function Profile() {
     }
   };
 
+  const formatWhatsapp = (raw: string) => {
+    const digits = raw.replace(/\D/g, '').slice(0, 11);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 7) return `${digits.slice(0, 2)} ${digits.slice(2)}`;
+    return `${digits.slice(0, 2)} ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  };
+
   const handleSaveProfile = async () => {
+    const digits = (editData.whatsapp || '').replace(/\D/g, '');
+    if (digits.length > 0 && digits.length !== 11) {
+      toast({
+        title: "WhatsApp inválido",
+        description: "Use o formato XX XXXXX-XXXX (com DDD).",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
-      await updateProfile(editData);
+      await updateProfile({
+        name: editData.name,
+        whatsapp: digits ? formatWhatsapp(digits) : null,
+        city: editData.city,
+        state: editData.state,
+      });
       setIsEditing(false);
       toast({
         title: "Sucesso",
@@ -49,7 +69,6 @@ export default function Profile() {
     if (profile) {
       setEditData({
         name: profile.name || '',
-        phone: profile.phone || '',
         whatsapp: profile.whatsapp || '',
         city: profile.city || '',
         state: profile.state || ''
@@ -96,14 +115,11 @@ export default function Profile() {
                       placeholder="Nome"
                     />
                     <Input
-                      value={editData.phone}
-                      onChange={(e) => setEditData(prev => ({ ...prev, phone: e.target.value }))}
-                      placeholder="Telefone"
-                    />
-                    <Input
                       value={editData.whatsapp}
-                      onChange={(e) => setEditData(prev => ({ ...prev, whatsapp: e.target.value }))}
-                      placeholder="WhatsApp"
+                      onChange={(e) => setEditData(prev => ({ ...prev, whatsapp: formatWhatsapp(e.target.value) }))}
+                      placeholder="WhatsApp (XX XXXXX-XXXX)"
+                      inputMode="tel"
+                      maxLength={13}
                     />
                     <div className="grid grid-cols-2 gap-2">
                       <Input
@@ -122,9 +138,6 @@ export default function Profile() {
                   <div>
                     <h2 className="text-2xl font-bold">{profile.name}</h2>
                     <p className="text-muted-foreground">{profile.email}</p>
-                    {profile.phone && (
-                      <p className="text-muted-foreground">{profile.phone}</p>
-                    )}
                     {profile.whatsapp && (
                       <p className="text-muted-foreground">WhatsApp: {profile.whatsapp}</p>
                     )}
