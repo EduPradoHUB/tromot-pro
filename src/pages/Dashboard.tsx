@@ -1,12 +1,82 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Calendar, Users, FileText, Heart, Star, TrendingUp } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Dashboard() {
-  const { currentUser, getDashboardStats, products, ratings, posts } = useApp();
+  const { currentUser, products, ratings } = useApp();
+
+  const WEEK_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  const emptyWeek = () => {
+    const today = new Date();
+    return Array.from({ length: 7 }).map((_, i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() - (6 - i));
+      return { date: d.toISOString().slice(0, 10), day: WEEK_LABELS[d.getDay()] };
+    });
+  };
+
+  const [stats, setStats] = useState({ dau: 0, mau: 0, manual_views_today: 0, avg_rating: 0 });
+  const [manualAccessData, setManualAccessData] = useState<Array<{ day: string; views: number }>>(
+    emptyWeek().map((d) => ({ day: d.day, views: 0 }))
+  );
+  const [engagementData, setEngagementData] = useState<Array<{ day: string; posts: number; likes: number }>>(
+    emptyWeek().map((d) => ({ day: d.day, posts: 0, likes: 0 }))
+  );
+
+  useEffect(() => {
+    const load = async () => {
+      const now = new Date();
+      const startToday = new Date(now); startToday.setHours(0, 0, 0, 0);
+      const start30 = new Date(now); start30.setDate(now.getDate() - 30);
+      const start7 = new Date(now); start7.setDate(now.getDate() - 6); start7.setHours(0, 0, 0, 0);
+
+      const [todayEvents, monthEvents, weekManualEvents, weekPosts, weekLikes, ratingsAgg] = await Promise.all([
+        supabase.from('analytics_events').select('user_id, event_type, created_at').gte('created_at', startToday.toISOString()),
+        supabase.from('analytics_events').select('user_id').gte('created_at', start30.toISOString()),
+        supabase.from('analytics_events').select('created_at').eq('event_type', 'view_manual').gte('created_at', start7.toISOString()),
+        supabase.from('posts').select('created_at').gte('created_at', start7.toISOString()),
+        supabase.from('post_likes').select('created_at').gte('created_at', start7.toISOString()),
+        supabase.from('ratings').select('rating'),
+      ]);
+
+      const dauUsers = new Set((todayEvents.data || []).map((e: any) => e.user_id).filter(Boolean));
+      const mauUsers = new Set((monthEvents.data || []).map((e: any) => e.user_id).filter(Boolean));
+      const manualViewsToday = (todayEvents.data || []).filter((e: any) => e.event_type === 'view_manual').length;
+      const ratingsArr = (ratingsAgg.data || []).map((r: any) => Number(r.rating)).filter((n) => !isNaN(n));
+      const avgRating = ratingsArr.length ? ratingsArr.reduce((s, n) => s + n, 0) / ratingsArr.length : 0;
+
+      setStats({
+        dau: dauUsers.size,
+        mau: mauUsers.size,
+        manual_views_today: manualViewsToday,
+        avg_rating: avgRating,
+      });
+
+      const week = emptyWeek();
+      const bucket: Record<string, { views: number; posts: number; likes: number }> = {};
+      week.forEach((d) => (bucket[d.date] = { views: 0, posts: 0, likes: 0 }));
+      (weekManualEvents.data || []).forEach((e: any) => {
+        const k = new Date(e.created_at).toISOString().slice(0, 10);
+        if (bucket[k]) bucket[k].views += 1;
+      });
+      (weekPosts.data || []).forEach((p: any) => {
+        const k = new Date(p.created_at).toISOString().slice(0, 10);
+        if (bucket[k]) bucket[k].posts += 1;
+      });
+      (weekLikes.data || []).forEach((l: any) => {
+        const k = new Date(l.created_at).toISOString().slice(0, 10);
+        if (bucket[k]) bucket[k].likes += 1;
+      });
+
+      setManualAccessData(week.map((d) => ({ day: d.day, views: bucket[d.date].views })));
+      setEngagementData(week.map((d) => ({ day: d.day, posts: bucket[d.date].posts, likes: bucket[d.date].likes })));
+    };
+    load();
+  }, []);
 
   if (!currentUser || currentUser.role !== 'ADM') {
     return (
@@ -16,35 +86,19 @@ export default function Dashboard() {
     );
   }
 
-  const stats = getDashboardStats();
-  
-  // Mock data for charts
-  const manualAccessData = [
-    { day: 'Seg', views: 45 },
-    { day: 'Ter', views: 62 },
-    { day: 'Qua', views: 38 },
-    { day: 'Qui', views: 71 },
-    { day: 'Sex', views: 89 },
-    { day: 'Sáb', views: 34 },
-    { day: 'Dom', views: 28 },
-  ];
-
-  const engagementData = [
-    { day: 'Seg', posts: 3, likes: 15 },
-    { day: 'Ter', posts: 5, likes: 28 },
-    { day: 'Qua', posts: 2, likes: 12 },
-    { day: 'Qui', posts: 7, likes: 35 },
-    { day: 'Sex', posts: 4, likes: 22 },
-    { day: 'Sáb', posts: 6, likes: 31 },
-    { day: 'Dom', posts: 3, likes: 18 },
-  ];
-
+  // Real category distribution from products
+  const palette = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))', 'hsl(var(--border))'];
+  const catCounts = products.reduce<Record<string, number>>((acc, p) => {
+    const key = (p.category || 'Sem categoria').trim() || 'Sem categoria';
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+  const catEntries = Object.entries(catCounts).sort((a, b) => b[1] - a[1]);
+  const topCats = catEntries.slice(0, 4);
+  const otherTotal = catEntries.slice(4).reduce((s, [, v]) => s + v, 0);
   const categoryData = [
-    { name: 'Alarmes', value: 35, color: 'hsl(var(--primary))' },
-    { name: 'Vidros Elétricos', value: 25, color: 'hsl(var(--secondary))' },
-    { name: 'Travas', value: 20, color: 'hsl(var(--accent))' },
-    { name: 'Sensores', value: 15, color: 'hsl(var(--muted))' },
-    { name: 'Outros', value: 5, color: 'hsl(var(--border))' },
+    ...topCats.map(([name, value], i) => ({ name, value, color: palette[i] })),
+    ...(otherTotal > 0 ? [{ name: 'Outros', value: otherTotal, color: palette[4] }] : []),
   ];
 
   const topProducts = products
