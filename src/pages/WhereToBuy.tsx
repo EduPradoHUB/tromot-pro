@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useApp } from '@/contexts/AppContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -39,6 +40,14 @@ export default function WhereToBuy() {
   const [showLocationForm, setShowLocationForm] = React.useState(false);
   const [contactingDistributor, setContactingDistributor] = React.useState<string | null>(null);
   const [locating, setLocating] = React.useState(false);
+  // Filtro exclusivo de admins: 'region' = filtra pela cidade/estado, 'all' = todos, ou sigla de UF
+  const [adminFilter, setAdminFilter] = React.useState<string>('region');
+  const isAdmin = profile?.role === 'ADM';
+
+  const BR_STATES = [
+    'AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB',
+    'PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'
+  ];
 
   React.useEffect(() => {
     if (id) {
@@ -62,18 +71,26 @@ export default function WhereToBuy() {
   }, [profile]);
 
   React.useEffect(() => {
-    if (userState) {
+    if (isAdmin && adminFilter !== 'region') {
+      fetchDistributors();
+    } else if (userState) {
       fetchDistributors();
     }
-  }, [userState, userCity]);
+  }, [userState, userCity, adminFilter, isAdmin]);
 
   const fetchDistributors = async () => {
     try {
       setLoading(true);
       
       let data: DistributorPublic[] = [];
-      
-      if (userState && userCity) {
+
+      if (isAdmin && adminFilter === 'all') {
+        // Admin: todos os estados
+        data = await fetchDistributorsPublic();
+      } else if (isAdmin && adminFilter !== 'region') {
+        // Admin: estado específico
+        data = await fetchDistributorsPublic(adminFilter);
+      } else if (userState && userCity) {
         data = await fetchDistributorsPublic(userState, userCity);
       } else if (userState) {
         data = await fetchDistributorsPublic(userState);
@@ -306,9 +323,13 @@ export default function WhereToBuy() {
       {/* Distributors List */}
       {!showLocationForm && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h2 className="text-lg font-semibold">
-              Distribuidores em {userCity}, {userState}
+              {isAdmin && adminFilter === 'all'
+                ? 'Todos os distribuidores'
+                : isAdmin && adminFilter !== 'region'
+                ? `Distribuidores em ${adminFilter}`
+                : `Distribuidores em ${userCity}, ${userState}`}
             </h2>
             <Button
               variant="outline"
@@ -318,6 +339,28 @@ export default function WhereToBuy() {
               Alterar localização
             </Button>
           </div>
+
+          {isAdmin && (
+            <Card className="shadow-card border-dashed">
+              <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                <span className="text-sm font-medium text-muted-foreground">
+                  Filtro de administrador:
+                </span>
+                <Select value={adminFilter} onValueChange={setAdminFilter}>
+                  <SelectTrigger className="w-full sm:w-64">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="region">Minha região ({userState || '—'})</SelectItem>
+                    <SelectItem value="all">Todos os estados</SelectItem>
+                    {BR_STATES.map((uf) => (
+                      <SelectItem key={uf} value={uf}>{uf}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
+          )}
 
           {loading ? (
             <Card className="shadow-card">
