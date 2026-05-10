@@ -710,6 +710,10 @@ export type Database = {
         Args: { phone_input: string; whatsapp_input: string }
         Returns: Json
       }
+      recalc_product_rating: {
+        Args: { p_product_id: string }
+        Returns: undefined
+      }
       search_distributors_masked: {
         Args: { p_city?: string; p_state?: string }
         Returns: {
