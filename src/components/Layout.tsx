@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
 import { EditableContent } from '@/components/EditableContent';
 import { EditableContactLink } from '@/components/EditableContactLink';
+import { BottomNav } from '@/components/BottomNav';
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -216,7 +217,7 @@ export const Layout: React.FC<LayoutProps> = ({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 pb-20 md:pb-0">
         {children}
       </main>
 
@@ -285,5 +286,6 @@ export const Layout: React.FC<LayoutProps> = ({
           <EditableContent section="footer-copyright" description={copyright} descriptionClassName="mt-8 pt-8 border-t text-center text-sm text-muted-foreground" onContentUpdate={content => setCopyright(content.description || copyright)} />
         </div>
       </footer>
+      <BottomNav />
     </div>;
 };
