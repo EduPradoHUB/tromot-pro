@@ -1000,20 +1000,37 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
     );
   };
 
-  const submitRating = (productId: string, rating: number, comment: string) => {
-    if (!profile) return;
-    
-    const newRating: LegacyRating = {
-      id: Math.random().toString(36).substr(2, 9),
-      product_id: productId,
-      author_id: profile.id,
-      author_name: profile.name,
-      rating,
-      comment,
-      created_at: new Date().toISOString(),
-    };
-    
-    setRatings(prev => [newRating, ...prev]);
+  const submitRating = async (productId: string, rating: number, comment: string) => {
+    if (!profile || !user) return;
+
+    const { data, error } = await supabase
+      .from('ratings')
+      .insert({
+        product_id: productId,
+        author_id: user.id, // RLS exige auth.uid() = author_id
+        rating,
+        comment: comment || null,
+      })
+      .select('id, product_id, author_id, rating, comment, created_at')
+      .single();
+
+    if (error) {
+      console.error('Erro ao salvar avaliação:', error);
+      return;
+    }
+
+    if (data) {
+      const newRating: LegacyRating = {
+        id: data.id,
+        product_id: data.product_id,
+        author_id: data.author_id,
+        author_name: profile.name,
+        rating: data.rating,
+        comment: data.comment || '',
+        created_at: data.created_at,
+      };
+      setRatings(prev => [newRating, ...prev]);
+    }
   };
 
   const submitQuestion = (productId: string, question: string) => {
