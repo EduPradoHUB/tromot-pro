@@ -44,6 +44,7 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
   const previewCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const hiddenAnchorRef = React.useRef<HTMLAnchorElement>(null);
   const blobUrlRef = React.useRef('');
+  const modalFileInputRef = React.useRef<HTMLInputElement>(null);
 
   const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -182,7 +183,7 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
           {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-black/50" 
-            onClick={() => setOpen(false)}
+            onClick={() => { setOpen(false); setImgSrc(''); }}
           />
           
           {/* Modal Content */}
@@ -191,7 +192,7 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
             <div className="flex items-center justify-between p-6 border-b">
               <h2 className="text-lg font-semibold">Editar Foto de Perfil</h2>
               <button
-                onClick={() => setOpen(false)}
+                onClick={() => { setOpen(false); setImgSrc(''); }}
                 className="p-2 hover:bg-muted rounded-full transition-colors"
               >
                 <X className="h-4 w-4" />
@@ -200,6 +201,46 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
             
             {/* Content */}
             <div className="p-6 space-y-4">
+              {!imgSrc && (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4 text-center">
+                  <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
+                    <Camera className="h-7 w-7 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Escolha uma foto do seu dispositivo</p>
+                    <p className="text-sm text-muted-foreground">
+                      Você poderá recortá-la antes de salvar.
+                    </p>
+                  </div>
+                  <input
+                    ref={modalFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={onSelectFile}
+                    className="hidden"
+                  />
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button onClick={() => modalFileInputRef.current?.click()}>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Escolher foto
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        if (modalFileInputRef.current) {
+                          modalFileInputRef.current.setAttribute('capture', 'user');
+                          modalFileInputRef.current.click();
+                          // remove attr afterwards so subsequent picks open gallery
+                          setTimeout(() => modalFileInputRef.current?.removeAttribute('capture'), 0);
+                        }
+                      }}
+                    >
+                      <Camera className="h-4 w-4 mr-2" />
+                      Tirar foto
+                    </Button>
+                  </div>
+                </div>
+              )}
               {imgSrc && (
                 <div>
                   <ReactCrop
@@ -220,6 +261,19 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
                       className="max-w-full max-h-96"
                     />
                   </ReactCrop>
+                  <div className="mt-3 text-center">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setImgSrc('');
+                        setCrop(undefined);
+                        setCompletedCrop(undefined);
+                      }}
+                    >
+                      Escolher outra foto
+                    </Button>
+                  </div>
                 </div>
               )}
               
@@ -241,7 +295,7 @@ export function AvatarUpload({ currentAvatar, userName, onUploadComplete }: Avat
 
             {/* Footer */}
             <div className="flex justify-end gap-2 p-6 border-t">
-              <Button variant="outline" onClick={() => setOpen(false)}>
+              <Button variant="outline" onClick={() => { setOpen(false); setImgSrc(''); }}>
                 Cancelar
               </Button>
               <Button onClick={uploadCroppedImage} disabled={uploading || !completedCrop}>
