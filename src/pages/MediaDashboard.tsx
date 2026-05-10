@@ -9,13 +9,52 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Responsive
 import { TrendingUp, Eye, MousePointer, Target } from 'lucide-react';
 import { AdminBroadcastCard } from '@/components/notifications/AdminBroadcastCard';
 import { NotificationPreferences } from '@/components/notifications/NotificationPreferences';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function MediaDashboard() {
   const {
     currentUser,
     advertisements,
-    getAdStats
   } = useApp();
+
+  const SLOT_LABELS: Record<string, string> = {
+    home_hero: 'Home Hero',
+    product_banner: 'Product Banner',
+    feed_sponsored: 'Feed Sponsored',
+  };
+
+  const [impressionsData, setImpressionsData] = React.useState<Array<{ date: string; impressions: number; clicks: number }>>([]);
+
+  React.useEffect(() => {
+    const load = async () => {
+      const start = new Date(); start.setDate(start.getDate() - 6); start.setHours(0, 0, 0, 0);
+      const { data } = await supabase
+        .from('analytics_events')
+        .select('event_type, created_at')
+        .in('event_type', ['ad_impression', 'ad_click'])
+        .gte('created_at', start.toISOString());
+
+      const days: Array<{ date: string; label: string }> = [];
+      const today = new Date();
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(today); d.setDate(today.getDate() - i);
+        const key = d.toISOString().slice(0, 10);
+        const label = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+        days.push({ date: key, label });
+      }
+      const bucket: Record<string, { impressions: number; clicks: number }> = {};
+      days.forEach((d) => (bucket[d.date] = { impressions: 0, clicks: 0 }));
+      (data || []).forEach((e: any) => {
+        const k = new Date(e.created_at).toISOString().slice(0, 10);
+        if (!bucket[k]) return;
+        if (e.event_type === 'ad_impression') bucket[k].impressions += 1;
+        else if (e.event_type === 'ad_click') bucket[k].clicks += 1;
+      });
+      setImpressionsData(days.map((d) => ({ date: d.label, ...bucket[d.date] })));
+    };
+    load();
+  }, []);
+
   if (!currentUser || currentUser.role !== 'ADM') {
     return <div className="container py-8">
         <div className="text-center">
@@ -31,36 +70,20 @@ export default function MediaDashboard() {
   const totalClicks = advertisements.reduce((sum, ad) => sum + ad.clicks_count, 0);
   const overallCTR = totalImpressions > 0 ? totalClicks / totalImpressions * 100 : 0;
 
-  // Mock data para gráficos
-  const impressionsData = [{
-    date: '27/08',
-    impressions: 1930,
-    clicks: 45
-  }, {
-    date: '28/08',
-    impressions: 1830,
-    clicks: 38
-  }, {
-    date: '29/08',
-    impressions: 2270,
-    clicks: 43
-  }];
-  const slotPerformanceData = [{
-    slot: 'Home Hero',
-    impressions: 15420,
-    clicks: 312,
-    ctr: 2.02
-  }, {
-    slot: 'Product Banner',
-    impressions: 8750,
-    clicks: 175,
-    ctr: 2.00
-  }, {
-    slot: 'Feed Sponsored',
-    impressions: 5230,
-    clicks: 94,
-    ctr: 1.80
-  }];
+  // Real performance per slot, aggregated from advertisements
+  const slotMap: Record<string, { impressions: number; clicks: number }> = {};
+  advertisements.forEach((ad) => {
+    const key = ad.slot;
+    if (!slotMap[key]) slotMap[key] = { impressions: 0, clicks: 0 };
+    slotMap[key].impressions += ad.impressions_count || 0;
+    slotMap[key].clicks += ad.clicks_count || 0;
+  });
+  const slotPerformanceData = Object.entries(slotMap).map(([slot, v]) => ({
+    slot: SLOT_LABELS[slot] || slot,
+    impressions: v.impressions,
+    clicks: v.clicks,
+    ctr: v.impressions > 0 ? (v.clicks / v.impressions) * 100 : 0,
+  }));
   const chartConfig: ChartConfig = {
     impressions: {
       label: "Impressões",
@@ -112,9 +135,7 @@ export default function MediaDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalImpressions.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              +5.2% em relação ao mês anterior
-            </p>
+            <p className="text-xs text-muted-foreground">acumulado</p>
           </CardContent>
         </Card>
 
@@ -125,9 +146,7 @@ export default function MediaDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalClicks.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              +8.1% em relação ao mês anterior
-            </p>
+            <p className="text-xs text-muted-foreground">acumulado</p>
           </CardContent>
         </Card>
 
@@ -138,9 +157,7 @@ export default function MediaDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{overallCTR.toFixed(2)}%</div>
-            <p className="text-xs text-muted-foreground">
-              +0.3% em relação ao mês anterior
-            </p>
+            <p className="text-xs text-muted-foreground">cliques / impressões</p>
           </CardContent>
         </Card>
       </div>
@@ -149,7 +166,7 @@ export default function MediaDashboard() {
         {/* Gráfico de Impressões e Cliques */}
         <Card>
           <CardHeader>
-            <CardTitle>Impressões e Cliques (Últimos 3 dias)</CardTitle>
+            <CardTitle>Impressões e Cliques (Últimos 7 dias)</CardTitle>
             <CardDescription>
               Acompanhe o volume de impressões e cliques diários
             </CardDescription>
@@ -178,6 +195,9 @@ export default function MediaDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              {slotPerformanceData.length === 0 && (
+                <p className="text-sm text-muted-foreground">Sem dados de slots ainda.</p>
+              )}
               {slotPerformanceData.map((slot, index) => <div key={index} className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-sm">{slot.slot}</p>
