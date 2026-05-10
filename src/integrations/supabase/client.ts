@@ -2,15 +2,12 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
-
-if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-  throw new Error(
-    'Variáveis de ambiente VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY não configuradas. ' +
-    'Verifique o painel do Lovable em Settings → Environment Variables.'
-  );
-}
+// A anon key é uma chave PÚBLICA por design (publishable key).
+// É seguro tê-la no código frontend — ela só permite acesso ao que
+// as políticas de RLS do Supabase explicitamente permitem.
+// A service_role key (essa sim secreta) nunca deve aparecer aqui.
+const SUPABASE_URL = "https://bclktrcbwpwsxksbhqsv.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjbGt0cmNid3B3c3hrc2JocXN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NzQ1MzgsImV4cCI6MjA3MjA1MDUzOH0.-aupERx8Iso3P4fXblxOOZ91K3UDxtSnh0QvsRszdcA";
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
