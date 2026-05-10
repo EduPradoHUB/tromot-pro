@@ -266,8 +266,8 @@ export default function ProductPage() {
                       className="w-full bg-tromot-red hover:bg-tromot-red/90"
                       size="lg"
                     >
-                      <ShoppingCart className="h-4 w-4 mr-2" />
-                      Comprar Agora
+                       <ShoppingCart className="h-4 w-4 mr-2" />
+                       Onde Comprar
                     </Button>
                   </div>
                 </div>
