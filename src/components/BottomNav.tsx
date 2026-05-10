@@ -42,7 +42,7 @@ export const BottomNav: React.FC = () => {
         className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        <div className="relative grid grid-cols-5 h-[59px]">
+        <div className="relative grid grid-cols-5 h-[48px]">
           {items.slice(0, 2).map((item) => (
             <NavItem key={item.path} item={item} active={isActive(item.path)} />
           ))}
@@ -53,10 +53,10 @@ export const BottomNav: React.FC = () => {
               type="button"
               onClick={() => setScanOpen(true)}
               aria-label="Escanear código"
-              className="relative -top-5 h-14 w-14 rounded-full text-primary-foreground bg-[linear-gradient(135deg,#C41E3A_0%,#9B1530_100%)] shadow-[0_6px_20px_rgba(196,30,58,0.5)] flex flex-col items-center justify-center active:scale-95 transition-transform"
+              className="relative -top-4 h-12 w-12 rounded-full text-primary-foreground bg-[linear-gradient(135deg,#C41E3A_0%,#9B1530_100%)] shadow-[0_6px_20px_rgba(196,30,58,0.5)] flex flex-col items-center justify-center active:scale-95 transition-transform"
             >
-              <ScanLine className="h-6 w-6" />
-              <span className="text-[10px] font-semibold mt-0.5">Escanear</span>
+              <ScanLine className="h-5 w-5" />
+              <span className="text-[9px] font-semibold leading-none mt-0.5">Escanear</span>
             </button>
           </div>
 
@@ -84,11 +84,11 @@ const NavItem: React.FC<{
     <Link
       to={item.path}
       className={cn(
-        'flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium transition-colors',
+        'flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors',
         active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
       )}
     >
-      <Icon className={cn('h-5 w-5', active && 'text-primary')} />
+      <Icon className={cn('h-[18px] w-[18px]', active && 'text-primary')} />
       <span>{item.name}</span>
     </Link>
   );
