@@ -388,10 +388,6 @@ export default function Catalog() {
                           ({product.rating_count})
                         </span>
                       </div>
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <Eye className="h-4 w-4 mr-1" />
-                        {product.compatibility.length} veículos
-                      </div>
                     </div>
 
                     <div className="mb-3">

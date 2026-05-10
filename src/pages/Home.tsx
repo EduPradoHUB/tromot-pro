@@ -327,10 +327,6 @@ export default function Home() {
                         ({product.rating_count})
                       </span>
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Eye className="h-4 w-4 mr-1" />
-                      {product.compatibility.length}
-                    </div>
                   </div>
 
                   <Button className="w-full" asChild onClick={() => handleProductView(product.id)}>
