@@ -13,12 +13,14 @@ import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
 import { EditableContent } from '@/components/EditableContent';
 import { BannerCarousel } from '@/components/BannerCarousel';
 import { toast } from '@/hooks/use-toast';
+import { usePWA } from '@/hooks/usePWA';
 
 export default function Home() {
   console.log('🏠 Renderizando componente Home...');
   console.log('🔍 Verificando useApp...', typeof useApp);
   
   const appContext = useApp();
+  const { isInstalled } = usePWA();
   console.log('✅ useApp funcionando!', appContext);
   
   const {
@@ -195,11 +197,23 @@ export default function Home() {
                   <ScanLine className="mr-2 h-5 w-5" />
                   Escanear Código de Barras
                 </Button>
-                <PWAInstallButtonSimple 
-                  className="border-white hover:bg-white text-primary hover:text-primary"
-                >
-                  Instalar App
-                </PWAInstallButtonSimple>
+                {isInstalled ? (
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-white hover:bg-white text-primary hover:text-primary"
+                    onClick={() => navigate('/manuais')}
+                  >
+                    <Search className="mr-2 h-5 w-5" />
+                    Buscar produto/manual
+                  </Button>
+                ) : (
+                  <PWAInstallButtonSimple
+                    className="border-white hover:bg-white text-primary hover:text-primary"
+                  >
+                    Instalar App
+                  </PWAInstallButtonSimple>
+                )}
               </div>
             </div>
 
