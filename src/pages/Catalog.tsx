@@ -18,6 +18,7 @@ import { useApp } from '@/contexts/AppContext';
 import { categories, brands } from '@/lib/data';
 import { PWAInstallButtonSimple } from '@/components/PWAInstallButtonSimple';
 import { supabase } from '@/integrations/supabase/client';
+import { SaveProductButton } from '@/components/SaveProductButton';
 
 export default function Catalog() {
   const { legacyProducts: products, vehicles, trackEvent } = useApp();
@@ -350,6 +351,13 @@ export default function Catalog() {
                           Fora de produção
                         </Badge>
                       )}
+                    </div>
+                    <div className="absolute top-3 left-3">
+                      <SaveProductButton
+                        productId={product.id}
+                        productName={product.name}
+                        variant="icon"
+                      />
                     </div>
                   </div>
 
