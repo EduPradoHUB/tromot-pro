@@ -42,7 +42,7 @@ export const BottomNav: React.FC = () => {
         className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        <div className="relative grid grid-cols-5 h-16">
+        <div className="relative grid grid-cols-5 h-[59px]">
           {items.slice(0, 2).map((item) => (
             <NavItem key={item.path} item={item} active={isActive(item.path)} />
           ))}
