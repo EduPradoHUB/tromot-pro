@@ -1192,6 +1192,39 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
           }));
           setPosts(legacyPosts);
         }
+
+        // Carrega avaliações persistidas
+        try {
+          const { data: ratingsData } = await supabase
+            .from('ratings')
+            .select('id, product_id, author_id, rating, comment, created_at')
+            .order('created_at', { ascending: false });
+
+          if (ratingsData && isMounted) {
+            const authorIds = Array.from(new Set(ratingsData.map(r => r.author_id).filter(Boolean)));
+            let nameMap = new Map<string, string>();
+            if (authorIds.length > 0) {
+              const { data: profilesData } = await supabase
+                .from('profiles')
+                .select('user_id, name')
+                .in('user_id', authorIds);
+              (profilesData || []).forEach(p => nameMap.set(p.user_id, p.name));
+            }
+            const legacyRatings: LegacyRating[] = ratingsData.map(r => ({
+              id: r.id,
+              product_id: r.product_id,
+              author_id: r.author_id,
+              author_name: nameMap.get(r.author_id) || 'Usuário',
+              rating: r.rating,
+              comment: r.comment || '',
+              created_at: r.created_at,
+            }));
+            setRatings(legacyRatings);
+          }
+        } catch (e) {
+          console.error('Erro ao carregar avaliações:', e);
+        }
+
         console.log('✅ Dados carregados!');
       } catch (error) {
         console.error('Error fetching data:', error);
