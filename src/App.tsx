@@ -33,6 +33,8 @@ const queryClient = new QueryClient();
 function AppContent() {
   return (
     <>
+      {/* Toaster renderizado aqui dentro do BrowserRouter para evitar conflitos de hooks */}
+      <Toaster />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<PasswordReset />} />
@@ -81,7 +83,6 @@ function AppContent() {
             <Layout><AdminDashboard /></Layout>
           </ProtectedRoute>
         } />
-        {/* SECURITY FIX: /tecnico agora exige role específico */}
         <Route path="/tecnico" element={
           <ProtectedRoute requireRoles={['ADM', 'Técnico Tromot', 'Suporte Tromot']}>
             <Layout><TechnicianDashboard /></Layout>
