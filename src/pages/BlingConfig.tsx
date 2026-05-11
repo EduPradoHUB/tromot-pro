@@ -21,7 +21,7 @@ export default function BlingConfig() {
   }, [])
 
   async function verificarConexao() {
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from('bling_tokens')
       .select('expires_at')
       .eq('id', 1)
@@ -36,7 +36,7 @@ export default function BlingConfig() {
   }
 
   async function contarClientes() {
-    const { count } = await supabase
+    const { count } = await (supabase as any)
       .from('clientes')
       .select('*', { count: 'exact', head: true })
     setTotalClientes(count || 0)

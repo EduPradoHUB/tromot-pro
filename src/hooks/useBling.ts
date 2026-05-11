@@ -39,7 +39,7 @@ export function useBling() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return []
 
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from('clientes')
       .select('*')
       .ilike('nome', '%' + pesquisa + '%')
