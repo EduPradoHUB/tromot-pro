@@ -282,6 +282,39 @@ export type Database = {
         }
         Relationships: []
       }
+      instalacao_sucesso: {
+        Row: {
+          created_at: string | null
+          id: string
+          produto_nome: string
+          publico: boolean | null
+          user_id: string | null
+          veiculo_ano: number | null
+          veiculo_marca: string | null
+          veiculo_modelo: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          produto_nome: string
+          publico?: boolean | null
+          user_id?: string | null
+          veiculo_ano?: number | null
+          veiculo_marca?: string | null
+          veiculo_modelo?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          produto_nome?: string
+          publico?: boolean | null
+          user_id?: string | null
+          veiculo_ano?: number | null
+          veiculo_marca?: string | null
+          veiculo_modelo?: string | null
+        }
+        Relationships: []
+      }
       post_likes: {
         Row: {
           created_at: string

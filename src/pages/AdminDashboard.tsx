@@ -13,6 +13,7 @@ import { Plus, Edit, Trash2, Upload, Eye, EyeOff, FileSpreadsheet, FileText, Ima
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { BulkProductUpload } from '@/components/BulkProductUpload';
+import { BulkDistributorUpload } from '@/components/BulkDistributorUpload';
 import { PostModeration } from '@/components/PostModeration';
 
 // Replaced Dialog imports with custom implementation to avoid React hooks conflicts
@@ -1270,10 +1271,13 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Distribuidores</h2>
             
-            <Button onClick={() => openDialog('distributor')}>
-              <Plus className="w-4 h-4 mr-2" />
-              Novo Distribuidor
-            </Button>
+            <div className="flex gap-2">
+              <BulkDistributorUpload />
+              <Button onClick={() => openDialog('distributor')}>
+                <Plus className="w-4 h-4 mr-2" />
+                Novo Distribuidor
+              </Button>
+            </div>
           </div>
           
           {/* Distributor Dialog */}
