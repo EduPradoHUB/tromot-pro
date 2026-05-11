@@ -4,9 +4,7 @@ export const toast = (options: {
   description?: string; 
   variant?: 'default' | 'destructive' 
 }) => {
-  console.log('🍞 Toast called:', options.title, options.description);
-  
-  // Create a simple notification div instead of alert
+  // Create a simple notification div
   const notification = document.createElement('div');
   notification.style.cssText = `
     position: fixed;
@@ -21,14 +19,20 @@ export const toast = (options: {
     max-width: 300px;
     font-family: system-ui, -apple-system, sans-serif;
   `;
-  
-  notification.innerHTML = `
-    <div style="font-weight: 600; margin-bottom: 4px;">${options.title || ''}</div>
-    <div style="font-size: 14px; opacity: 0.9;">${options.description || ''}</div>
-  `;
-  
+
+  // SECURITY FIX: usar textContent em vez de innerHTML para evitar XSS
+  const titleEl = document.createElement('div');
+  titleEl.style.cssText = 'font-weight: 600; margin-bottom: 4px;';
+  titleEl.textContent = options.title || '';
+
+  const descEl = document.createElement('div');
+  descEl.style.cssText = 'font-size: 14px; opacity: 0.9;';
+  descEl.textContent = options.description || '';
+
+  notification.appendChild(titleEl);
+  notification.appendChild(descEl);
   document.body.appendChild(notification);
-  
+
   // Auto remove after 3 seconds
   setTimeout(() => {
     if (notification.parentNode) {
