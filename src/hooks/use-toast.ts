@@ -31,11 +31,14 @@ export function toast(props: ToastProps) {
       font-family: system-ui, -apple-system, sans-serif;
     `;
     
-    notification.innerHTML = `
-      <div style="font-weight: 600; margin-bottom: 4px;">${props.title || ''}</div>
-      <div style="font-size: 14px; opacity: 0.9;">${props.description || ''}</div>
-    `;
-    
+    const titleEl = document.createElement('div');
+    titleEl.style.cssText = 'font-weight: 600; margin-bottom: 4px;';
+    titleEl.textContent = String(props.title ?? '');
+    const descEl = document.createElement('div');
+    descEl.style.cssText = 'font-size: 14px; opacity: 0.9;';
+    descEl.textContent = String(props.description ?? '');
+    notification.append(titleEl, descEl);
+
     document.body.appendChild(notification);
     
     // Auto remove after 3 seconds
