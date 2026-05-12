@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ChevronRight, Star, Eye, Download, Smartphone, ScanLine, CheckCircle } from 'lucide-react';
+import { Search, ChevronRight, Star, Eye, Download, Smartphone, ScanLine, CheckCircle, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,6 +14,8 @@ import { EditableContent } from '@/components/EditableContent';
 import { BannerCarousel } from '@/components/BannerCarousel';
 import { toast } from '@/hooks/use-toast';
 import { usePWA } from '@/hooks/usePWA';
+import SoroEmbed from '@/components/SoroEmbed';
+import { trackBlogEvent } from '@/lib/blogAnalytics';
 
 export default function Home() {
   console.log('🏠 Renderizando componente Home...');
@@ -273,6 +275,46 @@ export default function Home() {
         </Card>
       </section>
       )}
+
+      {/* Blog em destaque - artigo mais recente */}
+      <section className="container mt-12">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-3xl font-bold mb-1 flex items-center gap-2">
+              <BookOpen className="h-7 w-7 text-[#C41E3A]" />
+              Blog Tromot PRO
+            </h2>
+            <p className="text-muted-foreground">Artigo mais recente</p>
+          </div>
+          <Link
+            to="/blog"
+            onClick={() => trackBlogEvent('blog_cta_click', { source: 'home_header' })}
+            className="inline-flex items-center text-[#C41E3A] font-semibold border-b border-[rgba(196,30,58,0.3)] hover:border-[#C41E3A] transition-colors"
+          >
+            Ver Blog
+            <ChevronRight className="ml-1 h-4 w-4" />
+          </Link>
+        </div>
+        <Card className="overflow-hidden">
+          <CardContent className="p-4 md:p-6">
+            <div className="max-h-[420px] overflow-hidden relative">
+              <SoroEmbed />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-card to-transparent" />
+            </div>
+            <div className="flex justify-center mt-4">
+              <Button
+                onClick={() => {
+                  trackBlogEvent('blog_cta_click', { source: 'home_featured' });
+                  navigate('/blog');
+                }}
+              >
+                Continue lendo
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
 
       {/* Latest Products Carousel */}
       <section className="container mt-12">
