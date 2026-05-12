@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-import { Helmet } from "react-helmet-async";
 import SoroEmbed from "@/components/SoroEmbed";
 import { trackBlogEvent, getPostIdFromUrl } from "@/lib/blogAnalytics";
 
@@ -12,6 +11,18 @@ const Blog: React.FC = () => {
 
   useEffect(() => {
     const postId = getPostIdFromUrl();
+
+    document.title = "Blog Tromot PRO | Dicas técnicas e novidades";
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement("meta");
+      metaDesc.setAttribute("name", "description");
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.setAttribute(
+      "content",
+      "Artigos técnicos, dicas de instalação e novidades para instaladores e técnicos automotivos.",
+    );
 
     const fire = (reason: "scroll" | "time") => {
       if (fired.current) return;
@@ -37,14 +48,6 @@ const Blog: React.FC = () => {
 
   return (
     <div className="container py-8">
-      <Helmet>
-        <title>Blog Tromot PRO | Dicas técnicas e novidades</title>
-        <meta
-          name="description"
-          content="Artigos técnicos, dicas de instalação e novidades para instaladores e técnicos automotivos."
-        />
-        <link rel="canonical" href="https://pro.tromot.com/blog" />
-      </Helmet>
       <header className="mb-6">
         <h1 className="text-3xl md:text-4xl font-bold">Blog Tromot PRO</h1>
         <p className="text-muted-foreground mt-2">
