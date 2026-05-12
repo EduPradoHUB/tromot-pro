@@ -8,11 +8,13 @@ export async function trackBlogEvent(
     const { data } = await supabase.auth.getSession();
     const userId = data.session?.user?.id;
     if (!userId) return; // RLS exige autenticado
-    await supabase.from("analytics_events").insert({
-      event_type: eventType,
-      user_id: userId,
-      metadata,
-    });
+    await supabase.from("analytics_events").insert([
+      {
+        event_type: eventType,
+        user_id: userId,
+        metadata: metadata as never,
+      },
+    ]);
   } catch (err) {
     console.warn("trackBlogEvent failed", err);
   }
