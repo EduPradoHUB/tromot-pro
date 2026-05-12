@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ChevronRight, Star, Eye, Download, Smartphone, ScanLine, CheckCircle } from 'lucide-react';
+import { Search, ChevronRight, Star, Eye, Download, Smartphone, ScanLine, CheckCircle, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,6 +14,8 @@ import { EditableContent } from '@/components/EditableContent';
 import { BannerCarousel } from '@/components/BannerCarousel';
 import { toast } from '@/hooks/use-toast';
 import { usePWA } from '@/hooks/usePWA';
+import SoroEmbed from '@/components/SoroEmbed';
+import { trackBlogEvent } from '@/lib/blogAnalytics';
 
 export default function Home() {
   console.log('🏠 Renderizando componente Home...');
