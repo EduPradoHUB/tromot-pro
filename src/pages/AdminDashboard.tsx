@@ -1268,10 +1268,10 @@ export default function AdminDashboard() {
 
         {/* Distributors Tab */}
         <TabsContent value="distributors" className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-wrap justify-between items-center gap-3">
             <h2 className="text-2xl font-semibold">Distribuidores</h2>
-            
-            <div className="flex gap-2">
+
+            <div className="flex flex-wrap gap-2">
               <BulkDistributorUpload />
               <Button onClick={() => openDialog('distributor')}>
                 <Plus className="w-4 h-4 mr-2" />
