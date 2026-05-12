@@ -28,6 +28,7 @@ import InstallApp from "./pages/InstallApp";
 import Saved from "./pages/Saved";
 import NotFound from "./pages/NotFound";
 import BlingConfig from "./pages/BlingConfig";
+import Blog from "./pages/Blog";
 
 const queryClient = new QueryClient();
 
@@ -110,6 +111,12 @@ function AppContent() {
           </ProtectedRoute>
         } />
         <Route path="/instalar" element={<InstallApp />} />
+
+        <Route path="/blog" element={
+          <ProtectedRoute>
+            <Layout><Blog /></Layout>
+          </ProtectedRoute>
+        } />
 
             <Route path="/admin/bling" element={
               <ProtectedRoute>
