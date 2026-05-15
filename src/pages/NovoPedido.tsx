@@ -147,7 +147,7 @@ export default function NovoPedido() {
       })
 
       // Salva localmente para relatório de comissão
-      await supabase.from('pedidos').insert({
+      await (supabase as any).from('pedidos').insert({
         bling_id: resultado?.data?.id || null,
         vendedor_id: user?.id,
         cliente_bling_id: clienteSelecionado.bling_id,
