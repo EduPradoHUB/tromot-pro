@@ -144,10 +144,7 @@ export default function ProductPage() {
     if (!product) return;
     
     const PUBLIC_BASE = "https://pro.tromot.com";
-    const isLovablePreview = /lovableproject\.com$|lovable\.app$/.test(window.location.hostname)
-      && window.location.hostname.includes("preview");
-    const origin = isLovablePreview ? PUBLIC_BASE : window.location.origin;
-    const shareUrl = `${origin}/manual/${product.id}`;
+    const shareUrl = `${PUBLIC_BASE}/manual/${product.id}`;
     const shareData = {
       title: product.name,
       text: `Veja o manual de instalação: ${product.name}`,
