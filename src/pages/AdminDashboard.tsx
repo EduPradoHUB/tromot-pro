@@ -1147,6 +1147,7 @@ export default function AdminDashboard() {
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" onClick={() => {
                         handleEditProduct(product);
+                        setDialogContent('product');
                         setDialogOpen(true);
                       }}>
                         <Edit className="w-4 h-4" />
