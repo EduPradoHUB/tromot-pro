@@ -44,13 +44,10 @@ export default function PublicProduct() {
             .from('products')
             .select('*')
             .eq('id', id)
-            .eq('status', 'active')
             .maybeSingle();
           if (cancelled) return;
           if (data) {
             setProduct(data);
-          } else if (products.length > 0) {
-            navigate('/manuais-publico');
           }
         })();
         return () => { cancelled = true; };
