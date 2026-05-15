@@ -30,6 +30,7 @@ import { SaveProductButton } from '@/components/SaveProductButton';
 import { Product, Post, Rating, Question } from '@/lib/types';
 import AdSlot from '@/components/AdSlot';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -54,7 +55,25 @@ export default function ProductPage() {
         setProductQuestions(questions.filter(q => q.product_id === id));
         trackEvent({ type: 'view_product', product_id: id, user_id: currentUser?.id });
       } else {
-        navigate('/manuais');
+        // Fallback: busca direto no Supabase para evitar redirect
+        // quando a lista global ainda não carregou (ex.: link compartilhado)
+        let cancelled = false;
+        (async () => {
+          const { data } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', id)
+            .eq('status', 'active')
+            .maybeSingle();
+          if (cancelled) return;
+          if (data) {
+            setProduct(data);
+            trackEvent({ type: 'view_product', product_id: id, user_id: currentUser?.id });
+          } else if (products.length > 0) {
+            navigate('/manuais');
+          }
+        })();
+        return () => { cancelled = true; };
       }
     }
   }, [id, products, posts, ratings, questions, navigate, trackEvent, currentUser?.id]);
