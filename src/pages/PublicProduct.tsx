@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function PublicProduct() {
   const { id } = useParams<{ id: string }>();
@@ -35,7 +36,24 @@ export default function PublicProduct() {
       if (foundProduct) {
         setProduct(foundProduct);
       } else {
-        navigate('/manuais-publico');
+        // Fallback: busca direto no Supabase para evitar redirect
+        // quando a lista global ainda não carregou (ex.: link compartilhado)
+        let cancelled = false;
+        (async () => {
+          const { data } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', id)
+            .eq('status', 'active')
+            .maybeSingle();
+          if (cancelled) return;
+          if (data) {
+            setProduct(data);
+          } else if (products.length > 0) {
+            navigate('/manuais-publico');
+          }
+        })();
+        return () => { cancelled = true; };
       }
     }
   }, [id, products, navigate]);
