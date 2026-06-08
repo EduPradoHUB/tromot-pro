@@ -78,6 +78,15 @@ export default function TechnicianDashboard() {
   }
 
   const handleCreateProduct = async () => {
+    console.log('[TechnicianDashboard] handleCreateProduct called', productForm);
+    if (!productForm.name || !productForm.code || !productForm.category) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Preencha Nome, Código e Categoria.",
+        variant: "destructive"
+      });
+      return;
+    }
     if (productForm.barcode_ean && !/^\d{13}$/.test(productForm.barcode_ean)) {
       toast({
         title: "EAN-13 inválido",
@@ -88,11 +97,15 @@ export default function TechnicianDashboard() {
     }
 
     try {
-      await createProduct({
+      const compatibility = productForm.compatibility?.trim()
+        ? JSON.parse(productForm.compatibility)
+        : [];
+      const created = await createProduct({
         ...productForm,
         barcode_ean: productForm.barcode_ean || null,
-        compatibility: JSON.parse(productForm.compatibility)
+        compatibility
       });
+      console.log('[TechnicianDashboard] product created', created);
       
       setProductForm({
         name: '',
@@ -113,10 +126,11 @@ export default function TechnicianDashboard() {
         title: "Produto criado",
         description: "Produto adicionado com sucesso!"
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('[TechnicianDashboard] createProduct error', error);
       toast({
         title: "Erro",
-        description: "Falha ao criar produto.",
+        description: error?.message || "Falha ao criar produto.",
         variant: "destructive"
       });
     }
