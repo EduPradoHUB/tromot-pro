@@ -227,6 +227,8 @@ export default function AdminDashboard() {
     return matchesSearch && matchesFilters;
   });
 
+  const isProductEditing = Boolean(editingProduct || editingProductId);
+
   const handleNoManualChange = async (productId: string, noManualAvailable: boolean) => {
     console.log('Atualizando produto:', productId, 'no_manual_available:', noManualAvailable);
     try {
@@ -826,7 +828,12 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Produtos</h2>
             
-            <Button onClick={() => openDialog('product')}>
+            <Button onClick={() => {
+              setEditingProduct(null);
+              setEditingProductId(null);
+              setProductForm(defaultProductForm);
+              openDialog('product');
+            }}>
               <Plus className="w-4 h-4 mr-2" />
               Novo Produto
             </Button>
@@ -847,7 +854,7 @@ export default function AdminDashboard() {
               
               <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>{editingProduct ? 'Editar Produto' : 'Novo Produto'}</DialogTitle>
+                  <DialogTitle>{isProductEditing ? 'Editar Produto' : 'Novo Produto'}</DialogTitle>
                 </DialogHeader>
                 
                 <div className="grid gap-4">
@@ -1007,8 +1014,8 @@ export default function AdminDashboard() {
                      <Label htmlFor="out_of_production">Fora de produção</Label>
                    </div>
                    
-                    <Button onClick={editingProduct ? handleUpdateProduct : handleCreateProduct} disabled={uploadingFile}>
-                     {uploadingFile ? 'Enviando...' : (editingProduct ? 'Atualizar Produto' : 'Criar Produto')}
+                    <Button onClick={isProductEditing ? handleUpdateProduct : handleCreateProduct} disabled={uploadingFile}>
+                      {uploadingFile ? 'Enviando...' : (isProductEditing ? 'Atualizar Produto' : 'Criar Produto')}
                    </Button>
                 </div>
               </DialogContent>
