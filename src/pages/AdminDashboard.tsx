@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
   const [deletedProduct, setDeletedProduct] = useState<any>(null);
   
   
-  const [productForm, setProductForm] = useState({
+  const defaultProductForm = {
     name: '',
     code: '',
     barcode_ean: '',
@@ -75,7 +75,18 @@ export default function AdminDashboard() {
     video_url: '',
     compatibility: '[]',
     out_of_production: false
+  };
+  const [productForm, setProductForm] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('admin.productForm');
+      return saved ? { ...defaultProductForm, ...JSON.parse(saved) } : defaultProductForm;
+    } catch {
+      return defaultProductForm;
+    }
   });
+  useEffect(() => {
+    try { sessionStorage.setItem('admin.productForm', JSON.stringify(productForm)); } catch {}
+  }, [productForm]);
   
   const [bannerForm, setBannerForm] = useState({
     title: '',
@@ -125,9 +136,26 @@ export default function AdminDashboard() {
   const [editingVehicle, setEditingVehicle] = useState<any>(null);
   const [editingAdvertisement, setEditingAdvertisement] = useState<any>(null);
   const [editingDistributor, setEditingDistributor] = useState<any>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogContent, setDialogContent] = useState<'product' | 'banner' | 'ad' | 'vehicle' | 'category' | 'distributor' | null>(null);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(() => {
+    try { return sessionStorage.getItem('admin.dialogOpen') === '1'; } catch { return false; }
+  });
+  const [dialogContent, setDialogContent] = useState<'product' | 'banner' | 'ad' | 'vehicle' | 'category' | 'distributor' | null>(() => {
+    try { return (sessionStorage.getItem('admin.dialogContent') as any) || null; } catch { return null; }
+  });
   const [uploadingFile, setUploadingFile] = useState(false);
+
+  // Persistir estado do dialog para sobreviver à suspensão da aba no mobile
+  useEffect(() => {
+    try {
+      if (dialogOpen && dialogContent) {
+        sessionStorage.setItem('admin.dialogOpen', '1');
+        sessionStorage.setItem('admin.dialogContent', dialogContent);
+      } else {
+        sessionStorage.removeItem('admin.dialogOpen');
+        sessionStorage.removeItem('admin.dialogContent');
+      }
+    } catch {}
+  }, [dialogOpen, dialogContent]);
   
   // Estados para filtros e busca de produtos
   const [searchTerm, setSearchTerm] = useState('');
