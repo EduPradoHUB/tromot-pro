@@ -191,6 +191,15 @@ export default function AdminDashboard() {
     const product = products.find((item) => item.id === editingProductId);
     if (product) setEditingProduct(product);
   }, [editingProductId, editingProduct, products]);
+
+  useEffect(() => {
+    if (editingProductId || editingProduct || dialogContent !== 'product' || !dialogOpen || products.length === 0) return;
+    const product = products.find((item) => item.code === productForm.code && item.name === productForm.name);
+    if (product) {
+      setEditingProduct(product);
+      setEditingProductId(product.id);
+    }
+  }, [dialogOpen, dialogContent, editingProductId, editingProduct, products, productForm.code, productForm.name]);
   
   // Estados para filtros e busca de produtos
   const [searchTerm, setSearchTerm] = useState('');
