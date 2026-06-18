@@ -961,13 +961,13 @@ export default function AdminDashboard() {
                     <Input
                       id="manual_upload"
                       type="file"
-                      accept="image/*,.pdf"
+                      accept="application/pdf,image/*,.pdf"
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
                           try {
                             const url = await handleFileUpload(file, 'manuals');
-                            const type = file.type.includes('pdf') ? 'pdf' : 'image';
+                            const type = file.type.includes('pdf') || file.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image';
                             setProductForm(prev => ({
                               ...prev, 
                               manual_url: url,
