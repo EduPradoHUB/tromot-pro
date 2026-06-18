@@ -85,16 +85,6 @@ export default function AdminDashboard() {
     return [];
   };
 
-  const buildProductPayload = () => ({
-    ...productForm,
-    barcode_ean: productForm.barcode_ean || null,
-    image_url: productForm.image_url?.trim() || null,
-    manual_url: productForm.manual_url?.trim() || null,
-    video_url: productForm.video_url?.trim() || null,
-    compatibility: parseCompatibilityForm(productForm.compatibility),
-    no_manual_available: productForm.manual_url?.trim() ? false : productForm.no_manual_available
-  });
-
   const [productForm, setProductForm] = useState(() => {
     try {
       const saved = sessionStorage.getItem('admin.productForm');
@@ -106,6 +96,16 @@ export default function AdminDashboard() {
   useEffect(() => {
     try { sessionStorage.setItem('admin.productForm', JSON.stringify(productForm)); } catch {}
   }, [productForm]);
+
+  const buildProductPayload = () => ({
+    ...productForm,
+    barcode_ean: productForm.barcode_ean || null,
+    image_url: productForm.image_url?.trim() || null,
+    manual_url: productForm.manual_url?.trim() || null,
+    video_url: productForm.video_url?.trim() || null,
+    compatibility: parseCompatibilityForm(productForm.compatibility),
+    no_manual_available: productForm.manual_url?.trim() ? false : productForm.no_manual_available
+  });
   
   const [bannerForm, setBannerForm] = useState({
     title: '',
