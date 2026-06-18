@@ -63,7 +63,7 @@ export default function AdminDashboard() {
   const [deletedProduct, setDeletedProduct] = useState<any>(null);
   
   
-  const [productForm, setProductForm] = useState({
+  const defaultProductForm = {
     name: '',
     code: '',
     barcode_ean: '',
@@ -75,7 +75,18 @@ export default function AdminDashboard() {
     video_url: '',
     compatibility: '[]',
     out_of_production: false
+  };
+  const [productForm, setProductForm] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('admin.productForm');
+      return saved ? { ...defaultProductForm, ...JSON.parse(saved) } : defaultProductForm;
+    } catch {
+      return defaultProductForm;
+    }
   });
+  useEffect(() => {
+    try { sessionStorage.setItem('admin.productForm', JSON.stringify(productForm)); } catch {}
+  }, [productForm]);
   
   const [bannerForm, setBannerForm] = useState({
     title: '',
