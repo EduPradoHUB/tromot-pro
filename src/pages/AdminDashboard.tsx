@@ -74,8 +74,17 @@ export default function AdminDashboard() {
     manual_type: 'pdf' as 'pdf' | 'image',
     video_url: '',
     compatibility: '[]',
-    out_of_production: false
+    out_of_production: false,
+    no_manual_available: false
   };
+
+  const parseCompatibilityForm = (value: unknown) => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return value.trim() ? JSON.parse(value) : [];
+    return [];
+  };
+
   const [productForm, setProductForm] = useState(() => {
     try {
       const saved = sessionStorage.getItem('admin.productForm');
@@ -87,6 +96,16 @@ export default function AdminDashboard() {
   useEffect(() => {
     try { sessionStorage.setItem('admin.productForm', JSON.stringify(productForm)); } catch {}
   }, [productForm]);
+
+  const buildProductPayload = () => ({
+    ...productForm,
+    barcode_ean: productForm.barcode_ean || null,
+    image_url: productForm.image_url?.trim() || null,
+    manual_url: productForm.manual_url?.trim() || null,
+    video_url: productForm.video_url?.trim() || null,
+    compatibility: parseCompatibilityForm(productForm.compatibility),
+    no_manual_available: productForm.manual_url?.trim() ? false : productForm.no_manual_available
+  });
   
   const [bannerForm, setBannerForm] = useState({
     title: '',
@@ -132,6 +151,9 @@ export default function AdminDashboard() {
   });
   
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [editingProductId, setEditingProductId] = useState<string | null>(() => {
+    try { return sessionStorage.getItem('admin.editingProductId') || null; } catch { return null; }
+  });
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [editingVehicle, setEditingVehicle] = useState<any>(null);
   const [editingAdvertisement, setEditingAdvertisement] = useState<any>(null);
@@ -156,6 +178,28 @@ export default function AdminDashboard() {
       }
     } catch {}
   }, [dialogOpen, dialogContent]);
+
+  useEffect(() => {
+    try {
+      if (editingProductId) sessionStorage.setItem('admin.editingProductId', editingProductId);
+      else sessionStorage.removeItem('admin.editingProductId');
+    } catch {}
+  }, [editingProductId]);
+
+  useEffect(() => {
+    if (!editingProductId || editingProduct || products.length === 0) return;
+    const product = products.find((item) => item.id === editingProductId);
+    if (product) setEditingProduct(product);
+  }, [editingProductId, editingProduct, products]);
+
+  useEffect(() => {
+    if (editingProductId || editingProduct || dialogContent !== 'product' || !dialogOpen || products.length === 0) return;
+    const product = products.find((item) => item.code === productForm.code && item.name === productForm.name);
+    if (product) {
+      setEditingProduct(product);
+      setEditingProductId(product.id);
+    }
+  }, [dialogOpen, dialogContent, editingProductId, editingProduct, products, productForm.code, productForm.name]);
   
   // Estados para filtros e busca de produtos
   const [searchTerm, setSearchTerm] = useState('');
@@ -191,6 +235,8 @@ export default function AdminDashboard() {
       
     return matchesSearch && matchesFilters;
   });
+
+  const isProductEditing = Boolean(editingProduct || editingProductId);
 
   const handleNoManualChange = async (productId: string, noManualAvailable: boolean) => {
     console.log('Atualizando produto:', productId, 'no_manual_available:', noManualAvailable);
@@ -289,17 +335,29 @@ export default function AdminDashboard() {
   const handleFileUpload = async (file: File, bucket: string) => {
     setUploadingFile(true);
     try {
-      const fileName = `${Date.now()}-${file.name}`;
+      const extension = file.name.includes('.')
+        ? file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '')
+        : '';
+      const safeName = file.name
+        .replace(/\.[^/.]+$/, '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9-_]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 60) || 'arquivo';
+      const fileName = `${Date.now()}-${safeName}${extension ? `.${extension}` : ''}`;
       const url = await uploadFile(bucket, fileName, file);
       toast({
         title: "Upload realizado",
         description: "Arquivo enviado com sucesso!"
       });
       return url;
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Erro no upload:', error);
       toast({
         title: "Erro no upload",
-        description: "Falha ao enviar arquivo.",
+        description: error?.message || "Falha ao enviar arquivo.",
         variant: "destructive"
       });
       throw error;
@@ -379,6 +437,7 @@ export default function AdminDashboard() {
     setDialogContent(null);
     setDialogOpen(false);
     setEditingProduct(null);
+    setEditingProductId(null);
     setEditingCategory(null);
     setEditingVehicle(null);
     setEditingAdvertisement(null);
@@ -414,27 +473,11 @@ export default function AdminDashboard() {
     }
 
     try {
-      await createProduct({
-        ...productForm,
-        barcode_ean: productForm.barcode_ean || null,
-        compatibility: JSON.parse(productForm.compatibility)
-      });
+      await createProduct(buildProductPayload());
       
-      setProductForm({
-        name: '',
-        code: '',
-        barcode_ean: '',
-        category: '',
-        description: '',
-        image_url: '',
-        manual_url: '',
-        manual_type: 'pdf',
-        video_url: '',
-        compatibility: '[]',
-        out_of_production: false
-      });
+      setProductForm(defaultProductForm);
       
-      setDialogOpen(false);
+      closeDialog();
       
       toast({
         title: "Produto criado",
@@ -624,6 +667,7 @@ export default function AdminDashboard() {
 
   const handleEditProduct = (product: any) => {
     setEditingProduct(product);
+    setEditingProductId(product.id);
     setProductForm({
       name: product.name,
       code: product.code,
@@ -635,7 +679,8 @@ export default function AdminDashboard() {
       manual_type: product.manual_type || 'pdf',
       video_url: product.video_url || '',
       compatibility: JSON.stringify(product.compatibility || []),
-      out_of_production: product.out_of_production || false
+      out_of_production: product.out_of_production || false,
+      no_manual_available: product.no_manual_available || false
     });
   };
 
@@ -649,6 +694,9 @@ export default function AdminDashboard() {
   };
 
   const handleUpdateProduct = async () => {
+    const productId = editingProduct?.id || editingProductId;
+    if (!productId) return;
+
     // Validate EAN-13
     if (productForm.barcode_ean && !/^\d{13}$/.test(productForm.barcode_ean)) {
       toast({
@@ -660,37 +708,23 @@ export default function AdminDashboard() {
     }
 
     try {
-      await updateProduct(editingProduct.id, {
-        ...productForm,
-        barcode_ean: productForm.barcode_ean || null,
-        compatibility: JSON.parse(productForm.compatibility)
-      });
+      await updateProduct(productId, buildProductPayload());
       
-      setProductForm({
-        name: '',
-        code: '',
-        barcode_ean: '',
-        category: '',
-        description: '',
-        image_url: '',
-        manual_url: '',
-        manual_type: 'pdf',
-        video_url: '',
-        compatibility: '[]',
-        out_of_production: false
-      });
+      setProductForm(defaultProductForm);
       
       setEditingProduct(null);
-      setDialogOpen(false);
+      setEditingProductId(null);
+      closeDialog();
       
       toast({
         title: "Produto atualizado",
         description: "Produto editado com sucesso!"
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Erro ao atualizar produto:', error);
       toast({
-        title: "Erro",
-        description: "Falha ao atualizar produto.",
+        title: "Erro ao atualizar produto",
+        description: error?.message || "Falha ao atualizar produto.",
         variant: "destructive"
       });
     }
@@ -803,7 +837,12 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Produtos</h2>
             
-            <Button onClick={() => openDialog('product')}>
+            <Button onClick={() => {
+              setEditingProduct(null);
+              setEditingProductId(null);
+              setProductForm(defaultProductForm);
+              openDialog('product');
+            }}>
               <Plus className="w-4 h-4 mr-2" />
               Novo Produto
             </Button>
@@ -815,20 +854,7 @@ export default function AdminDashboard() {
               setDialogOpen(open);
               if (!open) {
                 closeDialog();
-                setEditingProduct(null);
-                setProductForm({
-                  name: '',
-                  code: '',
-                  barcode_ean: '',
-                  category: '',
-                  description: '',
-                  image_url: '',
-                  manual_url: '',
-                  manual_type: 'pdf',
-                  video_url: '',
-                  compatibility: '[]',
-                  out_of_production: false
-                });
+                setProductForm(defaultProductForm);
               }
             }}>
               <DialogTrigger asChild>
@@ -837,7 +863,7 @@ export default function AdminDashboard() {
               
               <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>{editingProduct ? 'Editar Produto' : 'Novo Produto'}</DialogTitle>
+                  <DialogTitle>{isProductEditing ? 'Editar Produto' : 'Novo Produto'}</DialogTitle>
                 </DialogHeader>
                 
                 <div className="grid gap-4">
@@ -918,7 +944,7 @@ export default function AdminDashboard() {
                         if (file) {
                           try {
                             const url = await handleFileUpload(file, 'product-images');
-                            setProductForm({...productForm, image_url: url});
+                            setProductForm(prev => ({...prev, image_url: url}));
                           } catch (error) {
                             console.error('Erro no upload:', error);
                           }
@@ -944,18 +970,19 @@ export default function AdminDashboard() {
                     <Input
                       id="manual_upload"
                       type="file"
-                      accept="image/*,.pdf"
+                      accept="application/pdf,image/*,.pdf"
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
                           try {
                             const url = await handleFileUpload(file, 'manuals');
-                            const type = file.type.includes('pdf') ? 'pdf' : 'image';
-                            setProductForm({
-                              ...productForm, 
+                            const type = file.type.includes('pdf') || file.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image';
+                            setProductForm(prev => ({
+                              ...prev, 
                               manual_url: url,
-                              manual_type: type
-                            });
+                              manual_type: type,
+                              no_manual_available: false
+                            }));
                           } catch (error) {
                             console.error('Erro no upload:', error);
                           }
@@ -996,8 +1023,8 @@ export default function AdminDashboard() {
                      <Label htmlFor="out_of_production">Fora de produção</Label>
                    </div>
                    
-                    <Button onClick={editingProduct ? handleUpdateProduct : handleCreateProduct} disabled={uploadingFile}>
-                     {uploadingFile ? 'Enviando...' : (editingProduct ? 'Atualizar Produto' : 'Criar Produto')}
+                    <Button onClick={isProductEditing ? handleUpdateProduct : handleCreateProduct} disabled={uploadingFile}>
+                      {uploadingFile ? 'Enviando...' : (isProductEditing ? 'Atualizar Produto' : 'Criar Produto')}
                    </Button>
                 </div>
               </DialogContent>
