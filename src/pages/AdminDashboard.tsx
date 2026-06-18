@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -125,9 +125,26 @@ export default function AdminDashboard() {
   const [editingVehicle, setEditingVehicle] = useState<any>(null);
   const [editingAdvertisement, setEditingAdvertisement] = useState<any>(null);
   const [editingDistributor, setEditingDistributor] = useState<any>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogContent, setDialogContent] = useState<'product' | 'banner' | 'ad' | 'vehicle' | 'category' | 'distributor' | null>(null);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(() => {
+    try { return sessionStorage.getItem('admin.dialogOpen') === '1'; } catch { return false; }
+  });
+  const [dialogContent, setDialogContent] = useState<'product' | 'banner' | 'ad' | 'vehicle' | 'category' | 'distributor' | null>(() => {
+    try { return (sessionStorage.getItem('admin.dialogContent') as any) || null; } catch { return null; }
+  });
   const [uploadingFile, setUploadingFile] = useState(false);
+
+  // Persistir estado do dialog para sobreviver à suspensão da aba no mobile
+  useEffect(() => {
+    try {
+      if (dialogOpen && dialogContent) {
+        sessionStorage.setItem('admin.dialogOpen', '1');
+        sessionStorage.setItem('admin.dialogContent', dialogContent);
+      } else {
+        sessionStorage.removeItem('admin.dialogOpen');
+        sessionStorage.removeItem('admin.dialogContent');
+      }
+    } catch {}
+  }, [dialogOpen, dialogContent]);
   
   // Estados para filtros e busca de produtos
   const [searchTerm, setSearchTerm] = useState('');
