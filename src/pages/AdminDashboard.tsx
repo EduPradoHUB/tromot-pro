@@ -412,10 +412,11 @@ export default function AdminDashboard() {
         title: "Produto criado",
         description: "Produto adicionado com sucesso!"
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Erro ao criar produto:', error);
       toast({
-        title: "Erro",
-        description: "Falha ao criar produto.",
+        title: "Erro ao criar produto",
+        description: error?.message || "Falha ao criar produto.",
         variant: "destructive"
       });
     }
