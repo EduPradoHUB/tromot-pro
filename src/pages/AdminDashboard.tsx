@@ -414,6 +414,7 @@ export default function AdminDashboard() {
     setDialogContent(null);
     setDialogOpen(false);
     setEditingProduct(null);
+    setEditingProductId(null);
     setEditingCategory(null);
     setEditingVehicle(null);
     setEditingAdvertisement(null);
@@ -449,27 +450,11 @@ export default function AdminDashboard() {
     }
 
     try {
-      await createProduct({
-        ...productForm,
-        barcode_ean: productForm.barcode_ean || null,
-        compatibility: JSON.parse(productForm.compatibility)
-      });
+      await createProduct(buildProductPayload());
       
-      setProductForm({
-        name: '',
-        code: '',
-        barcode_ean: '',
-        category: '',
-        description: '',
-        image_url: '',
-        manual_url: '',
-        manual_type: 'pdf',
-        video_url: '',
-        compatibility: '[]',
-        out_of_production: false
-      });
+      setProductForm(defaultProductForm);
       
-      setDialogOpen(false);
+      closeDialog();
       
       toast({
         title: "Produto criado",
@@ -659,6 +644,7 @@ export default function AdminDashboard() {
 
   const handleEditProduct = (product: any) => {
     setEditingProduct(product);
+    setEditingProductId(product.id);
     setProductForm({
       name: product.name,
       code: product.code,
@@ -670,7 +656,8 @@ export default function AdminDashboard() {
       manual_type: product.manual_type || 'pdf',
       video_url: product.video_url || '',
       compatibility: JSON.stringify(product.compatibility || []),
-      out_of_production: product.out_of_production || false
+      out_of_production: product.out_of_production || false,
+      no_manual_available: product.no_manual_available || false
     });
   };
 
@@ -684,6 +671,9 @@ export default function AdminDashboard() {
   };
 
   const handleUpdateProduct = async () => {
+    const productId = editingProduct?.id || editingProductId;
+    if (!productId) return;
+
     // Validate EAN-13
     if (productForm.barcode_ean && !/^\d{13}$/.test(productForm.barcode_ean)) {
       toast({
@@ -695,37 +685,23 @@ export default function AdminDashboard() {
     }
 
     try {
-      await updateProduct(editingProduct.id, {
-        ...productForm,
-        barcode_ean: productForm.barcode_ean || null,
-        compatibility: JSON.parse(productForm.compatibility)
-      });
+      await updateProduct(productId, buildProductPayload());
       
-      setProductForm({
-        name: '',
-        code: '',
-        barcode_ean: '',
-        category: '',
-        description: '',
-        image_url: '',
-        manual_url: '',
-        manual_type: 'pdf',
-        video_url: '',
-        compatibility: '[]',
-        out_of_production: false
-      });
+      setProductForm(defaultProductForm);
       
       setEditingProduct(null);
-      setDialogOpen(false);
+      setEditingProductId(null);
+      closeDialog();
       
       toast({
         title: "Produto atualizado",
         description: "Produto editado com sucesso!"
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Erro ao atualizar produto:', error);
       toast({
-        title: "Erro",
-        description: "Falha ao atualizar produto.",
+        title: "Erro ao atualizar produto",
+        description: error?.message || "Falha ao atualizar produto.",
         variant: "destructive"
       });
     }
