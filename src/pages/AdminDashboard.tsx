@@ -324,17 +324,29 @@ export default function AdminDashboard() {
   const handleFileUpload = async (file: File, bucket: string) => {
     setUploadingFile(true);
     try {
-      const fileName = `${Date.now()}-${file.name}`;
+      const extension = file.name.includes('.')
+        ? file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '')
+        : '';
+      const safeName = file.name
+        .replace(/\.[^/.]+$/, '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9-_]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 60) || 'arquivo';
+      const fileName = `${Date.now()}-${safeName}${extension ? `.${extension}` : ''}`;
       const url = await uploadFile(bucket, fileName, file);
       toast({
         title: "Upload realizado",
         description: "Arquivo enviado com sucesso!"
       });
       return url;
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Erro no upload:', error);
       toast({
         title: "Erro no upload",
-        description: "Falha ao enviar arquivo.",
+        description: error?.message || "Falha ao enviar arquivo.",
         variant: "destructive"
       });
       throw error;
@@ -826,20 +838,7 @@ export default function AdminDashboard() {
               setDialogOpen(open);
               if (!open) {
                 closeDialog();
-                setEditingProduct(null);
-                setProductForm({
-                  name: '',
-                  code: '',
-                  barcode_ean: '',
-                  category: '',
-                  description: '',
-                  image_url: '',
-                  manual_url: '',
-                  manual_type: 'pdf',
-                  video_url: '',
-                  compatibility: '[]',
-                  out_of_production: false
-                });
+                setProductForm(defaultProductForm);
               }
             }}>
               <DialogTrigger asChild>
@@ -929,7 +928,7 @@ export default function AdminDashboard() {
                         if (file) {
                           try {
                             const url = await handleFileUpload(file, 'product-images');
-                            setProductForm({...productForm, image_url: url});
+                            setProductForm(prev => ({...prev, image_url: url}));
                           } catch (error) {
                             console.error('Erro no upload:', error);
                           }
@@ -962,11 +961,12 @@ export default function AdminDashboard() {
                           try {
                             const url = await handleFileUpload(file, 'manuals');
                             const type = file.type.includes('pdf') ? 'pdf' : 'image';
-                            setProductForm({
-                              ...productForm, 
+                            setProductForm(prev => ({
+                              ...prev, 
                               manual_url: url,
-                              manual_type: type
-                            });
+                              manual_type: type,
+                              no_manual_available: false
+                            }));
                           } catch (error) {
                             console.error('Erro no upload:', error);
                           }
