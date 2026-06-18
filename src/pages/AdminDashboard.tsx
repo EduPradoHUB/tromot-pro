@@ -74,8 +74,27 @@ export default function AdminDashboard() {
     manual_type: 'pdf' as 'pdf' | 'image',
     video_url: '',
     compatibility: '[]',
-    out_of_production: false
+    out_of_production: false,
+    no_manual_available: false
   };
+
+  const parseCompatibilityForm = (value: unknown) => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return value.trim() ? JSON.parse(value) : [];
+    return [];
+  };
+
+  const buildProductPayload = () => ({
+    ...productForm,
+    barcode_ean: productForm.barcode_ean || null,
+    image_url: productForm.image_url?.trim() || null,
+    manual_url: productForm.manual_url?.trim() || null,
+    video_url: productForm.video_url?.trim() || null,
+    compatibility: parseCompatibilityForm(productForm.compatibility),
+    no_manual_available: productForm.manual_url?.trim() ? false : productForm.no_manual_available
+  });
+
   const [productForm, setProductForm] = useState(() => {
     try {
       const saved = sessionStorage.getItem('admin.productForm');
@@ -132,6 +151,9 @@ export default function AdminDashboard() {
   });
   
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [editingProductId, setEditingProductId] = useState<string | null>(() => {
+    try { return sessionStorage.getItem('admin.editingProductId') || null; } catch { return null; }
+  });
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [editingVehicle, setEditingVehicle] = useState<any>(null);
   const [editingAdvertisement, setEditingAdvertisement] = useState<any>(null);
@@ -156,6 +178,19 @@ export default function AdminDashboard() {
       }
     } catch {}
   }, [dialogOpen, dialogContent]);
+
+  useEffect(() => {
+    try {
+      if (editingProductId) sessionStorage.setItem('admin.editingProductId', editingProductId);
+      else sessionStorage.removeItem('admin.editingProductId');
+    } catch {}
+  }, [editingProductId]);
+
+  useEffect(() => {
+    if (!editingProductId || editingProduct || products.length === 0) return;
+    const product = products.find((item) => item.id === editingProductId);
+    if (product) setEditingProduct(product);
+  }, [editingProductId, editingProduct, products]);
   
   // Estados para filtros e busca de produtos
   const [searchTerm, setSearchTerm] = useState('');
