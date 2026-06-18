@@ -1,4 +1,5 @@
 import React, { createContext, useContext } from 'react';
+import { X } from 'lucide-react';
 
 interface DialogCtx {
   open: boolean;
@@ -64,12 +65,17 @@ export const DialogContent = ({ className, children }: CustomDialogContentProps)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="fixed inset-0 bg-black/50"
-        onClick={() => ctx.onOpenChange(false)}
-      />
+      <div className="fixed inset-0 bg-black/50" />
       <div className="relative z-50 mx-4 w-full max-w-2xl">
         <div className={`bg-background rounded-2xl shadow-lg border max-h-[80vh] overflow-y-auto ${className || ''}`}>
+          <button
+            type="button"
+            aria-label="Fechar"
+            onClick={() => ctx.onOpenChange(false)}
+            className="absolute right-3 top-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-md bg-background/80 text-foreground hover:bg-accent"
+          >
+            <X className="h-4 w-4" />
+          </button>
           <div className="p-6">
             {children}
           </div>
