@@ -366,6 +366,17 @@ export default function AdminDashboard() {
     }
   };
 
+  const uploadManualFile = async (file: File) => {
+    const url = await handleFileUpload(file, 'manuals');
+    const type = file.type.includes('pdf') || file.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image';
+    setProductForm(prev => ({
+      ...prev,
+      manual_url: url,
+      manual_type: type,
+      no_manual_available: false
+    }));
+  };
+
   // Distributor handlers  
   const handleCreateDistributor = async () => {
     try {
@@ -966,30 +977,63 @@ export default function AdminDashboard() {
                   </div>
                   
                   <div>
-                    <Label htmlFor="manual_upload">Ou faça upload do manual</Label>
-                    <Input
-                      id="manual_upload"
-                      type="file"
-                      accept="application/pdf,image/*,.pdf"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          try {
-                            const url = await handleFileUpload(file, 'manuals');
-                            const type = file.type.includes('pdf') || file.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image';
-                            setProductForm(prev => ({
-                              ...prev, 
-                              manual_url: url,
-                              manual_type: type,
-                              no_manual_available: false
-                            }));
-                          } catch (error) {
-                            console.error('Erro no upload:', error);
-                          }
-                        }
-                      }}
-                      disabled={uploadingFile}
-                    />
+                    <Label>Ou faça upload do manual</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label
+                          htmlFor="manual_pdf_upload"
+                          className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+                        >
+                          <FileText className="h-4 w-4" />
+                          PDF
+                        </Label>
+                        <Input
+                          id="manual_pdf_upload"
+                          type="file"
+                          accept=".pdf,application/pdf,application/x-pdf"
+                          className="sr-only"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            e.currentTarget.value = '';
+                            if (file) {
+                              try {
+                                await uploadManualFile(file);
+                              } catch (error) {
+                                console.error('Erro no upload:', error);
+                              }
+                            }
+                          }}
+                          disabled={uploadingFile}
+                        />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="manual_image_upload"
+                          className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+                        >
+                          <Image className="h-4 w-4" />
+                          Imagem
+                        </Label>
+                        <Input
+                          id="manual_image_upload"
+                          type="file"
+                          accept="image/*"
+                          className="sr-only"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            e.currentTarget.value = '';
+                            if (file) {
+                              try {
+                                await uploadManualFile(file);
+                              } catch (error) {
+                                console.error('Erro no upload:', error);
+                              }
+                            }
+                          }}
+                          disabled={uploadingFile}
+                        />
+                      </div>
+                    </div>
                     {uploadingFile && <p className="text-sm text-muted-foreground mt-1">Enviando arquivo...</p>}
                   </div>
                   

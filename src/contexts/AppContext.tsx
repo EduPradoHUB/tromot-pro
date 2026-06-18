@@ -404,18 +404,26 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   // File upload function
   const uploadFile = async (bucket: string, path: string, file: File): Promise<string> => {
-    if (import.meta.env.DEV) console.log('🔄 Iniciando upload:', { bucket, path, fileSize: file.size, fileType: file.type });
+    const extension = path.split('.').pop()?.toLowerCase();
+    const inferredContentType = file.type ||
+      (extension === 'pdf' ? 'application/pdf' :
+      ['jpg', 'jpeg'].includes(extension || '') ? 'image/jpeg' :
+      extension === 'png' ? 'image/png' :
+      extension === 'webp' ? 'image/webp' :
+      'application/octet-stream');
+
+    if (import.meta.env.DEV) console.log('🔄 Iniciando upload:', { bucket, path, fileSize: file.size, fileType: inferredContentType });
     
     if (!user) {
       console.error('❌ Usuário não autenticado para upload');
       throw new Error('Usuário não autenticado');
     }
 
-    // Validação de tamanho de arquivo (10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    // Validação de tamanho de arquivo (20MB)
+    const maxSize = 20 * 1024 * 1024; // 20MB
     if (file.size > maxSize) {
       console.error('❌ Arquivo muito grande:', file.size, 'bytes');
-      throw new Error('Arquivo muito grande. Máximo permitido: 10MB');
+      throw new Error('Arquivo muito grande. Máximo permitido: 20MB');
     }
     
     const { data, error } = await supabase.storage
@@ -423,7 +431,7 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
       .upload(path, file, {
         cacheControl: '3600',
         upsert: true,
-        contentType: file.type
+        contentType: inferredContentType
       });
     
     if (error) {
