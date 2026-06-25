@@ -45,26 +45,10 @@ function AppContent() {
         <Route path="/manuais-publico" element={<PublicLayout><PublicCatalog /></PublicLayout>} />
         <Route path="/manual/:id" element={<PublicLayout><PublicProduct /></PublicLayout>} />
 
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Layout><Home /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/manuais" element={
-          <ProtectedRoute>
-            <Layout><Catalog /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/produto/:id" element={
-          <ProtectedRoute>
-            <Layout><Product /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/comprar/:id" element={
-          <ProtectedRoute>
-            <Layout><WhereToBuy /></Layout>
-          </ProtectedRoute>
-        } />
+        <Route path="/" element={<Layout><Home /></Layout>} />
+        <Route path="/manuais" element={<Layout><Catalog /></Layout>} />
+        <Route path="/produto/:id" element={<Layout><Product /></Layout>} />
+        <Route path="/comprar/:id" element={<Layout><WhereToBuy /></Layout>} />
         <Route path="/perfil" element={
           <ProtectedRoute>
             <Layout><Profile /></Layout>
@@ -100,23 +84,11 @@ function AppContent() {
             <Layout><Users /></Layout>
           </ProtectedRoute>
         } />
-        <Route path="/termos" element={
-          <ProtectedRoute>
-            <Layout><Terms /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/privacidade" element={
-          <ProtectedRoute>
-            <Layout><Privacy /></Layout>
-          </ProtectedRoute>
-        } />
+        <Route path="/termos" element={<Layout><Terms /></Layout>} />
+        <Route path="/privacidade" element={<Layout><Privacy /></Layout>} />
         <Route path="/instalar" element={<InstallApp />} />
 
-        <Route path="/blog" element={
-          <ProtectedRoute>
-            <Layout><Blog /></Layout>
-          </ProtectedRoute>
-        } />
+        <Route path="/blog" element={<Layout><Blog /></Layout>} />
 
             <Route path="/admin/bling" element={
               <ProtectedRoute>

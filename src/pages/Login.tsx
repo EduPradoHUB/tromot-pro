@@ -193,7 +193,9 @@ export default function Login() {
             TROMOT PRO
           </CardTitle>
           <p className="text-muted-foreground">
-            Entre ou crie sua conta para continuar
+            Acesso da equipe Tromot e administradores.
+            <br />
+            <span className="text-xs">Clientes podem usar o app sem cadastro — o cadastro é opcional para postar instalações, salvar manuais e receber notificações.</span>
           </p>
         </CardHeader>
         <CardContent>
@@ -397,19 +399,19 @@ export default function Login() {
             </TabsContent>
           </Tabs>
 
-          {/* Separador e Botão de Acesso Rápido a Manuais */}
+          {/* Acesso livre ao app */}
           <div className="mt-6 pt-4 border-t border-border">
             <p className="text-sm text-muted-foreground text-center mb-3">
-              Quer apenas consultar um manual de instalação?
+              Não quer se cadastrar agora?
             </p>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full group"
               asChild
             >
-              <Link to="/manuais-publico">
+              <Link to="/">
                 <FileText className="h-4 w-4 mr-2" />
-                Acessar Manuais sem Cadastro
+                Entrar no app sem cadastro
                 <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
