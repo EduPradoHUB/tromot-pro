@@ -37,26 +37,44 @@ interface RadioGroupItemProps extends Omit<React.InputHTMLAttributes<HTMLInputEl
 }
 
 const RadioGroupItem = React.forwardRef<HTMLInputElement, RadioGroupItemProps>(
-  ({ className, value, ...props }, ref) => {
+  ({ className, value, id, disabled, onChange, ...props }, ref) => {
     const context = React.useContext(RadioGroupContext)
     const isChecked = context?.value === value
 
-    const handleChange = () => {
-      context?.onValueChange(value)
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange?.(event)
+
+      if (!event.defaultPrevented && !disabled) {
+        context?.onValueChange(value)
+      }
     }
 
     return (
-      <div className="relative inline-flex items-center">
+      <label
+        htmlFor={id}
+        onClick={() => {
+          if (!disabled) {
+            context?.onValueChange(value)
+          }
+        }}
+        className={cn(
+          "relative inline-flex items-center cursor-pointer",
+          disabled && "cursor-not-allowed opacity-50"
+        )}
+      >
         <input
           type="radio"
           ref={ref}
+          id={id}
           checked={isChecked}
           onChange={handleChange}
+          disabled={disabled}
           className="sr-only"
           value={value}
           {...props}
         />
-        <div
+        <span
+          aria-hidden="true"
           className={cn(
             "aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
             isChecked ? "bg-primary" : "bg-background",
@@ -68,8 +86,8 @@ const RadioGroupItem = React.forwardRef<HTMLInputElement, RadioGroupItemProps>(
               <div className="h-2.5 w-2.5 rounded-full bg-primary-foreground" />
             </div>
           )}
-        </div>
-      </div>
+        </span>
+      </label>
     )
   }
 )
