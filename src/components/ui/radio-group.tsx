@@ -52,6 +52,11 @@ const RadioGroupItem = React.forwardRef<HTMLInputElement, RadioGroupItemProps>(
     return (
       <label
         htmlFor={id}
+        onClick={() => {
+          if (!disabled) {
+            context?.onValueChange(value)
+          }
+        }}
         className={cn(
           "relative inline-flex items-center cursor-pointer",
           disabled && "cursor-not-allowed opacity-50"
