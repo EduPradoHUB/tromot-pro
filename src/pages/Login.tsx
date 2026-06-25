@@ -402,7 +402,7 @@ export default function Login() {
           {/* Acesso livre ao app */}
           <div className="mt-6 pt-4 border-t border-border">
             <p className="text-sm text-muted-foreground text-center mb-3">
-              Não quer se cadastrar agora?
+              Não quer se cadastrar?
             </p>
             <Button
               variant="outline"
@@ -411,7 +411,7 @@ export default function Login() {
             >
               <Link to="/">
                 <FileText className="h-4 w-4 mr-2" />
-                Entrar no app sem cadastro
+                Acesse Sem Cadastro
                 <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
