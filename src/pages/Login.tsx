@@ -406,7 +406,7 @@ export default function Login() {
             </p>
             <Button
               variant="outline"
-              className="w-full group"
+              className="w-full group border-primary border-[3px] hover:border-primary"
               asChild
             >
               <Link to="/">
