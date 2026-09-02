@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Search, Package, User, LogOut, Menu, BarChart3, Smartphone } from 'lucide-react';
+import { Home, Search, Package, User, LogOut, Menu, BarChart3, Smartphone, BrainCircuit, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 // Temporarily disable Avatar to fix React hooks conflicts  
 // import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -103,6 +103,14 @@ export const Layout: React.FC<LayoutProps> = ({
     name: 'Usuários',
     path: '/usuarios',
     icon: User
+  }, {
+    name: 'IA Suporte',
+    path: '/admin/base-conhecimento',
+    icon: BrainCircuit
+  }, {
+    name: 'Conversas',
+    path: '/admin/conversas',
+    icon: MessageCircle
   }] : profile?.role === 'Técnico Tromot' ? [{
     name: 'Dashboard',
     path: '/dashboard',
@@ -111,6 +119,10 @@ export const Layout: React.FC<LayoutProps> = ({
     name: 'Técnico',
     path: '/tecnico',
     icon: Package
+  }, {
+    name: 'IA Suporte',
+    path: '/admin/base-conhecimento',
+    icon: BrainCircuit
   }] : [])];
   return <div className="min-h-screen bg-background">
       {/* Header */}

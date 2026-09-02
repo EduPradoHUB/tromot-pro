@@ -9,3 +9,9 @@ max_rows = 1000
 
 [functions.send-post-notification]
 verify_jwt = true
+
+[functions.whatsapp-webhook]
+# Chamada pela uazapi (não por um usuário logado no app) — a autenticação
+# é feita por um segredo compartilhado (WHATSAPP_WEBHOOK_SECRET), não por
+# JWT do Supabase. Ver ARCHITECTURE_WHATSAPP_IA.md.
+verify_jwt = false

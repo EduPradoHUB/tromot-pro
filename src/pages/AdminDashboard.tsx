@@ -73,6 +73,7 @@ export default function AdminDashboard() {
     manual_url: '',
     manual_type: 'pdf' as 'pdf' | 'image',
     video_url: '',
+    store_url: '',
     compatibility: '[]',
     out_of_production: false,
     no_manual_available: false
@@ -103,6 +104,7 @@ export default function AdminDashboard() {
     image_url: productForm.image_url?.trim() || null,
     manual_url: productForm.manual_url?.trim() || null,
     video_url: productForm.video_url?.trim() || null,
+    store_url: productForm.store_url?.trim() || null,
     compatibility: parseCompatibilityForm(productForm.compatibility),
     no_manual_available: productForm.manual_url?.trim() ? false : productForm.no_manual_available
   });
@@ -689,6 +691,7 @@ export default function AdminDashboard() {
       manual_url: product.manual_url || '',
       manual_type: product.manual_type || 'pdf',
       video_url: product.video_url || '',
+      store_url: product.store_url || '',
       compatibility: JSON.stringify(product.compatibility || []),
       out_of_production: product.out_of_production || false,
       no_manual_available: product.no_manual_available || false
@@ -976,6 +979,19 @@ export default function AdminDashboard() {
                     />
                   </div>
                   
+                  <div>
+                    <Label htmlFor="store_url">Link de compra (tromotstore.com.br)</Label>
+                    <Input
+                      id="store_url"
+                      value={productForm.store_url}
+                      onChange={(e) => setProductForm({...productForm, store_url: e.target.value})}
+                      placeholder="https://tromotstore.com.br/categoria/codigo-produto"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Enviado pela IA de suporte no WhatsApp quando o cliente quer comprar este produto.
+                    </p>
+                  </div>
+
                   <div>
                     <Label>Ou faça upload do manual</Label>
                     <div className="grid grid-cols-2 gap-2">

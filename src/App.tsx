@@ -29,6 +29,8 @@ import Saved from "./pages/Saved";
 import NotFound from "./pages/NotFound";
 import BlingConfig from "./pages/BlingConfig";
 import Blog from "./pages/Blog";
+import KnowledgeBase from "./pages/KnowledgeBase";
+import WhatsappConversations from "./pages/WhatsappConversations";
 
 const queryClient = new QueryClient();
 
@@ -95,6 +97,16 @@ function AppContent() {
                 <Layout><BlingConfig /></Layout>
               </ProtectedRoute>
             } />
+        <Route path="/admin/base-conhecimento" element={
+          <ProtectedRoute requireRoles={['ADM', 'Técnico Tromot']}>
+            <Layout><KnowledgeBase /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/conversas" element={
+          <ProtectedRoute requireAdmin>
+            <Layout><WhatsappConversations /></Layout>
+          </ProtectedRoute>
+        } />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
