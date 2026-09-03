@@ -15,3 +15,20 @@ verify_jwt = true
 # é feita por um segredo compartilhado (WHATSAPP_WEBHOOK_SECRET), não por
 # JWT do Supabase. Ver ARCHITECTURE_WHATSAPP_IA.md.
 verify_jwt = false
+
+[functions.product-change-webhook]
+# Chamada pelo Database Webhook do Supabase (Dashboard → Database →
+# Webhooks) quando a tabela products muda — não é um usuário logado.
+# Autenticação por segredo compartilhado (PRODUCT_NOTIFICATIONS_SECRET).
+verify_jwt = false
+
+[functions.unsubscribe]
+# Chamada pela página pública /descadastro, sem login (o token no link
+# já identifica o cliente).
+verify_jwt = false
+
+[functions.app-chat]
+# Usada tanto por clientes logados quanto anônimos (o app pode navegar
+# sem cadastro) — a própria função trata os dois casos, então não exige
+# JWT do Supabase de cara.
+verify_jwt = false

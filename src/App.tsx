@@ -6,6 +6,7 @@ import { Layout } from "@/components/Layout";
 import { PublicLayout } from "@/components/PublicLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { NotificationManager } from "@/components/NotificationManager";
+import { SupportChatWidget } from "@/components/SupportChatWidget";
 import { Toaster } from "@/components/ui/toaster";
 
 import Home from "./pages/Home";
@@ -31,6 +32,8 @@ import BlingConfig from "./pages/BlingConfig";
 import Blog from "./pages/Blog";
 import KnowledgeBase from "./pages/KnowledgeBase";
 import WhatsappConversations from "./pages/WhatsappConversations";
+import ProductNotifications from "./pages/ProductNotifications";
+import Unsubscribe from "./pages/Unsubscribe";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +42,7 @@ function AppContent() {
     <>
       {/* Toaster renderizado aqui dentro do BrowserRouter para evitar conflitos de hooks */}
       <Toaster />
+      <SupportChatWidget />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<PasswordReset />} />
@@ -107,6 +111,12 @@ function AppContent() {
             <Layout><WhatsappConversations /></Layout>
           </ProtectedRoute>
         } />
+        <Route path="/admin/notificacoes-produto" element={
+          <ProtectedRoute requireRoles={['ADM', 'Técnico Tromot']}>
+            <Layout><ProductNotifications /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/descadastro" element={<Unsubscribe />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

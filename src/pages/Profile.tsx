@@ -4,6 +4,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useApp } from '@/contexts/AppContext';
 import { AvatarUpload } from '@/components/AvatarUpload';
 import { toast } from '@/hooks/use-toast';
@@ -23,6 +25,23 @@ export default function Profile() {
       await updateProfile({ avatar_url: avatarUrl });
     } catch (error) {
       console.error('Erro ao atualizar avatar:', error);
+    }
+  };
+
+  const emailOptIn = (profile as any)?.email_notifications_opt_in ?? true;
+
+  const handleToggleEmailOptIn = async (checked: boolean) => {
+    try {
+      await updateProfile({ email_notifications_opt_in: checked } as any);
+      toast({
+        title: checked ? 'Emails ativados' : 'Emails desativados',
+        description: checked
+          ? 'Você vai receber novidades de produto por email.'
+          : 'Você não vai mais receber novidades de produto por email.',
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar preferência de email:', error);
+      toast({ title: 'Erro', description: 'Não foi possível salvar a preferência.', variant: 'destructive' });
     }
   };
 
@@ -157,6 +176,23 @@ export default function Profile() {
                   </div>
                 )}
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-card mt-4">
+          <CardHeader>
+            <CardTitle className="text-base">Notificações por email</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="email-opt-in">Novidades de produto</Label>
+                <p className="text-xs text-muted-foreground">
+                  Produto novo, manual atualizado ou alteração em produtos que você acompanha.
+                </p>
+              </div>
+              <Switch id="email-opt-in" checked={emailOptIn} onCheckedChange={handleToggleEmailOptIn} />
             </div>
           </CardContent>
         </Card>

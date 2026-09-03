@@ -62,21 +62,32 @@ O Claude é ótimo para conversar e decidir o que fazer, mas a Anthropic não of
 - **`whatsapp_conversations`** — uma linha por número de telefone: nome, tipo de cliente, cidade/estado (aprendidos durante a conversa), distribuidor associado, status (`open` / `escalated` / `resolved`) e `needs_human` para a fila de atendimento humano.
 - **`whatsapp_messages`** — histórico completo de mensagens (cliente e IA), para auditoria e para você revisar conversas na página **Conversas**.
 - **`products.store_url`** — novo campo por produto com o link direto da página em `tromotstore.com.br`, editável no formulário de produto do admin. Se vazio, a IA manda o link da loja em geral.
-- **`service_ratings`** (migration `20260903120000_whatsapp_service_ratings.sql`) — uma linha por avaliação de 1 a 5 dada pelo cliente ao final de um atendimento (nota + comentário opcional + data). Como `whatsapp_conversations` é uma linha por telefone reaproveitada com o tempo, é esta tabela separada que dá o **histórico** de avaliações de cada cliente, não só a última.
+- **`service_ratings`** (migration `20260903120000_whatsapp_service_ratings.sql`) — uma linha por avaliação de 1 a 5 dada pelo cliente ao final de um atendimento (nota + comentário opcional + data), em qualquer canal (WhatsApp ou chat do app). Como as tabelas de conversa são uma linha por cliente reaproveitada com o tempo, é esta tabela separada que dá o **histórico** de avaliações, não só a última.
+- **`email_notification_settings`** e **`product_notifications`** (migration `20260903180000_product_email_notifications.sql`) — configuração automático/manual e fila/histórico dos emails de novidade de produto. Ver seção "Notificações de produto por email".
+- **`app_chat_conversations`** e **`app_chat_messages`** (migration `20260903200000_app_chat.sql`) — espelham as tabelas do WhatsApp, mas identificadas por `session_id` (gerado no navegador) em vez de telefone, pra dar suporte ao chat dentro do app. Ver seção "Chat com a IA dentro do app".
 - Bucket de storage **`knowledge-base`** — fotos anexadas aos casos da base de conhecimento.
 - Função `match_knowledge_base(...)` — a busca semântica (cosine similarity) usada pela IA.
 
 ## Edge Functions novas
 
-- **`whatsapp-webhook`** — recebe as mensagens da uazapi, roda o loop de ferramentas com a Claude API, envia a resposta de volta. É a única peça que fala tanto com a uazapi quanto com a Claude.
+- **`_shared/supportAgent.ts`** — o "cérebro" da IA de Suporte: system prompt, as 7 ferramentas e a lógica de decisão. É o mesmo código pros dois canais (WhatsApp e chat do app) — só muda como o manual é entregue e como o cliente é identificado pra escalar, através de um pequeno adaptador (`SupportChannel`) que cada função monta.
+- **`whatsapp-webhook`** — recebe as mensagens da uazapi, chama `runConversationTurn` de `supportAgent.ts`, envia a resposta de volta pelo WhatsApp.
+- **`app-chat`** — o mesmo, mas para o botão de chat dentro do app; funciona logado ou anônimo.
 - **`kb-embed`** — gera/atualiza o embedding de uma entrada da base de conhecimento. Chamada pelo app quando você salva um caso.
-- `_shared/uazapi.ts`, `_shared/claude.ts`, `_shared/embeddings.ts`, `_shared/cors.ts` — código compartilhado entre as duas funções acima.
+- **`product-change-webhook`** — chamada por um Database Webhook do Supabase quando a tabela `products` muda; decide o tipo de evento e dispara (ou enfileira) o email.
+- **`send-pending-notification`** — chamada pelo botão "Enviar agora" no painel, quando o modo do evento está manual.
+- **`unsubscribe`** — chamada pela página pública `/descadastro`, sem login.
+- `_shared/uazapi.ts`, `_shared/claude.ts`, `_shared/embeddings.ts`, `_shared/cors.ts`, `_shared/resend.ts`, `_shared/productEmail.ts` — código compartilhado entre as funções acima.
 
 ## Páginas novas no app
 
 - **`/admin/base-conhecimento`** (ADM e Técnico Tromot) — formulário para adicionar/editar/remover casos da base de conhecimento, com foto opcional.
 - **`/admin/conversas`** (ADM) — lista de conversas do WhatsApp, com destaque para as que a IA escalou para atendimento humano (`needs_human`), um botão para marcar como resolvida, a última nota do cliente (badge com estrela) e, ao expandir a conversa, o histórico completo de avaliações dele.
+- **`/admin/notificacoes-produto`** (ADM e Técnico Tromot) — os 3 switches automático/manual e a fila/histórico de emails de novidade de produto.
+- **`/descadastro`** (pública) — página do link de descadastro que vai em todo email de novidade.
 - Formulário de produto (`/admin`) — novo campo "Link de compra (tromotstore.com.br)".
+- Perfil do cliente (`/perfil`) — novo switch "Novidades de produto" (liga/desliga o email, mesma preferência do link de descadastro).
+- Botão flutuante de chat (aparece em qualquer página do app, para clientes logados ou não) — conversa direto com a IA sem precisar abrir o WhatsApp.
 
 ## Segredos que você precisa configurar no Supabase
 
@@ -89,7 +100,11 @@ No painel do projeto Supabase: **Project Settings → Edge Functions → Secrets
 | `UAZAPI_BASE_URL` | URL da sua instância uazapi | painel da sua instância uazapi |
 | `UAZAPI_TOKEN` | Token de autenticação da instância | painel da sua instância uazapi |
 | `WHATSAPP_WEBHOOK_SECRET` | Segredo compartilhado para validar que o webhook realmente veio da uazapi (invente uma string longa e aleatória) | você mesmo define |
-| `SUPPORT_ADMIN_WHATSAPP` (opcional) | Seu número de WhatsApp, para receber o aviso "fulano está precisando da sua ajuda!" sempre que a IA escalar um atendimento | você mesmo define — use o mesmo formato de número que a uazapi espera (ex: `5516999998888`) |
+| `SUPPORT_ADMIN_WHATSAPP` (opcional) | Seu número de WhatsApp, para receber o aviso "fulano está precisando da sua ajuda!" sempre que a IA escalar um atendimento (WhatsApp ou chat do app) | você mesmo define — use o mesmo formato de número que a uazapi espera (ex: `5516999998888`) |
+| `RESEND_API_KEY` | Envio dos emails de novidade de produto | dashboard da Resend (resend.com) → API Keys |
+| `RESEND_FROM_EMAIL` (opcional) | Remetente que aparece nos emails, ex: `TROMOT PRO <novidades@tromot.com>` — se não definir, usa esse valor como padrão | você mesmo define, precisa ser um domínio verificado na Resend |
+| `APP_BASE_URL` (opcional) | Base para montar os links dentro do email (produto, descadastro) — se não definir, usa `https://tromotpro.com.br` como padrão | você mesmo define |
+| `PRODUCT_NOTIFICATIONS_SECRET` | Segredo compartilhado para validar que a chamada em `product-change-webhook` realmente veio do Database Webhook do Supabase (invente uma string longa e aleatória) | você mesmo define |
 
 ## Configurando o webhook na uazapi
 
@@ -140,13 +155,63 @@ Isso só funciona depois de você habilitar o provedor Google no projeto Supabas
 
 > Se o provedor não estiver habilitado, o botão mostra uma mensagem de erro ao ser clicado (não quebra o app) — é só voltar aqui e completar os passos acima.
 
+## Notificações de produto por email
+
+Quando um produto novo é criado, um manual é atualizado, ou dados de um produto existente mudam (nome, descrição, categoria, foto, compatibilidade ou link de compra), o sistema pode avisar por email os clientes que optaram por receber novidades. Para cada um desses 3 tipos de evento, você escolhe (na página **`/admin/notificacoes-produto`**) se o envio é:
+
+- **Automático** — assim que a mudança acontece no banco, o email já sai sozinho.
+- **Manual** — a mudança fica registrada como "pendente" na mesma página, e você clica em **"Enviar agora"** quando quiser (ex: depois de revisar o texto/foto do produto).
+
+Só recebem o email os clientes com `email_notifications_opt_in = true` (ligado por padrão, mas o cliente pode desligar a qualquer momento no switch "Novidades de produto" em `/perfil`, ou clicando no link de descadastro que vai em todo email — página pública `/descadastro`).
+
+### Como a mudança no produto chega até o email (Database Webhook)
+
+Diferente da IA do WhatsApp (que é chamada diretamente pela uazapi), aqui quem avisa o sistema que um produto mudou é o próprio Supabase, através de um **Database Webhook** — um recurso do painel que dispara uma chamada HTTP toda vez que uma tabela é alterada. Isso evita colocar segredos ou URLs dentro de uma migration (que fica versionada no GitHub) e é a forma que o próprio Supabase recomenda para esse tipo de integração.
+
+Depois que a migration `20260903180000_product_email_notifications.sql` rodar e você configurar o secret `PRODUCT_NOTIFICATIONS_SECRET`, configure o webhook assim:
+
+1. No painel do Supabase: **Database → Webhooks → Create a new hook**.
+2. Nome: algo como `product-change-notify`.
+3. Tabela: `products`.
+4. Eventos: marque **Insert** e **Update** (não precisa de Delete).
+5. Tipo: **HTTP Request**.
+6. Método: `POST`.
+7. URL: `https://<seu-projeto>.supabase.co/functions/v1/product-change-webhook`.
+8. Headers: adicione um header `x-webhook-secret` com o mesmo valor do secret `PRODUCT_NOTIFICATIONS_SECRET`.
+9. Salvar.
+
+A partir daí, toda vez que um produto for criado ou editado, o Supabase chama `product-change-webhook`, que descobre o tipo de evento (produto novo, manual trocado, ou outro campo alterado), confere se o modo está automático ou manual para aquele tipo, e ou já dispara o envio (automático) ou só deixa registrado como pendente (manual) na tabela `product_notifications`, visível em `/admin/notificacoes-produto`.
+
+### Configurando a Resend
+
+1. Crie uma conta em resend.com (tem plano gratuito para volumes pequenos/médios).
+2. Em **Domains**, adicione o domínio que você quer usar para enviar (ex: `tromot.com`) e cadastre no seu provedor de DNS os registros **SPF/DKIM** que a Resend mostrar na tela — sem isso, os emails tendem a cair em spam ou nem serem entregues.
+3. Espere o domínio aparecer como "Verified" (geralmente rápido, pode levar até algumas horas dependendo do DNS).
+4. Em **API Keys**, crie uma chave e configure como o secret `RESEND_API_KEY`.
+5. Defina `RESEND_FROM_EMAIL` com um endereço desse domínio verificado, ex: `TROMOT PRO <novidades@tromot.com>`.
+
+> Sem o domínio verificado, a Resend recusa o envio (ou só permite mandar para o próprio email cadastrado na conta, dependendo do plano) — é o primeiro lugar para checar se um envio falhar.
+
+## Chat com a IA dentro do app
+
+Além do WhatsApp, agora existe um botão de chat flutuante (bolha no canto da tela, em qualquer página do app) para o cliente conversar direto com a mesma IA de Suporte, sem precisar sair do app nem abrir o WhatsApp. Funciona para cliente logado ou visitante anônimo.
+
+Para isso, a lógica da IA (prompt, ferramentas, decisões) foi extraída do `whatsapp-webhook` para um módulo compartilhado, `_shared/supportAgent.ts` — é o mesmo "cérebro" para os dois canais, então uma pergunta sobre manual, produto, compra ou instalação é respondida da mesma forma seja pelo WhatsApp ou pelo chat do app. O que muda entre os dois canais:
+
+- **Como o manual é entregue**: no WhatsApp, a IA manda o arquivo direto na conversa; no chat do app, ela manda o link e o front-end pode mostrar um botão.
+- **Como o cliente é identificado para escalar**: no WhatsApp já existe o número de telefone; no chat do app, se o cliente estiver logado, usa o WhatsApp/email do perfil dele automaticamente — se estiver anônimo e a IA precisar escalar (`escalar_para_humano`) sem ter nenhum contato, **ela pergunta um WhatsApp ou email antes de escalar**, do mesmo jeito que já pergunta cidade/estado para achar um distribuidor. Assim você sempre recebe um contato junto com o aviso de que alguém precisa de ajuda.
+
+Cada conversa do chat do app é identificada por um `session_id` gerado no navegador do cliente (guardado no `localStorage`, tabela `app_chat_conversations`) — funciona mesmo sem login, e se o cliente logar depois, a conversa é automaticamente associada à conta dele. O histórico de conversas do chat do app pode ser adicionado à página **Conversas** do admin futuramente (hoje ela mostra só o WhatsApp); por enquanto, as tabelas `app_chat_conversations`/`app_chat_messages` já guardam tudo, caso queira consultar direto no banco.
+
 ## O que falta para ativar
 
-1. Rodar as migrations (`20260902120000_whatsapp_ai_knowledge_base.sql` e `20260903120000_whatsapp_service_ratings.sql`) no projeto — o Lovable faz isso automaticamente ao sincronizar com o GitHub, ou via `supabase db push`.
-2. Configurar os secrets listados acima (os 5 originais + `SUPPORT_ADMIN_WHATSAPP` opcional).
-3. Fazer o deploy das edge functions (`whatsapp-webhook`, `kb-embed`) — o Lovable faz isso automaticamente a partir do GitHub também.
+1. Rodar as migrations (`20260902120000_whatsapp_ai_knowledge_base.sql`, `20260903120000_whatsapp_service_ratings.sql`, `20260903180000_product_email_notifications.sql` e `20260903200000_app_chat.sql`) no projeto — o Lovable faz isso automaticamente ao sincronizar com o GitHub, ou via `supabase db push`.
+2. Configurar os secrets listados acima: os 5 originais do WhatsApp + `SUPPORT_ADMIN_WHATSAPP` (opcional) + os 4 novos de email (`RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `APP_BASE_URL`, `PRODUCT_NOTIFICATIONS_SECRET`).
+3. Fazer o deploy das edge functions (`whatsapp-webhook`, `app-chat`, `kb-embed`, `product-change-webhook`, `send-pending-notification`, `unsubscribe`) — o Lovable faz isso automaticamente a partir do GitHub também.
 4. Apontar o webhook da uazapi (ver seção acima) e confirmar o formato do payload no primeiro teste real.
-5. Cadastrar alguns casos iniciais em `/admin/base-conhecimento` para a IA já começar com alguma bagagem.
-6. Preencher `store_url` nos produtos mais vendidos (não precisa ser todos de uma vez).
-7. Habilitar o provedor Google no Supabase (ver seção "Login com Google" acima), se quiser usar esse botão.
-8. Rodar a geração de tipos do Supabase (`supabase gen types typescript`) para que `knowledge_base`, `whatsapp_conversations`, `whatsapp_messages`, `service_ratings` e `products.store_url` fiquem tipados no app (hoje usam `as any`, seguindo o mesmo padrão já existente no projeto para `clientes`/`bling_tokens`/`pedidos`).
+5. Verificar o domínio de envio na Resend (SPF/DKIM) e configurar o Database Webhook no Supabase apontando para `product-change-webhook` (ver seção "Notificações de produto por email" acima) — sem isso, os emails de novidade não saem.
+6. Cadastrar alguns casos iniciais em `/admin/base-conhecimento` para a IA já começar com alguma bagagem.
+7. Preencher `store_url` nos produtos mais vendidos (não precisa ser todos de uma vez).
+8. Habilitar o provedor Google no Supabase (ver seção "Login com Google" acima), se quiser usar esse botão.
+9. Testar o chat dentro do app (bolha flutuante no canto da tela) como visitante anônimo e como cliente logado, e testar o fluxo de um produto/manual sendo alterado (automático e manual) em `/admin/notificacoes-produto`.
+10. Rodar a geração de tipos do Supabase (`supabase gen types typescript`) para que todas as tabelas novas (`knowledge_base`, `whatsapp_conversations`, `whatsapp_messages`, `service_ratings`, `products.store_url`, `email_notification_settings`, `product_notifications`, `app_chat_conversations`, `app_chat_messages`) fiquem tipadas no app (hoje usam `as any`, seguindo o mesmo padrão já existente no projeto para `clientes`/`bling_tokens`/`pedidos`).
