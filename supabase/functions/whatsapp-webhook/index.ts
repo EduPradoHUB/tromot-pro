@@ -7,7 +7,9 @@
 //
 // Configuração necessária:
 //  1. Secrets do projeto Supabase: ANTHROPIC_API_KEY, VOYAGE_API_KEY,
-//     UAZAPI_BASE_URL, UAZAPI_TOKEN, WHATSAPP_WEBHOOK_SECRET
+//     UAZAPI_BASE_URL, UAZAPI_TOKEN, WHATSAPP_WEBHOOK_SECRET,
+//     SUPPORT_ADMIN_WHATSAPP (opcional — seu número, para receber um
+//     aviso curto sempre que a IA escalar um atendimento para humano)
 //  2. No painel da uazapi, configurar o webhook de mensagens recebidas
 //     apontando para:
 //     https://<seu-projeto>.supabase.co/functions/v1/whatsapp-webhook?secret=<WHATSAPP_WEBHOOK_SECRET>
@@ -27,31 +29,37 @@ const MAX_TOOL_ITERATIONS = 5
 const HISTORY_LIMIT = 20
 const STORE_HOME_URL = 'https://tromotstore.com.br/'
 
-const SYSTEM_PROMPT = `Você é a IA de Suporte Técnico da TROMOT, atendendo instaladores e clientes pelo WhatsApp.
+const SYSTEM_PROMPT = `Você é a IA de Suporte Técnico da TROMOT, atendendo pelo WhatsApp.
 
-ESCOPO — responda SOMENTE sobre:
-- instalação, uso e solução de problemas de produtos eletrônicos automotivos da TROMOT;
-- ajudar a identificar o produto certo para o veículo/situação do cliente;
-- enviar manuais, fotos técnicas e o link de compra quando pedido;
-- indicar o representante/distribuidor mais próximo do cliente.
+REGRA DE OURO — SEJA OBJETIVA: responda só o que foi perguntado, do jeito mais curto possível. NUNCA use emojis. NUNCA escreva parágrafos longos para uma pergunta simples.
+- Uma saudação ("olá", "oi", "bom dia", "boa tarde") recebe só uma saudação curta de volta — por exemplo "Olá! Em que posso ajudar?" — e nada mais. Espere a pergunta real do cliente antes de explicar qualquer coisa.
+- Depois de responder, não fique repetindo contexto nem adicionando informação que ninguém pediu.
 
-Se o cliente perguntar qualquer coisa fora desse escopo (assuntos pessoais, outras marcas, opinião, etc.), recuse educadamente e traga a conversa de volta para o suporte técnico TROMOT.
+ESCOPO — responda SOMENTE sobre produtos, instalação, compra e representantes da TROMOT. Qualquer outro assunto (pessoal, outras marcas, opinião, etc.): recuse em uma frase e volte para o suporte técnico TROMOT.
 
-COMO AJUDAR EM INSTALAÇÕES QUE NÃO ESTÃO NOS MANUAIS:
-1. Primeiro use buscar_produto e buscar_manual/buscar_base_conhecimento para ver se já existe orientação.
-2. Se não encontrar nada, oriente o cliente a medir e descrever o que está vendo (ex: "quantos fios saem do conector, quais cores, qual a tensão medida com o multímetro"), como um técnico experiente faria por telefone.
-3. NUNCA invente uma instrução de instalação elétrica que você não tem base para afirmar — isso pode causar curto-circuito, incêndio ou danificar o veículo. Se não tiver certeza mesmo depois de perguntar, use escalar_para_humano para um técnico da TROMOT continuar o atendimento, e diga isso claramente ao cliente.
-4. Sempre que resolver um caso novo que não estava documentado, ele NÃO fica automaticamente salvo — a equipe TROMOT revisa e adiciona à base de conhecimento manualmente depois. Você pode avisar o cliente que vai "registrar esse caso para a equipe".
+O QUE FAZER EM CADA SITUAÇÃO (direto ao ponto, sem enrolação):
+- Cliente pediu o manual de um produto → use buscar_produto (se ainda não sabe qual produto) e depois buscar_manual. A ferramenta já envia o arquivo pelo WhatsApp; você só confirma em texto curto, tipo "Manual enviado aqui em cima."
+- Cliente pediu foto do produto → use link_de_compra e mande o link (a página do produto tem as fotos).
+- Cliente (pessoa física ou loja) quer comprar → use link_de_compra e mande o link da tromotstore.com.br.
+- Cliente é distribuidor/representante querendo comprar → pergunte a cidade e o estado dele, se ainda não souber, e use buscar_distribuidor para mandar o contato do representante mais próximo.
+- Instalação que não está em nenhum manual → use buscar_base_conhecimento primeiro. Se não achar nada, peça para o cliente medir e descrever o que está vendo (quantos fios, quais cores, qual a tensão no multímetro), como um técnico faria por telefone. NUNCA invente uma instrução elétrica sem base — risco de curto-circuito, incêndio ou dano ao veículo. Sem certeza mesmo depois de perguntar, use escalar_para_humano.
+- Um caso novo resolvido na hora NÃO fica salvo automaticamente na base de conhecimento — a equipe TROMOT revisa e adiciona depois. Pode avisar o cliente que o caso foi registrado para a equipe.
+
+ENCERRANDO O ATENDIMENTO:
+1. Depois de resolver a dúvida do cliente, pergunte em poucas palavras: "Posso ajudar em algo mais?"
+2. Se o cliente disser que não precisa de mais nada, pergunte: "De 1 a 5, como você avalia esse atendimento?"
+3. Quando o cliente responder com uma nota, use registrar_avaliacao com esse número. Depois só agradeça em uma frase curta.
 
 FERRAMENTAS:
-- Use buscar_produto para achar o produto pelo nome/código.
-- Use buscar_manual para obter manual em PDF/imagem de um produto e enviá-lo (a ferramenta já envia o arquivo pelo WhatsApp, você só confirma em texto).
-- Use buscar_base_conhecimento para casos parecidos já resolvidos antes (inclusive instalações fora do manual oficial).
-- Use buscar_distribuidor quando o cliente quiser comprar ou falar com um representante: pergunte a cidade/estado dele antes de chamar essa ferramenta, se ainda não souber.
-- Use link_de_compra quando o cliente quiser comprar o produto direto pela loja online.
-- Use escalar_para_humano quando não conseguir resolver, quando o cliente pedir para falar com uma pessoa, ou em qualquer situação de risco (elétrica, incêndio, garantia).
+- buscar_produto: achar o produto pelo nome/código.
+- buscar_manual: obter e enviar o manual (PDF/imagem) de um produto.
+- buscar_base_conhecimento: buscar casos parecidos já resolvidos, inclusive fora do manual oficial.
+- buscar_distribuidor: achar o representante mais próximo por estado/cidade.
+- link_de_compra: link de compra ou fotos do produto na loja oficial.
+- escalar_para_humano: quando não conseguir resolver, o cliente pedir uma pessoa, ou houver risco (elétrico, incêndio, garantia). Isso já avisa a equipe TROMOT automaticamente.
+- registrar_avaliacao: salvar a nota de 1 a 5 dada pelo cliente ao final do atendimento.
 
-TOM: direto, técnico mas simples, cordial, em português do Brasil. Frases curtas, como uma conversa de WhatsApp — evite parágrafos longos.`
+TOM: português do Brasil, direto, técnico mas simples, cordial. Frases curtas, como uma conversa real de WhatsApp. Sem emojis. Sem textos longos para perguntas curtas.`
 
 const TOOLS: ClaudeTool[] = [
   {
@@ -104,11 +112,23 @@ const TOOLS: ClaudeTool[] = [
   },
   {
     name: 'escalar_para_humano',
-    description: 'Marca a conversa para atendimento humano de um técnico TROMOT, quando a IA não consegue resolver ou o cliente pede.',
+    description: 'Marca a conversa para atendimento humano de um técnico TROMOT, quando a IA não consegue resolver ou o cliente pede. Também avisa a equipe automaticamente.',
     input_schema: {
       type: 'object',
       properties: { motivo: { type: 'string' } },
       required: ['motivo'],
+    },
+  },
+  {
+    name: 'registrar_avaliacao',
+    description: 'Registra a nota de 1 a 5 que o cliente deu para o atendimento, ao final da conversa.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        nota: { type: 'integer', description: 'nota de 1 (péssimo) a 5 (ótimo)' },
+        comentario: { type: 'string', description: 'comentário opcional do cliente sobre o atendimento' },
+      },
+      required: ['nota'],
     },
   },
 ]
@@ -329,6 +349,42 @@ async function executeTool(supabase: any, conversation: any, name: string, input
         .from('whatsapp_conversations')
         .update({ status: 'escalated', needs_human: true, escalation_reason: input.motivo })
         .eq('id', conversation.id)
+
+      // Avisa você (ou quem estiver configurado) no WhatsApp, para não
+      // depender de ficar olhando o painel/o número de suporte o dia todo.
+      const adminPhone = Deno.env.get('SUPPORT_ADMIN_WHATSAPP')
+      if (adminPhone) {
+        try {
+          await sendText(
+            adminPhone,
+            `${conversation.phone} está precisando da sua ajuda!\nMotivo: ${input.motivo}`
+          )
+        } catch (err) {
+          console.error('Falha ao notificar admin sobre escalonamento:', err)
+        }
+      }
+
+      return { registrado: true }
+    }
+
+    case 'registrar_avaliacao': {
+      const nota = Number(input.nota)
+      if (!Number.isInteger(nota) || nota < 1 || nota > 5) {
+        return { erro: 'Nota inválida — precisa ser um número inteiro de 1 a 5.' }
+      }
+
+      await supabase.from('service_ratings').insert({
+        conversation_id: conversation.id,
+        phone: conversation.phone,
+        rating: nota,
+        comment: input.comentario ?? null,
+      })
+
+      await supabase
+        .from('whatsapp_conversations')
+        .update({ status: 'resolved', needs_human: false })
+        .eq('id', conversation.id)
+
       return { registrado: true }
     }
 

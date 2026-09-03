@@ -130,6 +130,7 @@ interface AppContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, name: string, customerType?: 'lojista_instalador' | 'distribuidor_representante' | 'usuario_final', whatsapp?: string, city?: string, state?: string) => Promise<{ error: Error | null }>;
+  loginWithGoogle: () => Promise<{ error: Error | null }>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
   logout: () => Promise<void>;
   
@@ -341,6 +342,25 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
         }
       });
       
+      return { error };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  };
+
+  const loginWithGoogle = async (): Promise<{ error: Error | null }> => {
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+        },
+      });
+      // Em sucesso o Supabase redireciona o navegador para o Google —
+      // não há o que fazer aqui além de propagar um eventual erro
+      // imediato (ex: provedor Google não habilitado no projeto).
       return { error };
     } catch (error) {
       return { error: error as Error };
@@ -1319,6 +1339,7 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
     profile,
     loading,
     signUp,
+    loginWithGoogle,
     resetPassword,
     fetchAllProfiles,
     updateUserRole,

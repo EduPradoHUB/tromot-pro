@@ -4,10 +4,11 @@ import { useApp } from '@/contexts/AppContext'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Loader2, MessageCircle, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react'
+import { Loader2, MessageCircle, AlertTriangle, ChevronDown, ChevronUp, Star } from 'lucide-react'
 
-// whatsapp_conversations / whatsapp_messages ainda não estão no types.ts
-// gerado (mesma observação de KnowledgeBase.tsx) — daqui vem o `as any`.
+// whatsapp_conversations / whatsapp_messages / service_ratings ainda não
+// estão no types.ts gerado (mesma observação de KnowledgeBase.tsx) — daqui
+// vem o `as any`.
 
 interface Conversation {
   id: string
@@ -29,12 +30,21 @@ interface Message {
   created_at: string
 }
 
+interface Rating {
+  id: string
+  conversation_id: string
+  rating: number
+  comment: string | null
+  created_at: string
+}
+
 export default function WhatsappConversations() {
   const { profile } = useApp()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState<string | null>(null)
   const [messages, setMessages] = useState<Record<string, Message[]>>({})
+  const [ratingsByConversation, setRatingsByConversation] = useState<Record<string, Rating[]>>({})
   const [onlyEscalated, setOnlyEscalated] = useState(false)
 
   useEffect(() => {
@@ -48,7 +58,26 @@ export default function WhatsappConversations() {
       .select('*')
       .order('last_message_at', { ascending: false })
       .limit(100)
-    setConversations(data ?? [])
+    const convs: Conversation[] = data ?? []
+    setConversations(convs)
+
+    if (convs.length > 0) {
+      const { data: ratingsData } = await (supabase as any)
+        .from('service_ratings')
+        .select('id, conversation_id, rating, comment, created_at')
+        .in('conversation_id', convs.map((c) => c.id))
+        .order('created_at', { ascending: false })
+
+      const grouped: Record<string, Rating[]> = {}
+      for (const r of (ratingsData ?? []) as Rating[]) {
+        if (!grouped[r.conversation_id]) grouped[r.conversation_id] = []
+        grouped[r.conversation_id].push(r)
+      }
+      setRatingsByConversation(grouped)
+    } else {
+      setRatingsByConversation({})
+    }
+
     setLoading(false)
   }
 
@@ -113,6 +142,12 @@ export default function WhatsappConversations() {
                       <Badge variant="destructive" className="gap-1"><AlertTriangle className="w-3 h-3" /> precisa de humano</Badge>
                     )}
                     {conv.city && <span className="text-xs text-muted-foreground">{conv.city}/{conv.state}</span>}
+                    {ratingsByConversation[conv.id]?.[0] && (
+                      <Badge variant="outline" className="gap-1">
+                        <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                        {ratingsByConversation[conv.id][0].rating}/5
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-xs text-muted-foreground">{conv.phone}</p>
                   {conv.escalation_reason && (
@@ -133,6 +168,25 @@ export default function WhatsappConversations() {
                     <Button size="sm" variant="outline" onClick={() => marcarResolvido(conv.id)}>
                       Marcar como resolvido
                     </Button>
+                  )}
+
+                  {(ratingsByConversation[conv.id] ?? []).length > 0 && (
+                    <div className="pt-2 border-t">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Histórico de avaliações</p>
+                      <div className="space-y-1">
+                        {ratingsByConversation[conv.id].map((r) => (
+                          <div key={r.id} className="text-xs flex items-center gap-2 flex-wrap">
+                            <span className="flex items-center gap-0.5 font-medium">
+                              <Star className="w-3 h-3 fill-amber-500 text-amber-500" /> {r.rating}/5
+                            </span>
+                            <span className="text-muted-foreground">
+                              {new Date(r.created_at).toLocaleDateString('pt-BR')}
+                            </span>
+                            {r.comment && <span className="text-muted-foreground italic">"{r.comment}"</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
               )}
