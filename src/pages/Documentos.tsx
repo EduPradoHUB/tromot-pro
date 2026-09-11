@@ -37,16 +37,26 @@ export default function Documentos() {
     return documents.filter((document) => `${document.title} ${document.description ?? ''} ${categoryLabel(document.category)}`.toLocaleLowerCase('pt-BR').includes(term))
   }, [documents, search])
 
-  async function accessDocument(document: TromotDocument, download: boolean) {
-    setOpeningId(document.id)
+  async function signUrl(document: TromotDocument, download: boolean) {
     const options = download ? { download: `${document.title}.${document.file_type || 'arquivo'}` } : undefined
-    const { data, error } = await supabase.storage.from('documentos').createSignedUrl(document.file_url, 60, options)
-    setOpeningId(null)
+    const { data, error } = await supabase.storage.from('documentos').createSignedUrl(document.file_url, 300, options)
     if (error || !data?.signedUrl) {
       toast({ title: 'Não foi possível abrir o arquivo', description: error?.message, variant: 'destructive' })
+      return null
+    }
+    return data.signedUrl
+  }
+
+  async function accessDocument(document: TromotDocument, download: boolean) {
+    setOpeningId(document.id)
+    const url = await signUrl(document, download)
+    setOpeningId(null)
+    if (!url) return
+    if (!download && isSpreadsheet(document)) {
+      setViewer({ document, url })
       return
     }
-    window.open(data.signedUrl, '_blank', 'noopener,noreferrer')
+    window.open(url, '_blank', 'noopener,noreferrer')
   }
 
   const prices = filtered.filter((document) => document.category === 'tabela_precos')
