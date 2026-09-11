@@ -155,72 +155,97 @@ export const Layout: React.FC<LayoutProps> = ({
   return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between bg-stone-50">
+        {/* Desktop Header: logo + user on top row, navigation wrapped below */}
+        <div className="container hidden md:flex flex-col py-2 gap-2 bg-stone-50">
+          <div className="flex items-center justify-between w-full">
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-2">
+              <img src="/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png" alt="Tromot Logo" className="h-10 w-auto object-contain" />
+              <span className="text-2xl font-bold text-primary">PRO</span>
+            </Link>
+
+            {/* User Menu */}
+            <div className="flex items-center space-x-4">
+              {profile ? <div className="flex items-center space-x-2">
+                  {/* User Avatar */}
+                  <div className="flex items-center space-x-2">
+                    {/* Simple Avatar Replacement */}
+                    <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium overflow-hidden">
+                      {profile.avatar_url ? (
+                        <img
+                          src={profile.avatar_url}
+                          alt={profile.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        profile.name.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <span className="hidden md:block text-sm font-medium">{profile.name}</span>
+                  </div>
+                  
+                  {/* Quick Actions */}
+                  <div className="hidden md:flex items-center space-x-1">
+                    {profile?.role === 'ADM' && <>
+                        <Button variant="ghost" size="sm" asChild>
+                          
+                        </Button>
+                      </>}
+                    {profile?.role === 'Técnico Tromot' && <Button variant="ghost" size="sm" asChild>
+                        <Link to="/tecnico">
+                          <Package className="h-4 w-4 mr-1" />
+                          Técnico
+                        </Link>
+                      </Button>}
+                    <Button variant="ghost" size="sm" asChild>
+                      
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={handleLogout}>
+                      <LogOut className="h-4 w-4 mr-1" />
+                      Sair
+                    </Button>
+                  </div>
+                </div> : <Button asChild>
+                  <Link to="/login">Entrar</Link>
+                </Button>}
+            </div>
+          </div>
+
+          {/* Desktop Navigation - wraps into 2 lines when needed */}
+          <nav className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 w-full">
+            {navigationItems.map(item => <Link key={item.path} to={item.path} className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition-colors ${isActive(item.path) ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}>
+                <item.icon className="h-4 w-4" />
+                <span>{item.name}</span>
+              </Link>)}
+          </nav>
+        </div>
+
+        {/* Mobile Header */}
+        <div className="container flex md:hidden h-16 items-center justify-between bg-stone-50">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <img src="/lovable-uploads/69f15a00-b5c3-4777-ae5b-5285cf57e763.png" alt="Tromot Logo" className="h-10 w-auto object-contain" />
             <span className="text-2xl font-bold text-primary">PRO</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {navigationItems.map(item => <Link key={item.path} to={item.path} className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive(item.path) ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}>
-                <item.icon className="h-4 w-4" />
-                <span>{item.name}</span>
-              </Link>)}
-          </nav>
-
-          {/* User Menu */}
-          <div className="flex items-center space-x-4">
-            {profile ? <div className="flex items-center space-x-2">
-                {/* User Avatar */}
-                <div className="flex items-center space-x-2">
-                  {/* Simple Avatar Replacement */}
-                  <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium overflow-hidden">
-                    {profile.avatar_url ? (
-                      <img
-                        src={profile.avatar_url}
-                        alt={profile.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      profile.name.charAt(0).toUpperCase()
-                    )}
-                  </div>
-                  <span className="hidden md:block text-sm font-medium">{profile.name}</span>
-                </div>
-                
-                {/* Quick Actions */}
-                <div className="hidden md:flex items-center space-x-1">
-                  {profile?.role === 'ADM' && <>
-                      <Button variant="ghost" size="sm" asChild>
-                        
-                      </Button>
-                    </>}
-                  {profile?.role === 'Técnico Tromot' && <Button variant="ghost" size="sm" asChild>
-                      <Link to="/tecnico">
-                        <Package className="h-4 w-4 mr-1" />
-                        Técnico
-                      </Link>
-                    </Button>}
-                  <Button variant="ghost" size="sm" asChild>
-                    
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={handleLogout}>
-                    <LogOut className="h-4 w-4 mr-1" />
-                    Sair
-                  </Button>
-                </div>
-              </div> : <Button asChild>
+          {/* Mobile Menu Button */}
+          <div className="flex items-center space-x-2">
+            {profile ? <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium overflow-hidden">
+                {profile.avatar_url ? (
+                  <img
+                    src={profile.avatar_url}
+                    alt={profile.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  profile.name.charAt(0).toUpperCase()
+                )}
+              </div> : <Button asChild size="sm">
                 <Link to="/login">Entrar</Link>
               </Button>}
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-                <Menu className="h-5 w-5" />
-              </Button>
-            </div>
+            <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+              <Menu className="h-5 w-5" />
+            </Button>
           </div>
         </div>
 
