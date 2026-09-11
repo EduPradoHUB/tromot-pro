@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import * as XLSX from 'xlsx'
 import { Download, Loader2, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -128,7 +128,7 @@ export default function TabelaDocumentoViewer({ fileUrl, onDownload }: TabelaDoc
           </thead>
           <tbody>
             {filteredGroups.map((group, groupIndex) => (
-              <>
+              <Fragment key={groupIndex}>
                 {group.category && (
                   <tr key={`cat-${groupIndex}`} className="bg-primary/10">
                     <th colSpan={model.columns.length} className="border-b px-3 py-2 text-left text-sm font-bold">{group.category}</th>
@@ -147,7 +147,7 @@ export default function TabelaDocumentoViewer({ fileUrl, onDownload }: TabelaDoc
                     })}
                   </tr>
                 ))}
-              </>
+              </Fragment>
             ))}
           </tbody>
         </table>
