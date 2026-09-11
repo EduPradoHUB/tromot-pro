@@ -159,7 +159,7 @@ export default function NovoPedido() {
       })
 
       toast({ title: 'Pedido enviado com sucesso!', description: 'Registrado no Bling.' })
-      navigate('/pedidos')
+      navigate('/meus-pedidos')
     } catch (err: any) {
       toast({ title: 'Erro ao enviar pedido', description: err.message, variant: 'destructive' })
     } finally {

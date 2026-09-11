@@ -5,7 +5,7 @@ import { useApp } from '@/contexts/AppContext';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
-  requireRoles?: Array<'ADM' | 'Técnico Tromot' | 'Suporte Tromot' | 'Cliente'>;
+  requireRoles?: Array<'ADM' | 'Técnico Tromot' | 'Suporte Tromot' | 'Cliente' | 'Vendedor'>;
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
