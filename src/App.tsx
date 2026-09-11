@@ -34,6 +34,8 @@ import KnowledgeBase from "./pages/KnowledgeBase";
 import WhatsappConversations from "./pages/WhatsappConversations";
 import ProductNotifications from "./pages/ProductNotifications";
 import Unsubscribe from "./pages/Unsubscribe";
+import NovoPedido from "./pages/NovoPedido";
+import MeusPedidos from "./pages/MeusPedidos";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +90,16 @@ function AppContent() {
         <Route path="/usuarios" element={
           <ProtectedRoute requireAdmin>
             <Layout><Users /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/novo-pedido" element={
+          <ProtectedRoute requireRoles={['ADM', 'Vendedor']}>
+            <Layout><NovoPedido /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/meus-pedidos" element={
+          <ProtectedRoute requireRoles={['ADM', 'Vendedor']}>
+            <Layout><MeusPedidos /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/termos" element={<Layout><Terms /></Layout>} />

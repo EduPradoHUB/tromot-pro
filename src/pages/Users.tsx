@@ -35,7 +35,7 @@ export default function Users() {
     }
   };
 
-  const handleRoleChange = async (userId: string, newRole: 'ADM' | 'Técnico Tromot' | 'Cliente') => {
+  const handleRoleChange = async (userId: string, newRole: 'ADM' | 'Técnico Tromot' | 'Cliente' | 'Suporte Tromot' | 'Vendedor') => {
     try {
       await updateUserRole(userId, newRole);
       
@@ -266,10 +266,11 @@ export default function Users() {
                     <div className="relative">
                       <select
                         value={profile.role}
-                        onChange={(e) => handleRoleChange(profile.user_id, e.target.value as 'ADM' | 'Técnico Tromot' | 'Cliente')}
+                        onChange={(e) => handleRoleChange(profile.user_id, e.target.value as 'ADM' | 'Técnico Tromot' | 'Cliente' | 'Suporte Tromot' | 'Vendedor')}
                         className="w-[180px] h-10 px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                       >
                         <option value="Cliente">Cliente</option>
+                        <option value="Vendedor">Vendedor</option>
                         <option value="Técnico Tromot">Técnico Tromot</option>
                         <option value="ADM">ADM</option>
                       </select>
