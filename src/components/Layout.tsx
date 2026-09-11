@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Search, Package, User, LogOut, Menu, BarChart3, Smartphone, BrainCircuit, MessageCircle, Mail, ShoppingCart, ClipboardList } from 'lucide-react';
+import { Home, Search, Package, User, LogOut, Menu, BarChart3, Smartphone, BrainCircuit, MessageCircle, Mail, ShoppingCart, ClipboardList, FolderOpen, Files } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 // Temporarily disable Avatar to fix React hooks conflicts  
 // import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -115,6 +115,10 @@ export const Layout: React.FC<LayoutProps> = ({
     name: 'Notificações',
     path: '/admin/notificacoes-produto',
     icon: Mail
+  }, {
+    name: 'Gerenciar Documentos',
+    path: '/admin/documentos',
+    icon: Files
   }] : profile?.role === 'Técnico Tromot' ? [{
     name: 'Dashboard',
     path: '/dashboard',
@@ -131,6 +135,10 @@ export const Layout: React.FC<LayoutProps> = ({
     name: 'Notificações',
     path: '/admin/notificacoes-produto',
     icon: Mail
+  }, {
+    name: 'Gerenciar Documentos',
+    path: '/admin/documentos',
+    icon: Files
   }] : []), ...(profile?.role === 'ADM' || profile?.role === 'Vendedor' ? [{
     name: 'Novo Pedido',
     path: '/novo-pedido',
@@ -139,6 +147,10 @@ export const Layout: React.FC<LayoutProps> = ({
     name: 'Meus Pedidos',
     path: '/meus-pedidos',
     icon: ClipboardList
+  }] : []), ...(['ADM', 'Técnico Tromot', 'Vendedor'].includes(profile?.role ?? '') ? [{
+    name: 'Documentos',
+    path: '/documentos',
+    icon: FolderOpen
   }] : [])];
   return <div className="min-h-screen bg-background">
       {/* Header */}

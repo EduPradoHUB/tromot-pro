@@ -36,6 +36,8 @@ import ProductNotifications from "./pages/ProductNotifications";
 import Unsubscribe from "./pages/Unsubscribe";
 import NovoPedido from "./pages/NovoPedido";
 import MeusPedidos from "./pages/MeusPedidos";
+import AdminDocumentos from "./pages/AdminDocumentos";
+import Documentos from "./pages/Documentos";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +102,16 @@ function AppContent() {
         <Route path="/meus-pedidos" element={
           <ProtectedRoute requireRoles={['ADM', 'Vendedor']}>
             <Layout><MeusPedidos /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/documentos" element={
+          <ProtectedRoute requireRoles={['ADM', 'Técnico Tromot', 'Vendedor']}>
+            <Layout><Documentos /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/documentos" element={
+          <ProtectedRoute requireRoles={['ADM', 'Técnico Tromot']}>
+            <Layout><AdminDocumentos /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/termos" element={<Layout><Terms /></Layout>} />
