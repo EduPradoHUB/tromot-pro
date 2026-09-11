@@ -147,7 +147,7 @@ export const Layout: React.FC<LayoutProps> = ({
     name: 'Meus Pedidos',
     path: '/meus-pedidos',
     icon: ClipboardList
-  }] : []), ...(['ADM', 'Técnico Tromot', 'Vendedor'].includes(profile?.role ?? '') ? [{
+  }] : []), ...(['ADM', 'Vendedor'].includes(profile?.role ?? '') ? [{
     name: 'Documentos',
     path: '/documentos',
     icon: FolderOpen
