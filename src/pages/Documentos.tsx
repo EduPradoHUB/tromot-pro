@@ -1,12 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Download, ExternalLink, Loader2, Search, Star } from 'lucide-react'
+import { Download, ExternalLink, Loader2, Search, Star, Table2 } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import TabelaDocumentoViewer from '@/components/TabelaDocumentoViewer'
 import { categoryLabel, documentCategories, documentIcon, type TromotDocument } from '@/lib/documents'
+
+const spreadsheetTypes = ['xlsx', 'xls', 'csv']
+const isSpreadsheet = (document: TromotDocument) => spreadsheetTypes.includes((document.file_type || '').toLowerCase())
 
 export default function Documentos() {
   const { toast } = useToast()
@@ -14,6 +19,7 @@ export default function Documentos() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [openingId, setOpeningId] = useState<string | null>(null)
+  const [viewer, setViewer] = useState<{ document: TromotDocument; url: string } | null>(null)
 
   useEffect(() => {
     async function loadDocuments() {
