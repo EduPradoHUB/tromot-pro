@@ -101,6 +101,13 @@ export default function Documentos() {
           {!filtered.length && search && <div className="py-10 text-center text-muted-foreground">Nenhum documento encontrado para “{search}”.</div>}
         </>
       )}
+
+      <Dialog open={!!viewer} onOpenChange={(open) => { if (!open) setViewer(null) }}>
+        <DialogContent className="flex h-[92vh] w-[calc(100%-1rem)] max-w-6xl flex-col gap-4 overflow-hidden p-4 sm:p-6">
+          <DialogHeader className="shrink-0 text-left"><DialogTitle className="pr-8 text-base sm:text-lg">{viewer?.document.title}</DialogTitle></DialogHeader>
+          {viewer && <TabelaDocumentoViewer fileUrl={viewer.url} onDownload={() => void accessDocument(viewer.document, true)} />}
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }
