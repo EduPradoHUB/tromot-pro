@@ -73,7 +73,7 @@ export default function Documentos() {
           </div>
           {document.description && <p className="text-sm text-muted-foreground">{document.description}</p>}
           <div className="mt-auto flex flex-wrap gap-2">
-            <Button size="sm" className="gap-2" disabled={openingId === document.id} onClick={() => void accessDocument(document, false)}>{openingId === document.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}Abrir</Button>
+            <Button size="sm" className="gap-2" disabled={openingId === document.id} onClick={() => void accessDocument(document, false)}>{openingId === document.id ? <Loader2 className="h-4 w-4 animate-spin" /> : isSpreadsheet(document) ? <Table2 className="h-4 w-4" /> : <ExternalLink className="h-4 w-4" />}{isSpreadsheet(document) ? 'Ver tabela' : 'Abrir'}</Button>
             <Button size="sm" variant="outline" className="gap-2" disabled={openingId === document.id} onClick={() => void accessDocument(document, true)}><Download className="h-4 w-4" />Baixar</Button>
           </div>
         </CardContent>
