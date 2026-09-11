@@ -1160,7 +1160,12 @@ export type Database = {
         | "lojista_instalador"
         | "distribuidor_representante"
         | "usuario_final"
-      user_role: "ADM" | "Técnico Tromot" | "Cliente" | "Suporte Tromot"
+      user_role:
+        | "ADM"
+        | "Técnico Tromot"
+        | "Cliente"
+        | "Suporte Tromot"
+        | "Vendedor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1294,7 +1299,13 @@ export const Constants = {
         "distribuidor_representante",
         "usuario_final",
       ],
-      user_role: ["ADM", "Técnico Tromot", "Cliente", "Suporte Tromot"],
+      user_role: [
+        "ADM",
+        "Técnico Tromot",
+        "Cliente",
+        "Suporte Tromot",
+        "Vendedor",
+      ],
     },
   },
 } as const
