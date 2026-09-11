@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   phone?: string;
-  role: 'ADM' | 'Técnico Tromot' | 'Cliente';
+  role: 'ADM' | 'Técnico Tromot' | 'Cliente' | 'Suporte Tromot' | 'Vendedor';
   avatar?: string;
 }
 

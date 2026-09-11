@@ -28,7 +28,7 @@ interface LegacyUser {
   name: string;
   email: string;
   phone?: string;
-  role: 'ADM' | 'Técnico Tromot' | 'Cliente' | 'Suporte Tromot';
+  role: 'ADM' | 'Técnico Tromot' | 'Cliente' | 'Suporte Tromot' | 'Vendedor';
   avatar?: string;
 }
 
@@ -136,7 +136,7 @@ interface AppContextType {
   
   // User management (admin only)
   fetchAllProfiles: () => Promise<Profile[]>;
-  updateUserRole: (userId: string, role: 'ADM' | 'Técnico Tromot' | 'Cliente') => Promise<void>;
+  updateUserRole: (userId: string, role: 'ADM' | 'Técnico Tromot' | 'Cliente' | 'Suporte Tromot' | 'Vendedor') => Promise<void>;
   
   // Legacy Auth (for backward compatibility)
   currentUser: LegacyUser | null;
@@ -397,10 +397,10 @@ export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
     return data || [];
   };
 
-  const updateUserRole = async (userId: string, role: 'ADM' | 'Técnico Tromot' | 'Cliente'): Promise<void> => {
+  const updateUserRole = async (userId: string, role: 'ADM' | 'Técnico Tromot' | 'Cliente' | 'Suporte Tromot' | 'Vendedor'): Promise<void> => {
     const { error } = await supabase
       .from('profiles')
-      .update({ role })
+      .update({ role } as any)
       .eq('user_id', userId);
     
     if (error) throw error;
