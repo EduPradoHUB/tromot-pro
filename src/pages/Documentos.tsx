@@ -1,12 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Download, ExternalLink, Loader2, Search, Star } from 'lucide-react'
+import { Download, ExternalLink, Loader2, Search, Star, Table2 } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import TabelaDocumentoViewer from '@/components/TabelaDocumentoViewer'
 import { categoryLabel, documentCategories, documentIcon, type TromotDocument } from '@/lib/documents'
+
+const spreadsheetTypes = ['xlsx', 'xls', 'csv']
+const isSpreadsheet = (document: TromotDocument) => spreadsheetTypes.includes((document.file_type || '').toLowerCase())
 
 export default function Documentos() {
   const { toast } = useToast()
@@ -14,6 +19,7 @@ export default function Documentos() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [openingId, setOpeningId] = useState<string | null>(null)
+  const [viewer, setViewer] = useState<{ document: TromotDocument; url: string } | null>(null)
 
   useEffect(() => {
     async function loadDocuments() {
@@ -31,16 +37,26 @@ export default function Documentos() {
     return documents.filter((document) => `${document.title} ${document.description ?? ''} ${categoryLabel(document.category)}`.toLocaleLowerCase('pt-BR').includes(term))
   }, [documents, search])
 
-  async function accessDocument(document: TromotDocument, download: boolean) {
-    setOpeningId(document.id)
+  async function signUrl(document: TromotDocument, download: boolean) {
     const options = download ? { download: `${document.title}.${document.file_type || 'arquivo'}` } : undefined
-    const { data, error } = await supabase.storage.from('documentos').createSignedUrl(document.file_url, 60, options)
-    setOpeningId(null)
+    const { data, error } = await supabase.storage.from('documentos').createSignedUrl(document.file_url, 300, options)
     if (error || !data?.signedUrl) {
       toast({ title: 'Não foi possível abrir o arquivo', description: error?.message, variant: 'destructive' })
+      return null
+    }
+    return data.signedUrl
+  }
+
+  async function accessDocument(document: TromotDocument, download: boolean) {
+    setOpeningId(document.id)
+    const url = await signUrl(document, download)
+    setOpeningId(null)
+    if (!url) return
+    if (!download && isSpreadsheet(document)) {
+      setViewer({ document, url })
       return
     }
-    window.open(data.signedUrl, '_blank', 'noopener,noreferrer')
+    window.open(url, '_blank', 'noopener,noreferrer')
   }
 
   const prices = filtered.filter((document) => document.category === 'tabela_precos')
@@ -57,7 +73,7 @@ export default function Documentos() {
           </div>
           {document.description && <p className="text-sm text-muted-foreground">{document.description}</p>}
           <div className="mt-auto flex flex-wrap gap-2">
-            <Button size="sm" className="gap-2" disabled={openingId === document.id} onClick={() => void accessDocument(document, false)}>{openingId === document.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}Abrir</Button>
+            <Button size="sm" className="gap-2" disabled={openingId === document.id} onClick={() => void accessDocument(document, false)}>{openingId === document.id ? <Loader2 className="h-4 w-4 animate-spin" /> : isSpreadsheet(document) ? <Table2 className="h-4 w-4" /> : <ExternalLink className="h-4 w-4" />}{isSpreadsheet(document) ? 'Ver tabela' : 'Abrir'}</Button>
             <Button size="sm" variant="outline" className="gap-2" disabled={openingId === document.id} onClick={() => void accessDocument(document, true)}><Download className="h-4 w-4" />Baixar</Button>
           </div>
         </CardContent>
@@ -85,6 +101,13 @@ export default function Documentos() {
           {!filtered.length && search && <div className="py-10 text-center text-muted-foreground">Nenhum documento encontrado para “{search}”.</div>}
         </>
       )}
+
+      <Dialog open={!!viewer} onOpenChange={(open) => { if (!open) setViewer(null) }}>
+        <DialogContent className="flex h-[92vh] w-[calc(100%-1rem)] max-w-6xl flex-col gap-4 overflow-hidden p-4 sm:p-6">
+          <DialogHeader className="shrink-0 text-left"><DialogTitle className="pr-8 text-base sm:text-lg">{viewer?.document.title}</DialogTitle></DialogHeader>
+          {viewer && <TabelaDocumentoViewer fileUrl={viewer.url} onDownload={() => void accessDocument(viewer.document, true)} />}
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }
