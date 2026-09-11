@@ -244,6 +244,33 @@ export type Database = {
         }
         Relationships: []
       }
+      bling_tokens: {
+        Row: {
+          access_token: string | null
+          created_at: string
+          expires_at: string | null
+          id: number
+          refresh_token: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id: number
+          refresh_token?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: number
+          refresh_token?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           active: boolean
@@ -267,6 +294,57 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      clientes: {
+        Row: {
+          bling_id: number
+          cep: string | null
+          cidade: string | null
+          created_at: string
+          documento: string | null
+          email: string | null
+          endereco: string | null
+          id: string
+          nome: string
+          situacao: string | null
+          synced_at: string | null
+          telefone: string | null
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          bling_id: number
+          cep?: string | null
+          cidade?: string | null
+          created_at?: string
+          documento?: string | null
+          email?: string | null
+          endereco?: string | null
+          id?: string
+          nome: string
+          situacao?: string | null
+          synced_at?: string | null
+          telefone?: string | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bling_id?: number
+          cep?: string | null
+          cidade?: string | null
+          created_at?: string
+          documento?: string | null
+          email?: string | null
+          endereco?: string | null
+          id?: string
+          nome?: string
+          situacao?: string | null
+          synced_at?: string | null
+          telefone?: string | null
+          uf?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -489,6 +567,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pedidos: {
+        Row: {
+          bling_id: number | null
+          cliente_bling_id: number | null
+          cliente_nome: string | null
+          comissao: number
+          created_at: string
+          id: string
+          itens_json: Json | null
+          observacoes: string | null
+          status: string
+          updated_at: string
+          valor_total: number
+          vendedor_id: string
+        }
+        Insert: {
+          bling_id?: number | null
+          cliente_bling_id?: number | null
+          cliente_nome?: string | null
+          comissao?: number
+          created_at?: string
+          id?: string
+          itens_json?: Json | null
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+          valor_total?: number
+          vendedor_id?: string
+        }
+        Update: {
+          bling_id?: number | null
+          cliente_bling_id?: number | null
+          cliente_nome?: string | null
+          comissao?: number
+          created_at?: string
+          id?: string
+          itens_json?: Json | null
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+          valor_total?: number
+          vendedor_id?: string
+        }
+        Relationships: []
       }
       post_likes: {
         Row: {
