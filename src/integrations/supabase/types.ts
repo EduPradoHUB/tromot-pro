@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -123,6 +123,94 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      app_chat_conversations: {
+        Row: {
+          city: string | null
+          contact_info: string | null
+          created_at: string
+          distributor_id: string | null
+          escalation_reason: string | null
+          id: string
+          last_message_at: string
+          needs_human: boolean
+          session_id: string
+          state: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          city?: string | null
+          contact_info?: string | null
+          created_at?: string
+          distributor_id?: string | null
+          escalation_reason?: string | null
+          id?: string
+          last_message_at?: string
+          needs_human?: boolean
+          session_id: string
+          state?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          city?: string | null
+          contact_info?: string | null
+          created_at?: string
+          distributor_id?: string | null
+          escalation_reason?: string | null
+          id?: string
+          last_message_at?: string
+          needs_human?: boolean
+          session_id?: string
+          state?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_chat_conversations_distributor_id_fkey"
+            columns: ["distributor_id"]
+            isOneToOne: false
+            referencedRelation: "distributors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_chat_messages: {
+        Row: {
+          content: string | null
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          content?: string | null
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+        }
+        Update: {
+          content?: string | null
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "app_chat_conversations"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -282,6 +370,30 @@ export type Database = {
         }
         Relationships: []
       }
+      email_notification_settings: {
+        Row: {
+          id: boolean
+          manual_atualizado_modo: string
+          novo_produto_modo: string
+          produto_alterado_modo: string
+          updated_at: string
+        }
+        Insert: {
+          id?: boolean
+          manual_atualizado_modo?: string
+          novo_produto_modo?: string
+          produto_alterado_modo?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: boolean
+          manual_atualizado_modo?: string
+          novo_produto_modo?: string
+          produto_alterado_modo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       instalacao_sucesso: {
         Row: {
           created_at: string | null
@@ -314,6 +426,69 @@ export type Database = {
           veiculo_modelo?: string | null
         }
         Relationships: []
+      }
+      knowledge_base: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          embedding: string | null
+          id: string
+          image_url: string | null
+          product_id: string | null
+          situation: string
+          solution: string
+          status: Database["public"]["Enums"]["content_status"]
+          title: string
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          embedding?: string | null
+          id?: string
+          image_url?: string | null
+          product_id?: string | null
+          situation: string
+          solution: string
+          status?: Database["public"]["Enums"]["content_status"]
+          title: string
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          embedding?: string | null
+          id?: string
+          image_url?: string | null
+          product_id?: string | null
+          situation?: string
+          solution?: string
+          status?: Database["public"]["Enums"]["content_status"]
+          title?: string
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_base_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_base_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       post_likes: {
         Row: {
@@ -408,6 +583,44 @@ export type Database = {
           },
         ]
       }
+      product_notifications: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          product_id: string
+          recipients_count: number | null
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          product_id: string
+          recipients_count?: number | null
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          product_id?: string
+          recipients_count?: number | null
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_notifications_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           barcode_ean: string | null
@@ -426,6 +639,7 @@ export type Database = {
           rating_average: number | null
           rating_count: number | null
           status: Database["public"]["Enums"]["content_status"] | null
+          store_url: string | null
           updated_at: string
           video_url: string | null
         }
@@ -446,6 +660,7 @@ export type Database = {
           rating_average?: number | null
           rating_count?: number | null
           status?: Database["public"]["Enums"]["content_status"] | null
+          store_url?: string | null
           updated_at?: string
           video_url?: string | null
         }
@@ -466,6 +681,7 @@ export type Database = {
           rating_average?: number | null
           rating_count?: number | null
           status?: Database["public"]["Enums"]["content_status"] | null
+          store_url?: string | null
           updated_at?: string
           video_url?: string | null
         }
@@ -478,11 +694,13 @@ export type Database = {
           created_at: string
           customer_type: Database["public"]["Enums"]["customer_type"] | null
           email: string
+          email_notifications_opt_in: boolean
           id: string
           name: string
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
           state: string | null
+          unsubscribe_token: string
           updated_at: string
           user_id: string
           whatsapp: string | null
@@ -493,11 +711,13 @@ export type Database = {
           created_at?: string
           customer_type?: Database["public"]["Enums"]["customer_type"] | null
           email: string
+          email_notifications_opt_in?: boolean
           id?: string
           name: string
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           state?: string | null
+          unsubscribe_token?: string
           updated_at?: string
           user_id: string
           whatsapp?: string | null
@@ -508,11 +728,13 @@ export type Database = {
           created_at?: string
           customer_type?: Database["public"]["Enums"]["customer_type"] | null
           email?: string
+          email_notifications_opt_in?: boolean
           id?: string
           name?: string
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           state?: string | null
+          unsubscribe_token?: string
           updated_at?: string
           user_id?: string
           whatsapp?: string | null
@@ -652,6 +874,41 @@ export type Database = {
         }
         Relationships: []
       }
+      service_ratings: {
+        Row: {
+          comment: string | null
+          conversation_id: string
+          created_at: string
+          id: string
+          phone: string
+          rating: number
+        }
+        Insert: {
+          comment?: string | null
+          conversation_id: string
+          created_at?: string
+          id?: string
+          phone: string
+          rating: number
+        }
+        Update: {
+          comment?: string | null
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          phone?: string
+          rating?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_ratings_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           brand: string
@@ -675,6 +932,103 @@ export type Database = {
           years?: string[]
         }
         Relationships: []
+      }
+      whatsapp_conversations: {
+        Row: {
+          city: string | null
+          created_at: string
+          customer_name: string | null
+          customer_type: Database["public"]["Enums"]["customer_type"] | null
+          distributor_id: string | null
+          escalation_reason: string | null
+          id: string
+          last_message_at: string
+          needs_human: boolean
+          phone: string
+          state: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          customer_name?: string | null
+          customer_type?: Database["public"]["Enums"]["customer_type"] | null
+          distributor_id?: string | null
+          escalation_reason?: string | null
+          id?: string
+          last_message_at?: string
+          needs_human?: boolean
+          phone: string
+          state?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          customer_name?: string | null
+          customer_type?: Database["public"]["Enums"]["customer_type"] | null
+          distributor_id?: string | null
+          escalation_reason?: string | null
+          id?: string
+          last_message_at?: string
+          needs_human?: boolean
+          phone?: string
+          state?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_conversations_distributor_id_fkey"
+            columns: ["distributor_id"]
+            isOneToOne: false
+            referencedRelation: "distributors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_messages: {
+        Row: {
+          content: string | null
+          conversation_id: string
+          created_at: string
+          id: string
+          media_type: string | null
+          media_url: string | null
+          role: string
+          tool_name: string | null
+        }
+        Insert: {
+          content?: string | null
+          conversation_id: string
+          created_at?: string
+          id?: string
+          media_type?: string | null
+          media_url?: string | null
+          role: string
+          tool_name?: string | null
+        }
+        Update: {
+          content?: string | null
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          media_type?: string | null
+          media_url?: string | null
+          role?: string
+          tool_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -743,6 +1097,23 @@ export type Database = {
         Args: { phone_input: string; whatsapp_input: string }
         Returns: Json
       }
+      match_knowledge_base: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          category: string
+          id: string
+          image_url: string
+          product_id: string
+          similarity: number
+          situation: string
+          solution: string
+          title: string
+        }[]
+      }
       recalc_product_rating: {
         Args: { p_product_id: string }
         Returns: undefined
@@ -805,12 +1176,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -834,11 +1205,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -859,11 +1230,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -884,11 +1255,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -901,11 +1272,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
