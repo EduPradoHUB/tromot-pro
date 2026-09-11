@@ -81,7 +81,7 @@ export function SupportChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="fixed bottom-[26px] right-4 z-50">
       {isOpen ? (
         <Card className="w-[calc(100vw-2rem)] max-w-sm h-[70vh] max-h-[520px] flex flex-col shadow-xl">
           <div className="flex items-center justify-between px-4 py-3 border-b bg-tromot-red text-white rounded-t-lg">
