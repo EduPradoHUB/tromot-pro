@@ -105,12 +105,12 @@ function AppContent() {
           </ProtectedRoute>
         } />
         <Route path="/documentos" element={
-          <ProtectedRoute requireRoles={['ADM', 'Técnico Tromot', 'Vendedor']}>
+          <ProtectedRoute requireRoles={['ADM', 'Vendedor']}>
             <Layout><Documentos /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/admin/documentos" element={
-          <ProtectedRoute requireRoles={['ADM', 'Técnico Tromot']}>
+          <ProtectedRoute requireRoles={['ADM']}>
             <Layout><AdminDocumentos /></Layout>
           </ProtectedRoute>
         } />
