@@ -21,7 +21,7 @@ import { PostModeration } from '@/components/PostModeration';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/CustomDialog';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { uploadFixedProductImage, withImageVersion } from '@/lib/productImage';
+import { uploadProductImageSet, withImageVersion, isFixedImageUrl, standardizeExternalImage } from '@/lib/productImage';
 
 export default function AdminDashboard() {
   const { 
@@ -506,7 +506,20 @@ export default function AdminDashboard() {
     }
 
     try {
-      await createProduct(buildProductPayload());
+      const payload = buildProductPayload();
+      // URL externa colada: tenta converter para o link fixo antes de salvar
+      if (payload.image_url && /^https?:\/\//.test(payload.image_url) && !isFixedImageUrl(payload.image_url) && productForm.code?.trim()) {
+        try {
+          payload.image_url = await standardizeExternalImage(payload.image_url, productForm.code);
+          payload.image_updated_at = new Date().toISOString();
+        } catch {
+          toast({
+            title: "Imagem externa mantida",
+            description: "Não foi possível padronizar essa imagem. Envie o arquivo pelo botão de upload."
+          });
+        }
+      }
+      await createProduct(payload);
       
       setProductForm(defaultProductForm);
       
@@ -742,7 +755,20 @@ export default function AdminDashboard() {
     }
 
     try {
-      await updateProduct(productId, buildProductPayload());
+      const payload = buildProductPayload();
+      // URL externa colada: tenta converter para o link fixo antes de salvar
+      if (payload.image_url && /^https?:\/\//.test(payload.image_url) && !isFixedImageUrl(payload.image_url) && productForm.code?.trim()) {
+        try {
+          payload.image_url = await standardizeExternalImage(payload.image_url, productForm.code);
+          payload.image_updated_at = new Date().toISOString();
+        } catch {
+          toast({
+            title: "Imagem externa mantida",
+            description: "Não foi possível padronizar essa imagem. Envie o arquivo pelo botão de upload."
+          });
+        }
+      }
+      await updateProduct(productId, payload);
       
       setProductForm(defaultProductForm);
       
@@ -982,7 +1008,7 @@ export default function AdminDashboard() {
                         if (file) {
                           setUploadingFile(true);
                           try {
-                            const url = await uploadFixedProductImage(file, productForm.code);
+                            const url = await uploadProductImageSet(file, productForm.code);
                             setProductForm(prev => ({...prev, image_url: url}));
                             setImageVersion(new Date().toISOString());
                             toast({ title: "Imagem substituída. O link continua o mesmo." });

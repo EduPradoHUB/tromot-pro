@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
 import { useSavedProducts } from '@/hooks/useSavedProducts';
 import { SaveProductButton } from '@/components/SaveProductButton';
+import { ProductImage } from '@/components/ProductImage';
 
 export default function Saved() {
   const { legacyProducts: products } = useApp();
@@ -46,8 +47,8 @@ export default function Saved() {
             <Card key={product.id} className="shadow-card hover:shadow-lg transition-shadow">
               <CardContent className="p-0">
                 <div className="relative overflow-hidden aspect-[4/3] rounded-t-2xl">
-                  <img
-                    src={product.image_url || '/src/assets/photo-unavailable.png'}
+                  <ProductImage
+                    src={product.image_url}
                     alt={product.name}
                     className="w-full h-full object-contain bg-muted/30"
                   />

@@ -17,6 +17,7 @@ import {
 import { useApp } from '@/contexts/AppContext';
 import { categories, brands } from '@/lib/data';
 import { PWAInstallButtonSimple } from '@/components/PWAInstallButtonSimple';
+import { ProductImage } from '@/components/ProductImage';
 import { supabase } from '@/integrations/supabase/client';
 import { SaveProductButton } from '@/components/SaveProductButton';
 
@@ -337,8 +338,8 @@ export default function Catalog() {
                       ? 'w-48 h-36 flex-shrink-0'
                       : 'aspect-[4/3] rounded-t-2xl'
                   }`}>
-                    <img
-                      src={product.image_url || '/src/assets/photo-unavailable.png'}
+                    <ProductImage
+                      src={product.image_url}
                       alt={product.name}
                       className="w-full h-full object-contain bg-muted/30"
                     />
