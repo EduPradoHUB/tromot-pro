@@ -872,7 +872,7 @@ export default function AdminDashboard() {
             <h2 className="text-2xl font-semibold">Produtos</h2>
             
             <div className="flex flex-wrap gap-2">
-            {profile?.role === 'ADM' && <StandardizeImageLinks />}
+            <StandardizeImageLinks />
             <Button onClick={() => {
               setEditingProduct(null);
               setEditingProductId(null);
