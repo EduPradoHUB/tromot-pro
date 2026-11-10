@@ -20,6 +20,7 @@ import { PostModeration } from '@/components/PostModeration';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/CustomDialog';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+import { uploadFixedProductImage, withImageVersion } from '@/lib/productImage';
 
 export default function AdminDashboard() {
   const { 
@@ -333,6 +334,8 @@ export default function AdminDashboard() {
       </div>
     );
   }
+
+  const [imageVersion, setImageVersion] = useState<string | null>(null);
 
   const handleFileUpload = async (file: File, bucket: string) => {
     setUploadingFile(true);
@@ -956,17 +959,48 @@ export default function AdminDashboard() {
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
+                          setUploadingFile(true);
                           try {
-                            const url = await handleFileUpload(file, 'product-images');
+                            const url = await uploadFixedProductImage(file, productForm.code);
                             setProductForm(prev => ({...prev, image_url: url}));
-                          } catch (error) {
+                            setImageVersion(new Date().toISOString());
+                            toast({ title: "Imagem substituída. O link continua o mesmo." });
+                          } catch (error: any) {
                             console.error('Erro no upload:', error);
+                            toast({ title: "Erro no upload", description: error?.message || "Falha ao enviar imagem.", variant: "destructive" });
+                          } finally {
+                            setUploadingFile(false);
+                            e.target.value = '';
                           }
                         }
                       }}
                       disabled={uploadingFile}
                     />
                     {uploadingFile && <p className="text-sm text-muted-foreground mt-1">Enviando arquivo...</p>}
+                    {productForm.image_url && (
+                      <div className="mt-2 flex items-center gap-3">
+                        <img
+                          src={withImageVersion(productForm.image_url, imageVersion)}
+                          alt="Prévia"
+                          className="h-16 w-16 rounded-md object-cover border"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground truncate" title={productForm.image_url}>{productForm.image_url}</p>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="mt-1"
+                            onClick={async () => {
+                              await navigator.clipboard.writeText(productForm.image_url);
+                              toast({ title: "Link copiado" });
+                            }}
+                          >
+                            Copiar link
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   
                   <div>
