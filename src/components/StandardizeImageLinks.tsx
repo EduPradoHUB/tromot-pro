@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Link2, Download, Loader2 } from 'lucide-react';
 import { normalizeProductCode, convertToJpeg } from '@/lib/productImage';
 
@@ -97,5 +97,6 @@ export const StandardizeImageLinks = ({ onDone }: { onDone?: () => void }) => {
         </Button>
       </DialogContent>
     </Dialog>
+    </>
   );
 };
