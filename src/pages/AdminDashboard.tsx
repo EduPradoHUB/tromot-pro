@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { BulkProductUpload } from '@/components/BulkProductUpload';
 import { BulkDistributorUpload } from '@/components/BulkDistributorUpload';
+import { StandardizeImageLinks } from '@/components/StandardizeImageLinks';
 import { PostModeration } from '@/components/PostModeration';
 
 // Replaced Dialog imports with custom implementation to avoid React hooks conflicts
@@ -870,6 +871,8 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Produtos</h2>
             
+            <div className="flex flex-wrap gap-2">
+            {profile?.role === 'ADM' && <StandardizeImageLinks />}
             <Button onClick={() => {
               setEditingProduct(null);
               setEditingProductId(null);
@@ -880,6 +883,7 @@ export default function AdminDashboard() {
               <Plus className="w-4 h-4 mr-2" />
               Novo Produto
             </Button>
+            </div>
           </div>
           
           {/* Product Dialog */}
