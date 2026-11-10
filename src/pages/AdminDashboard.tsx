@@ -22,6 +22,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { uploadProductImageSet, withImageVersion, isFixedImageUrl, standardizeExternalImage } from '@/lib/productImage';
+import { normalizeSearchTerm } from '@/lib/search';
 
 export default function AdminDashboard() {
   const { 
@@ -240,9 +241,10 @@ export default function AdminDashboard() {
   // Função para filtrar produtos
   const filteredProducts = products.filter(product => {
     // Busca por nome ou código
-    const matchesSearch = searchTerm === '' || 
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.code.toLowerCase().includes(searchTerm.toLowerCase());
+    const term = normalizeSearchTerm(searchTerm);
+    const matchesSearch = term === '' || 
+      product.name.toLowerCase().includes(term) ||
+      product.code.toLowerCase().includes(term);
     
     // Filtros
     const matchesFilters = 

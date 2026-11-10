@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/custom-sheet';
 import { useApp } from '@/contexts/AppContext';
 import { categories, brands } from '@/lib/data';
+import { normalizeSearchTerm } from '@/lib/search';
 import { BarcodeScannerDialog } from '@/components/BarcodeScannerDialog';
 import { ProductImage } from '@/components/ProductImage';
 import { toast } from '@/hooks/use-toast';
@@ -55,11 +56,12 @@ export default function PublicCatalog() {
     let filtered = products;
 
     // Text search
-    if (localSearch) {
+    const term = normalizeSearchTerm(localSearch);
+    if (term) {
       filtered = filtered.filter(p =>
-        p.name.toLowerCase().includes(localSearch.toLowerCase()) ||
-        p.code.toLowerCase().includes(localSearch.toLowerCase()) ||
-        p.description.toLowerCase().includes(localSearch.toLowerCase())
+        p.name.toLowerCase().includes(term) ||
+        p.code.toLowerCase().includes(term) ||
+        p.description.toLowerCase().includes(term)
       );
     }
 
