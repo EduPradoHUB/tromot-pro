@@ -54,6 +54,15 @@ serve(async (req) => {
       })
     }
 
+    // Padronização em massa de imagens: o app marca image_standardize_batch=true
+    // na mesma atualização do image_url. Nesse caso, ignorar o evento e NÃO
+    // enviar e-mail aos clientes. Troca individual de imagem continua notificando.
+    if (record.image_standardize_batch === true) {
+      return new Response(JSON.stringify({ ignored: true, reason: 'padronização em massa de imagens' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
     let eventType: 'novo_produto' | 'manual_atualizado' | 'produto_alterado' | null = null
 
     if (type === 'INSERT') {

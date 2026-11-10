@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
 import { useSavedProducts } from '@/hooks/useSavedProducts';
 import { SaveProductButton } from '@/components/SaveProductButton';
+import { ProductImage } from '@/components/ProductImage';
 
 export default function Saved() {
   const { legacyProducts: products } = useApp();

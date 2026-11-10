@@ -7,6 +7,7 @@ import { PublicLayout } from "@/components/PublicLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { NotificationManager } from "@/components/NotificationManager";
 import { SupportChatWidget } from "@/components/SupportChatWidget";
+import { ImageStandardizerIndicator } from "@/components/ImageStandardizerIndicator";
 import { Toaster } from "@/components/ui/toaster";
 
 import Home from "./pages/Home";
@@ -47,6 +48,7 @@ function AppContent() {
       {/* Toaster renderizado aqui dentro do BrowserRouter para evitar conflitos de hooks */}
       <Toaster />
       <SupportChatWidget />
+      <ImageStandardizerIndicator />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<PasswordReset />} />

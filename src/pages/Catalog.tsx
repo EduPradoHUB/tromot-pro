@@ -17,6 +17,7 @@ import {
 import { useApp } from '@/contexts/AppContext';
 import { categories, brands } from '@/lib/data';
 import { PWAInstallButtonSimple } from '@/components/PWAInstallButtonSimple';
+import { ProductImage } from '@/components/ProductImage';
 import { supabase } from '@/integrations/supabase/client';
 import { SaveProductButton } from '@/components/SaveProductButton';
 

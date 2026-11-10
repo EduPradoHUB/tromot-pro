@@ -15,6 +15,7 @@ import { BannerCarousel } from '@/components/BannerCarousel';
 import { toast } from '@/hooks/use-toast';
 import { usePWA } from '@/hooks/usePWA';
 import SoroEmbed from '@/components/SoroEmbed';
+import { ProductImage } from '@/components/ProductImage';
 import { trackBlogEvent } from '@/lib/blogAnalytics';
 
 export default function Home() {
