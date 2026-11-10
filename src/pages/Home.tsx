@@ -231,7 +231,7 @@ export default function Home() {
       </section>
 
       {/* Admin Banners Carousel Section */}
-      {banners.length > 0 && (
+      {getEditableContent('banner-carousel')?.visible !== false && banners.length > 0 && (
         <BannerCarousel banners={banners} />
       )}
 
@@ -278,6 +278,7 @@ export default function Home() {
       )}
 
       {/* Blog em destaque - artigo mais recente */}
+      {getEditableContent('blog')?.visible !== false && (
       <section className="container mt-12">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -316,6 +317,7 @@ export default function Home() {
           </CardContent>
         </Card>
       </section>
+      )}
 
       {/* Latest Products Carousel */}
       <section className="container mt-12">
