@@ -16,7 +16,7 @@ const MIME_BY_FORMAT = {
 export const normalizeProductCode = (code: string) =>
   code
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toUpperCase()
     .trim()
     .replace(/[^A-Z0-9]+/g, '-')
