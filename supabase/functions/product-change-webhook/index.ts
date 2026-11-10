@@ -27,7 +27,7 @@ import { sendProductNotification } from '../_shared/productEmail.ts'
 // Colunas que, se mudarem, contam como "produto alterado" pro cliente.
 // Mudanças em campos só-internos (rating, barcode, timestamps etc.) não
 // disparam notificação.
-const RELEVANT_FIELDS = ['name', 'description', 'category', 'image_url', 'compatibility', 'store_url']
+const RELEVANT_FIELDS = ['name', 'description', 'category', 'image_url', 'image_updated_at', 'compatibility', 'store_url']
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {

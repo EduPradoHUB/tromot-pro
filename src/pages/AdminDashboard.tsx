@@ -107,7 +107,9 @@ export default function AdminDashboard() {
     video_url: productForm.video_url?.trim() || null,
     store_url: productForm.store_url?.trim() || null,
     compatibility: parseCompatibilityForm(productForm.compatibility),
-    no_manual_available: productForm.manual_url?.trim() ? false : productForm.no_manual_available
+    no_manual_available: productForm.manual_url?.trim() ? false : productForm.no_manual_available,
+    // Só grava quando uma foto foi enviada nesta sessão; senão o campo fica intacto
+    image_updated_at: imageVersion ?? undefined
   });
   
   const [bannerForm, setBannerForm] = useState({
@@ -168,7 +170,21 @@ export default function AdminDashboard() {
     try { return (sessionStorage.getItem('admin.dialogContent') as any) || null; } catch { return null; }
   });
   const [uploadingFile, setUploadingFile] = useState(false);
-  const [imageVersion, setImageVersion] = useState<string | null>(null);
+  const [imageVersion, setImageVersion] = useState<string | null>(() => {
+    try { return sessionStorage.getItem('admin.imageVersion'); } catch { return null; }
+  });
+
+  // Marca a troca de foto: vira products.image_updated_at no salvamento e fura o cache do navegador
+  const clearImageVersion = () => {
+    setImageVersion(null);
+    try { sessionStorage.removeItem('admin.imageVersion'); } catch {}
+  };
+  useEffect(() => {
+    try {
+      if (imageVersion) sessionStorage.setItem('admin.imageVersion', imageVersion);
+      else sessionStorage.removeItem('admin.imageVersion');
+    } catch {}
+  }, [imageVersion]);
 
   // Persistir estado do dialog para sobreviver à suspensão da aba no mobile
   useEffect(() => {
@@ -453,6 +469,7 @@ export default function AdminDashboard() {
     setDialogOpen(false);
     setEditingProduct(null);
     setEditingProductId(null);
+    clearImageVersion();
     setEditingCategory(null);
     setEditingVehicle(null);
     setEditingAdvertisement(null);
@@ -857,6 +874,7 @@ export default function AdminDashboard() {
               setEditingProduct(null);
               setEditingProductId(null);
               setProductForm(defaultProductForm);
+              clearImageVersion();
               openDialog('product');
             }}>
               <Plus className="w-4 h-4 mr-2" />
