@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Link2, Download, Loader2 } from 'lucide-react';
 import { normalizeProductCode, convertToJpeg } from '@/lib/productImage';
 
@@ -67,10 +67,9 @@ export const StandardizeImageLinks = ({ onDone }: { onDone?: () => void }) => {
   };
 
   return (
+    <>
+    <Button variant="outline" onClick={() => setOpen(true)}><Link2 className="w-4 h-4 mr-2" />Padronizar links das imagens</Button>
     <Dialog open={open} onOpenChange={o => { if (!running) setOpen(o); }}>
-      <DialogTrigger asChild>
-        <Button variant="outline"><Link2 className="w-4 h-4 mr-2" />Padronizar links das imagens</Button>
-      </DialogTrigger>
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader><DialogTitle>Padronizar links das imagens</DialogTitle></DialogHeader>
         <p className="text-sm text-muted-foreground">Cada foto será convertida para JPG e salva com link fixo pelo código do produto. Os arquivos antigos não serão apagados.</p>
@@ -98,5 +97,6 @@ export const StandardizeImageLinks = ({ onDone }: { onDone?: () => void }) => {
         </Button>
       </DialogContent>
     </Dialog>
+    </>
   );
 };
