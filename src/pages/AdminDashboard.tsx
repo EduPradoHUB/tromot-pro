@@ -168,6 +168,7 @@ export default function AdminDashboard() {
     try { return (sessionStorage.getItem('admin.dialogContent') as any) || null; } catch { return null; }
   });
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [imageVersion, setImageVersion] = useState<string | null>(null);
 
   // Persistir estado do dialog para sobreviver à suspensão da aba no mobile
   useEffect(() => {
@@ -334,8 +335,6 @@ export default function AdminDashboard() {
       </div>
     );
   }
-
-  const [imageVersion, setImageVersion] = useState<string | null>(null);
 
   const handleFileUpload = async (file: File, bucket: string) => {
     setUploadingFile(true);
