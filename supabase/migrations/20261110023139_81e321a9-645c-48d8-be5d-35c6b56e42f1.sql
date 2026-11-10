@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS image_standardize_batch boolean NOT NULL DEFAULT false;

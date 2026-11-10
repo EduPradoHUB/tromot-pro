@@ -797,6 +797,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          image_standardize_batch: boolean
           image_updated_at: string | null
           image_url: string | null
           manual_type: string | null
@@ -819,6 +820,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_standardize_batch?: boolean
           image_updated_at?: string | null
           image_url?: string | null
           manual_type?: string | null
@@ -841,6 +843,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_standardize_batch?: boolean
           image_updated_at?: string | null
           image_url?: string | null
           manual_type?: string | null
