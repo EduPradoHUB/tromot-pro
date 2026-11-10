@@ -317,6 +317,7 @@ export default function Home() {
           </CardContent>
         </Card>
       </section>
+      )}
 
       {/* Latest Products Carousel */}
       <section className="container mt-12">
