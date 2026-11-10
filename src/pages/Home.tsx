@@ -336,10 +336,10 @@ export default function Home() {
             <Card key={product.id} className="shadow-card hover:shadow-lg transition-shadow">
               <CardContent className="p-0">
                 <div className="aspect-[4/3] relative overflow-hidden rounded-t-2xl">
-                  <img 
-                    src={product.image_url || '/src/assets/photo-unavailable.png'} 
-                    alt={product.name} 
-                    className="w-full h-full object-contain bg-muted/30" 
+                  <ProductImage
+                    src={product.image_url}
+                    alt={product.name}
+                    className="w-full h-full object-contain bg-muted/30"
                   />
                   <div className="absolute top-3 right-3">
                     <Badge variant="secondary" className="bg-background/90">
